@@ -4,7 +4,7 @@ package com.chinadaas.common.utils;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.ChainEntity;
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,15 +85,11 @@ public abstract class AssistantUtils {
         return type;
     }
 
-    public static ChainEntity modelTransferToEntity(SuperCorporationModel superCorporationModel) {
+    public static ChainEntity modelTransferToEntity(ChainModel chainModel) {
 
-        ModelStatus resultStatus;
-        NodeWrapper sourceNode;
-        NodeWrapper targetNode;
-
-        resultStatus = superCorporationModel.getResultStatus();
-        sourceNode = superCorporationModel.getSourceNode();
-        targetNode = superCorporationModel.getTargetNode();
+        ModelStatus resultStatus = chainModel.getResultStatus();
+        NodeWrapper sourceNode = chainModel.getSourceNode();
+        NodeWrapper targetNode = chainModel.getTargetNode();
 
         ChainEntity chainEntity = new ChainEntity();
         chainEntity.setSourceEntId(sourceNode.getEntId());

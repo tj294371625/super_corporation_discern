@@ -1,8 +1,7 @@
 package com.chinadaas.repository.impl;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
-import com.chinadaas.component.mapper.base.Mapper;
-import com.chinadaas.component.template.Neo4jTemplate;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
@@ -60,9 +59,10 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public ChainEntity chainQuery(String entId) {
+    public ChainEntity chainQuery(String entId, ModelType modelType) {
         Query condition = new Query(Criteria.where(SOURCE_ENT_ID).is(entId));
-        return mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN_PARENT);
+        String collectionName = selectCollectionName(modelType);
+        return mongoTemplate.findOne(condition, ChainEntity.class, collectionName);
     }
 
     @Override
@@ -80,46 +80,28 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public void chainFix(String parentId, String parentName, List<String> sourceEntIds) {
+    public void chainFix(String parentId, String parentName, List<String> sourceEntIds, ModelType modelType) {
         Query matchCondition = new Query(Criteria.where(SOURCE_ENT_ID).in(sourceEntIds));
         Update update = new Update()
                 .set(GROUP_ENT_ID, parentId)
                 .set(GROUP_NAME, parentName);
-        mongoTemplate.updateMulti(matchCondition, update, SC_CHAIN_PARENT);
+        String collectionName = selectCollectionName(modelType);
+        mongoTemplate.updateMulti(matchCondition, update, collectionName);
     }
 
     @Override
-    public void parentChainPersistence(ChainEntity chainEntity) {
+    public void chainPersistence(ChainEntity chainEntity, ModelType modelType) {
 
         synchronized (LOCK) {
             int index = 0;
             while (index < 3) {
                 try {
-                    mongoTemplate.insert(chainEntity, SC_CHAIN_PARENT);
+                    String collectionName = selectCollectionName(modelType);
+                    mongoTemplate.insert(chainEntity, collectionName);
                     break;
                 } catch (Exception e) {
                     index++;
-                    log.warn("ChainOperationRepositoryImpl#parentChainPersistence insert fail, " +
-                            "try insert count: [{}]", index, e);
-                    Assert.isFalse(3 == index, "");
-                }
-            }
-        }
-
-    }
-
-    @Override
-    public void finCtrlChainPersistence(ChainEntity chainEntity) {
-
-        synchronized (LOCK) {
-            int index = 0;
-            while (index < 3) {
-                try {
-                    mongoTemplate.insert(chainEntity, SC_CHAIN_FINCTRL);
-                    break;
-                } catch (Exception e) {
-                    index++;
-                    log.warn("ChainOperationRepositoryImpl#finCtrlChainPersistence insert fail, " +
+                    log.warn("ChainOperationRepositoryImpl#chainPersistence insert fail, " +
                             "try insert count: [{}]", index, e);
                     Assert.isFalse(3 == index, "");
                 }
@@ -187,6 +169,17 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     private List<List<String>> batchProcess(Set<String> entIds) {
         final int BATCH_SIZE = 1_000;
         return Lists.partition(new ArrayList<>(entIds), BATCH_SIZE);
+    }
+
+    private String selectCollectionName(ModelType modelType) {
+        // zs: 违反ocp
+        if (ModelType.FIN_CTRL.equals(modelType)) {
+            return SC_CHAIN_FINCTRL;
+        } else if (ModelType.PARENT.equals(modelType)) {
+            return SC_CHAIN_PARENT;
+        } else {
+            throw new IllegalArgumentException("input a illegal modelType");
+        }
     }
 
 }

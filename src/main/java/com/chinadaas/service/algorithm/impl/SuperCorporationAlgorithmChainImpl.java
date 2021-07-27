@@ -1,7 +1,7 @@
 package com.chinadaas.service.algorithm.impl;
 
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithmChain;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -29,16 +29,16 @@ public class SuperCorporationAlgorithmChainImpl implements SuperCorporationAlgor
     }
 
     @Override
-    public SuperCorporationModel discernSpecialNode(String entId, ModelType modelType) {
-        SuperCorporationModel superCorporationModel = new SuperCorporationModel(entId, modelType);
+    public ChainModel discernSpecialTypeChain(String entId, ModelType modelType) {
+        ChainModel chainModel = new ChainModel(entId, modelType);
 
         // 职责链
         for (SuperCorporationAlgorithm superCorporationAlgorithm : superCorporationAlgorithms) {
-            if (BooleanUtils.isFalse(superCorporationAlgorithm.calculation(superCorporationModel))) {
+            if (BooleanUtils.isFalse(superCorporationAlgorithm.calculation(chainModel))) {
                 break;
             }
         }
 
-        return superCorporationModel;
+        return chainModel;
     }
 }

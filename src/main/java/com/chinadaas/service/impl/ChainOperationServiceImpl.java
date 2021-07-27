@@ -1,5 +1,6 @@
 package com.chinadaas.service.impl;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
 import com.chinadaas.common.utils.CircularPathHandler;
 import com.chinadaas.common.utils.RecordHandler;
@@ -37,10 +38,10 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public void recursiveChainFix(String entId) {
-        ChainEntity chainEntity = repository.chainQuery(entId);
-        Assert.nonNull(chainEntity, "ChainFixServiceImpl#recursiveFix " +
-                "call ChainFixRepository#recursiveQueryParent, entId: [{}] not found in mongodb.", entId);
+    public void recursiveChainFix(String entId, ModelType modelType) {
+        ChainEntity chainEntity = repository.chainQuery(entId, modelType);
+        Assert.nonNull(chainEntity, "ChainOperationService#recursiveChainFix " +
+                "call ChainOperationRepository#chainQuery, entId: [{}] not found in mongodb.", entId);
 
         // 首次查询获得的结果无法穿透，则return
         if (parentIdUnknown(chainEntity)) {
@@ -50,17 +51,12 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         CircularPathHandler snapshotHandler = CircularPathHandler.newInstance();
         snapshotHandler.circularCheck(entId);
 
-        recursiveChainFix(chainEntity, snapshotHandler);
+        recursiveChainFix(chainEntity, snapshotHandler, modelType);
     }
 
     @Override
-    public void parentChainPersistence(ChainEntity chainEntity) {
-        repository.parentChainPersistence(chainEntity);
-    }
-
-    @Override
-    public void finCtrlChainPersistence(ChainEntity chainEntity) {
-        repository.finCtrlChainPersistence(chainEntity);
+    public void chainPersistence(ChainEntity chainEntity, ModelType modelType) {
+        repository.chainPersistence(chainEntity, modelType);
     }
 
     @Override
@@ -89,8 +85,8 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public ChainEntity chainQuery(String entId) {
-        return repository.chainQuery(entId);
+    public ChainEntity chainQuery(String entId, ModelType modelType) {
+        return repository.chainQuery(entId, modelType);
     }
 
     @Override
@@ -103,20 +99,20 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         return repository.queryFinCtrlEntIds();
     }
 
-    private void recursiveChainFix(ChainEntity chainEntity, CircularPathHandler snapshotHandler) {
+    private void recursiveChainFix(ChainEntity chainEntity, CircularPathHandler snapshotHandler, ModelType modelType) {
 
         while (parentIdKnown(chainEntity)) {
             final String preTargetEntId = chainEntity.getTargetEntId();
             final String preTargetName = chainEntity.getTargetName();
-            chainEntity = repository.chainQuery(preTargetEntId);
+            chainEntity = repository.chainQuery(preTargetEntId, modelType);
 
-            // zs: 解决目标节点不存在于SC_CHAIN_PARENT的问题（名单中没有提供）
+            // zs: 解决目标节点不存在于SC_CHAIN_*的问题（名单中未提供）
             if (Objects.isNull(chainEntity)) {
                 List<String> chainEntIds = snapshotHandler.obtainChain(preTargetEntId);
                 ChainEntity targetEntity = new ChainEntity();
                 targetEntity.setSourceEntId(preTargetEntId);
                 targetEntity.setSourceName(preTargetName);
-                doRecursiveChainFix(targetEntity, chainEntIds);
+                doRecursiveChainFix(targetEntity, chainEntIds, modelType);
                 return;
             }
 
@@ -128,14 +124,15 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         }
 
         List<String> chainEntIds = snapshotHandler.obtainChain(chainEntity.getSourceEntId());
-        doRecursiveChainFix(chainEntity, chainEntIds);
+        doRecursiveChainFix(chainEntity, chainEntIds, modelType);
     }
 
-    private void doRecursiveChainFix(ChainEntity parentEntity, List<String> sourceEntIds) {
+    private void doRecursiveChainFix(ChainEntity parentEntity, List<String> sourceEntIds, ModelType modelType) {
         repository.chainFix(
                 parentEntity.getSourceEntId(),
                 parentEntity.getSourceName(),
-                sourceEntIds
+                sourceEntIds,
+                modelType
         );
     }
 

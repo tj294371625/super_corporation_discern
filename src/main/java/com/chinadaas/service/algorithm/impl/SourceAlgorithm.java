@@ -1,7 +1,7 @@
 package com.chinadaas.service.algorithm.impl;
 
 import com.chinadaas.entity.SourceEntity;
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 import com.chinadaas.repository.NodeOperationRepository;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,9 @@ public class SourceAlgorithm implements SuperCorporationAlgorithm {
     }
 
     @Override
-    public boolean calculation(SuperCorporationModel superCorporationModel) {
-        SourceEntity sourceEntity = repository.findSourceNode(superCorporationModel.getCurrentQueryId());
-        return superCorporationModel.recordSourceResult(sourceEntity);
+    public boolean calculation(ChainModel chainModel) {
+        SourceEntity sourceEntity = repository.findSourceNode(chainModel.getCurrentQueryId());
+        return chainModel.recordSourceResult(sourceEntity);
     }
 
 }

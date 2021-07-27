@@ -6,7 +6,7 @@ import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.io.EntIdListHolder;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
-import com.chinadaas.task.FullTask;
+import com.chinadaas.task.Task;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +32,11 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
 
-    private final List<FullTask> fullTasks;
+    private final List<Task> fullTasks;
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public DiscernFullDataServiceImpl(List<FullTask> fullTasks,
+    public DiscernFullDataServiceImpl(List<Task> fullTasks,
                                       EntIdListLoader entIdListLoader,
                                       EntIdListHolder entIdListHolder,
                                       RecordHandler recordHandler,
@@ -50,7 +50,7 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     }
 
     @Override
-    protected void init() {
+    protected void preDoDiscern() {
         // 全量跑数之前，清空SC_CHAIN表
         if (mongoTemplate.collectionExists(SC_CHAIN_PARENT)) {
             mongoTemplate.dropCollection(SC_CHAIN_PARENT);
@@ -66,7 +66,7 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
         log.info("main task run start...");
         long startTime = TimeUtils.startTime();
 
-        for (FullTask fullTask : fullTasks) {
+        for (Task fullTask : fullTasks) {
             fullTask.run();
         }
 

@@ -1,6 +1,6 @@
 package com.chinadaas.service.algorithm;
 
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 
 /**
  * @author lawliet
@@ -11,10 +11,10 @@ import com.chinadaas.model.SuperCorporationModel;
 public interface SuperCorporationAlgorithm {
 
     /**
-     * 计算获得指定模型
+     * 计算获得链路模型
      *
-     * @param superCorporationModel
+     * @param chainModel
      * @return
      */
-    boolean calculation(SuperCorporationModel superCorporationModel);
+    boolean calculation(ChainModel chainModel);
 }

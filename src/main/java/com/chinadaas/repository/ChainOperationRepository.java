@@ -1,5 +1,6 @@
 package com.chinadaas.repository;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.entity.ChainEntity;
 
 import java.util.List;
@@ -17,9 +18,10 @@ public interface ChainOperationRepository {
      * 链路查询
      *
      * @param entId
+     * @param modelType
      * @return
      */
-    ChainEntity chainQuery(String entId);
+    ChainEntity chainQuery(String entId, ModelType modelType);
 
     /**
      * 链路批量查询
@@ -35,22 +37,17 @@ public interface ChainOperationRepository {
      * @param parentId
      * @param parentName
      * @param sourceEntIds
+     * @param modelType
      */
-    void chainFix(String parentId, String parentName, List<String> sourceEntIds);
+    void chainFix(String parentId, String parentName, List<String> sourceEntIds, ModelType modelType);
 
     /**
-     * 链路持久化（母公司）
+     * 持久化链路（母公司 or 最终控股股东）
      *
      * @param chainEntity
+     * @param modelType
      */
-    void parentChainPersistence(ChainEntity chainEntity);
-
-    /**
-     * 链路持久化（母公司）
-     *
-     * @param chainEntity
-     */
-    void finCtrlChainPersistence(ChainEntity chainEntity);
+    void chainPersistence(ChainEntity chainEntity, ModelType modelType);
 
     /**
      * 链路批量删除

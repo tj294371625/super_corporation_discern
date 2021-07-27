@@ -22,21 +22,13 @@ public interface NodeOperationRepository {
     SourceEntity findSourceNode(String entId);
 
     /**
-     * 识别决策权点（母公司）
+     * 识别决策权点（母公司 or 最终控股股东）
      *
      * @param entId
      * @param modelType
      * @return
      */
     List<DecisionEntity> findDecisionNode(String entId, ModelType modelType);
-
-    /**
-     * 识别决策权点（最终控股股东）
-     *
-     * @param entId
-     * @return
-     */
-    List<DecisionEntity> findDecisionNodeOfFinCtrl(String entId);
 
     /**
      * 识别单一大股东点

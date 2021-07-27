@@ -11,11 +11,11 @@ import java.util.Objects;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 母公司模型
+ * @description 链路模型
  * @createTime 2021.07.13
  */
 @Slf4j
-public class SuperCorporationModel {
+public class ChainModel {
 
     /**
      * 当前queryId
@@ -42,8 +42,9 @@ public class SuperCorporationModel {
      */
     private NodeWrapper sourceNode;
 
-    public SuperCorporationModel(String currentQueryId,
-                                 ModelType modelType) {
+    public ChainModel(String currentQueryId,
+                      ModelType modelType) {
+
         this.currentQueryId = currentQueryId;
         this.businessType = modelType;
         this.resultStatus = ModelStatus.NO_RESULT;
@@ -63,13 +64,8 @@ public class SuperCorporationModel {
     public boolean recordDecisionResult(DecisionModel decisionModel, ModelType businessType) {
 
         if (ModelStatus.NO_RESULT.equals(decisionModel.getResultStatus())) {
-
-            // zs: 最终控股股东不需要修正，直接返回
-            if (ModelType.FIN_CTRL.equals(businessType)) {
-                return false;
-            }
-            return true;
-
+            // zs: 最终控股股东不需要修正，结束责任链执行
+            return !ModelType.FIN_CTRL.equals(businessType);
         }
 
         this.resultStatus = ModelStatus.COMPLETE_RESULT;

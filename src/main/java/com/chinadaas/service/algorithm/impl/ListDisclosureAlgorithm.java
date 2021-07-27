@@ -2,7 +2,7 @@ package com.chinadaas.service.algorithm.impl;
 
 import com.chinadaas.entity.ListDisclosureEntity;
 import com.chinadaas.model.ListDisclosureModel;
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 import com.chinadaas.repository.NodeOperationRepository;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +27,9 @@ public class ListDisclosureAlgorithm implements SuperCorporationAlgorithm {
     }
 
     @Override
-    public boolean calculation(SuperCorporationModel superCorporationModel) {
-        ListDisclosureEntity listDisclosureEntity = repository.findListDisclosureNode(superCorporationModel.getCurrentQueryId());
+    public boolean calculation(ChainModel chainModel) {
+        ListDisclosureEntity listDisclosureEntity = repository.findListDisclosureNode(chainModel.getCurrentQueryId());
         ListDisclosureModel listDisclosureModel = new ListDisclosureModel().convertResult(listDisclosureEntity);
-        return superCorporationModel.recordListDisclosureResult(listDisclosureModel);
+        return chainModel.recordListDisclosureResult(listDisclosureModel);
     }
 }

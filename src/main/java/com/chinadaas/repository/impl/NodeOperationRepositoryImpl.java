@@ -95,7 +95,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
         Map<String, Object> params = Maps.newHashMap();
         params.put(ENT_ID, entId);
 
-        String cypher = createSpecialCypher(modelType);
+        String cypher = createCypherWithSpecialType(modelType);
 
         List<Map<String, Object>> tempResultList = Lists.newArrayList();
         try {
@@ -105,41 +105,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
 
             long spendTime = TimeUtils.endTime(startTime);
             if (spendTime > 100L) {
-                log.warn("NodeOperationRepositoryImpl#findDecisionNodeOfParent method " +
-                        "entId: [{}], slow query spend time: [{}ms]", entId, spendTime);
-            }
-        } catch (QueryNeo4jTimeOutException e) {
-            recordHandler.recordTimeOut(entId);
-        }
-
-        Map<String, Object> tempResult = tempResultList.get(0);
-        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
-
-        List<DecisionEntity> decisionEntities = Lists.newArrayList();
-        for (Map<String, Object> info : moreInfo) {
-            DecisionEntity decisionEntity = mapper.getBean(info, DecisionEntity.class);
-            decisionEntities.add(decisionEntity);
-        }
-        return decisionEntities;
-    }
-
-    @Override
-    public List<DecisionEntity> findDecisionNodeOfFinCtrl(String entId) {
-        Map<String, Object> params = Maps.newHashMap();
-        params.put(ENT_ID, entId);
-
-        final String CYPHER_PATH = "cypher/findDecisionNodeOfFinCtrl.cql";
-        String cypher = CypherBuilderFactory.getCypherBuilder(CYPHER_PATH).build();
-
-        List<Map<String, Object>> tempResultList = Lists.newArrayList();
-        try {
-            long startTime = TimeUtils.startTime();
-
-            tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
-
-            long spendTime = TimeUtils.endTime(startTime);
-            if (spendTime > 100L) {
-                log.warn("NodeOperationRepositoryImpl#findDecisionNodeOfFinCtrl method " +
+                log.warn("NodeOperationRepositoryImpl#findDecisionNode method " +
                         "entId: [{}], slow query spend time: [{}ms]", entId, spendTime);
             }
         } catch (QueryNeo4jTimeOutException e) {
@@ -247,10 +213,11 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     }
 
 
-    private String createSpecialCypher(ModelType modelType) {
+    private String createCypherWithSpecialType(ModelType modelType) {
 
         final String CYPHER_PATH;
 
+        // zs: 违反ocp
         if (ModelType.FIN_CTRL.equals(modelType)) {
             CYPHER_PATH = "cypher/findDecisionNodeOfFinCtrl.cql";
         } else if (ModelType.PARENT.equals(modelType)) {

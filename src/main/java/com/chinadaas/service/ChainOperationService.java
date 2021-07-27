@@ -1,5 +1,6 @@
 package com.chinadaas.service;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.entity.ChainEntity;
 
 import java.util.Set;
@@ -16,22 +17,17 @@ public interface ChainOperationService {
      * 递归修复链路
      *
      * @param entId
+     * @param finCtrl
      */
-    void recursiveChainFix(String entId);
+    void recursiveChainFix(String entId, ModelType finCtrl);
 
     /**
-     * 持久化链路（母公司）
+     * 持久化链路（母公司 or 最终控股股东）
      *
      * @param chainEntity
+     * @param modelType
      */
-    void parentChainPersistence(ChainEntity chainEntity);
-
-    /**
-     * 持久化链路（最终控股股东）
-     *
-     * @param chainEntity
-     */
-    void finCtrlChainPersistence(ChainEntity chainEntity);
+    void chainPersistence(ChainEntity chainEntity, ModelType modelType);
 
     void chainBatchDelete(Set<String> entIds);
 
@@ -47,9 +43,10 @@ public interface ChainOperationService {
      * 链路查询
      *
      * @param entId
+     * @param parent
      * @return
      */
-    ChainEntity chainQuery(String entId);
+    ChainEntity chainQuery(String entId, ModelType parent);
 
     /**
      * 获取全部source entId

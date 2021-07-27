@@ -22,16 +22,20 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
     protected RecordHandler recordHandler;
 
     public void discernSuperCorporation() {
-        preHandle();
 
-        init();
+        lockResouce();
+
+        preDoDiscern();
 
         doDiscern();
 
-        postHandle();
+        postDoDiscern();
+
+        releaseResource();
+
     }
 
-    protected void preHandle() {
+    protected void lockResouce() {
         if (BooleanUtils.isFalse(entIdListLoader.lock())) {
             throw new IllegalStateException("data processing, please do not repeat call");
         }
@@ -39,16 +43,20 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
         entIdListLoader.loadEntIdList(resourcePath);
     }
 
-    protected void init() {
-        // subclass do something
+    protected void preDoDiscern() {
+        // subclass do something here
+    }
+
+    protected void postDoDiscern() {
+        // subclass do something here
     }
 
     protected abstract void doDiscern();
 
-    protected void postHandle() {
+    protected void releaseResource() {
         entIdListHolder.clear();
-        recordHandler.clearMissRecords();
         recordHandler.clearAUTypeIncr();
+        recordHandler.clearDelTypeIncr();
 
         entIdListLoader.unlock();
     }

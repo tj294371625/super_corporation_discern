@@ -1,12 +1,13 @@
 package com.chinadaas.task.impl;
 
 import com.chinadaas.common.constant.ModelStatus;
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.executor.Executor;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.ChainEntity;
-import com.chinadaas.model.SuperCorporationModel;
+import com.chinadaas.model.ChainModel;
 import com.chinadaas.service.ChainOperationService;
 import com.chinadaas.service.NodeOperationService;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithmChain;
@@ -69,8 +70,9 @@ public class IncrListScreenTask implements IncrTask {
             }
 
             // 2 判断当前在营企业是否发生了股权变化
-            SuperCorporationModel superCorporationModel = superCorporationAlgorithmChain.discernSpecialNode(entId);
-            ChainEntity chainEntity = chainOperationService.chainQuery(entId);
+            ChainModel chainModel
+                    = superCorporationAlgorithmChain.discernSpecialTypeChain(entId, ModelType.PARENT);
+            ChainEntity chainEntity = chainOperationService.chainQuery(entId, ModelType.PARENT);
 
             // 2.1 如果链路表中不存在该在营企业，则说明是新增的点，记录
             if (Objects.isNull(chainEntity)) {
@@ -80,7 +82,7 @@ public class IncrListScreenTask implements IncrTask {
 
             // 2.2 neo4j及链路表中存在该在营企业
             // 2.2.1 未发生变化，返回
-            if (notChange(chainEntity, superCorporationModel)) {
+            if (notChange(chainEntity, chainModel)) {
                 return;
             }
 
@@ -99,14 +101,14 @@ public class IncrListScreenTask implements IncrTask {
      * true表示未发生变化
      *
      * @param chainEntity
-     * @param superCorporationModel
+     * @param chainModel
      * @return
      */
-    private boolean notChange(ChainEntity chainEntity, SuperCorporationModel superCorporationModel) {
+    private boolean notChange(ChainEntity chainEntity, ChainModel chainModel) {
         String targetEntId = chainEntity.getTargetEntId();
-        NodeWrapper parentNode = superCorporationModel.getTargetNode();
+        NodeWrapper parentNode = chainModel.getTargetNode();
 
-        if (ModelStatus.SOURCE_ONLY.equals(superCorporationModel.getResultStatus())) {
+        if (ModelStatus.SOURCE_ONLY.equals(chainModel.getResultStatus())) {
             final String UNKNOWN_ID = "-1";
             return UNKNOWN_ID.equals(targetEntId);
         }
