@@ -1,0 +1,24 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://192.168.100.44:27017/test
+
+db:
+  neo4j:
+    user: neo4j
+    password: chinadaas2017
+    url: bolt://192.168.100.89:7687
+  mongodb:
+    chainCollection: SC_CHAIN_DEV
+    singleCollection: MODEL_PARENT_SINGLE
+
+data:
+  filename:
+    incr: incr_record.csv
+    timeout: timeout_record.csv
+    circular: circular_record.csv
+  path:
+    incr: /Users/chinadaas/data/test/incr
+    source: /Users/chinadaas/data/test/source
+    timeout: /Users/chinadaas/data/test/timeout
+    circular: /Users/chinadaas/data/test/circular

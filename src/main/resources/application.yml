@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: super_corporation_discern
+
+server:
+  port: 17173
+
+annotation:
+  package:
+    path: com.chinadaas.component.mapper.annotation
