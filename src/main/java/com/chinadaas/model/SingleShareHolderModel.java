@@ -7,7 +7,7 @@ import com.chinadaas.entity.SingleShareHolderEntity;
 import java.util.Objects;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 单一大股东模型
  * @createTime 2021.07.13

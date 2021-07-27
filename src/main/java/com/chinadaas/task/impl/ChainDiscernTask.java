@@ -1,12 +1,13 @@
 package com.chinadaas.task.impl;
 
 import com.chinadaas.common.constant.ModelStatus;
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.AssistantUtils;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.executor.Executor;
-import com.chinadaas.model.ParentModel;
+import com.chinadaas.model.SuperCorporationModel;
 import com.chinadaas.service.ChainOperationService;
-import com.chinadaas.service.algorithm.parent.ParentAlgorithmChain;
+import com.chinadaas.service.algorithm.SuperCorporationAlgorithmChain;
 import com.chinadaas.task.FullTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Consumer;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 链路识别
  * @createTime 2021.07.20
@@ -27,15 +28,15 @@ import java.util.function.Consumer;
 public class ChainDiscernTask implements FullTask {
 
     private final Executor executor;
-    private final ParentAlgorithmChain parentAlgorithmChain;
+    private final SuperCorporationAlgorithmChain superCorporationAlgorithmChain;
     private final ChainOperationService chainOperationService;
 
     public ChainDiscernTask(@Qualifier("parallelExecutor") Executor executor,
-                            ParentAlgorithmChain parentAlgorithmChain,
+                            SuperCorporationAlgorithmChain superCorporationAlgorithmChain,
                             ChainOperationService chainOperationService) {
 
         this.executor = executor;
-        this.parentAlgorithmChain = parentAlgorithmChain;
+        this.superCorporationAlgorithmChain = superCorporationAlgorithmChain;
         this.chainOperationService = chainOperationService;
     }
 
@@ -46,13 +47,13 @@ public class ChainDiscernTask implements FullTask {
 
         final Consumer<String> chainDiscernTask = (entId) -> {
 
-            ParentModel parentModel = parentAlgorithmChain.discernParentNode(entId);
-            if (ModelStatus.NO_RESULT.equals(parentModel.getResultStatus())) {
+            SuperCorporationModel superCorporationModel = superCorporationAlgorithmChain.discernSpecialNode(entId, ModelType.PARENT);
+            if (ModelStatus.NO_RESULT.equals(superCorporationModel.getResultStatus())) {
                 return;
             }
 
             try {
-                chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntity(parentModel));
+                chainOperationService.parentChainPersistence(AssistantUtils.modelTransferToEntity(superCorporationModel));
             } catch (Exception e) {
                 log.warn("chain persistence fail, entId: [{}]", entId);
             }

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 全量数据识别服务
  * @createTime 2021.07.02
@@ -29,8 +29,8 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
 
     private static final String SOURCE_ENT_ID = "source_entid";
 
-    @Value("${db.mongodb.chainCollection}")
-    private String SC_CHAIN;
+    @Value("${db.mongodb.parentCollection}")
+    private String SC_CHAIN_PARENT;
 
     private final List<FullTask> fullTasks;
     private final MongoTemplate mongoTemplate;
@@ -52,13 +52,13 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     @Override
     protected void init() {
         // 全量跑数之前，清空SC_CHAIN表
-        if (mongoTemplate.collectionExists(SC_CHAIN)) {
-            mongoTemplate.dropCollection(SC_CHAIN);
+        if (mongoTemplate.collectionExists(SC_CHAIN_PARENT)) {
+            mongoTemplate.dropCollection(SC_CHAIN_PARENT);
         }
 
         DBObject bdo = new BasicDBObject();
         bdo.put(SOURCE_ENT_ID, 1);
-        mongoTemplate.createCollection(SC_CHAIN).createIndex(bdo);
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(bdo);
     }
 
     @Override

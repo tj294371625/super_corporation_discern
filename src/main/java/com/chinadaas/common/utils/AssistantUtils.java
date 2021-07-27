@@ -4,14 +4,14 @@ package com.chinadaas.common.utils;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.ChainEntity;
-import com.chinadaas.model.ParentModel;
+import com.chinadaas.model.SuperCorporationModel;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 辅助工具
  * @createTime 2021.07.01
@@ -85,20 +85,25 @@ public abstract class AssistantUtils {
         return type;
     }
 
-    public static ChainEntity modelTransferToEntity(ParentModel parentModel) {
-        ModelStatus resultStatus = parentModel.getResultStatus();
-        NodeWrapper sourceNode = parentModel.getSourceNode();
-        NodeWrapper parentNode = parentModel.getParentNode();
+    public static ChainEntity modelTransferToEntity(SuperCorporationModel superCorporationModel) {
+
+        ModelStatus resultStatus;
+        NodeWrapper sourceNode;
+        NodeWrapper targetNode;
+
+        resultStatus = superCorporationModel.getResultStatus();
+        sourceNode = superCorporationModel.getSourceNode();
+        targetNode = superCorporationModel.getTargetNode();
 
         ChainEntity chainEntity = new ChainEntity();
         chainEntity.setSourceEntId(sourceNode.getEntId());
         chainEntity.setSourceName(sourceNode.getEntName());
 
         if (ModelStatus.COMPLETE_RESULT.equals(resultStatus)) {
-            chainEntity.setTargetEntId(parentNode.getEntId());
-            chainEntity.setTargetName(parentNode.getEntName());
-            chainEntity.setGroupEntId(parentNode.getEntId());
-            chainEntity.setGroupName(parentNode.getEntName());
+            chainEntity.setTargetEntId(targetNode.getEntId());
+            chainEntity.setTargetName(targetNode.getEntName());
+            chainEntity.setGroupEntId(targetNode.getEntId());
+            chainEntity.setGroupName(targetNode.getEntName());
             return chainEntity;
         }
 

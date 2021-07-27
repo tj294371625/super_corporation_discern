@@ -1,6 +1,7 @@
 package com.chinadaas.model;
 
 import com.chinadaas.common.constant.ModelStatus;
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.SourceEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -8,13 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 母公司模型
  * @createTime 2021.07.13
  */
 @Slf4j
-public class ParentModel {
+public class SuperCorporationModel {
 
     /**
      * 当前queryId
@@ -22,22 +23,29 @@ public class ParentModel {
     private final String currentQueryId;
 
     /**
+     * 业务类型
+     */
+    private final ModelType businessType;
+
+    /**
      * 结果状态
      */
     private ModelStatus resultStatus;
 
     /**
-     * 母公司点
+     * 目标点（母公司 or 最终控股股东）
      */
-    private NodeWrapper parentNode;
+    private NodeWrapper targetNode;
 
     /**
      * 输入点
      */
     private NodeWrapper sourceNode;
 
-    public ParentModel(String currentQueryId) {
+    public SuperCorporationModel(String currentQueryId,
+                                 ModelType modelType) {
         this.currentQueryId = currentQueryId;
+        this.businessType = modelType;
         this.resultStatus = ModelStatus.NO_RESULT;
     }
 
@@ -52,19 +60,22 @@ public class ParentModel {
         return false;
     }
 
-    public boolean recordDecisionResult(DecisionModel decisionModel) {
+    public boolean recordDecisionResult(DecisionModel decisionModel, ModelType businessType) {
 
-        if (ModelStatus.NO_RESULT.equals(decisionModel.getResultStatus()))
+        if (ModelStatus.NO_RESULT.equals(decisionModel.getResultStatus())) {
+
+            // zs: 最终控股股东不需要修正，直接返回
+            if (ModelType.FIN_CTRL.equals(businessType)) {
+                return false;
+            }
             return true;
 
+        }
+
         this.resultStatus = ModelStatus.COMPLETE_RESULT;
-        this.parentNode = decisionModel.getDecisionNode();
+        this.targetNode = decisionModel.getDecisionNode();
         return false;
     }
-
-    /*
-    * 单一大股东和上市披露绑定执行，故返回结果永远为true
-    * */
 
     public boolean recordSingleShareHolder(SingleShareHolderModel singleShareHolderModel) {
 
@@ -72,7 +83,7 @@ public class ParentModel {
             return true;
 
         this.resultStatus = ModelStatus.COMPLETE_RESULT;
-        this.parentNode = singleShareHolderModel.getSingleShareHolderNode();
+        this.targetNode = singleShareHolderModel.getSingleShareHolderNode();
         return false;
     }
 
@@ -82,20 +93,24 @@ public class ParentModel {
             return true;
 
         this.resultStatus = ModelStatus.COMPLETE_RESULT;
-        this.parentNode = listDisclosureModel.getListDisclosureNode();
-        return true;
+        this.targetNode = listDisclosureModel.getListDisclosureNode();
+        return false;
     }
 
     public String getCurrentQueryId() {
         return currentQueryId;
     }
 
+    public ModelType getBusinessType() {
+        return businessType;
+    }
+
     public ModelStatus getResultStatus() {
         return resultStatus;
     }
 
-    public NodeWrapper getParentNode() {
-        return parentNode;
+    public NodeWrapper getTargetNode() {
+        return targetNode;
     }
 
     public NodeWrapper getSourceNode() {

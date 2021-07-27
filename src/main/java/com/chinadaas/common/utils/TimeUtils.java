@@ -1,7 +1,7 @@
 package com.chinadaas.common.utils;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 计时工具
  * @createTime 2021.07.13

@@ -9,7 +9,7 @@ db:
     password: chinadaas2017
     url: bolt://192.168.100.89:7687
   mongodb:
-    chainCollection: SC_CHAIN_DEV
+    parentCollection: SC_CHAIN_DEV
     singleCollection: MODEL_PARENT_SINGLE
 
 data:

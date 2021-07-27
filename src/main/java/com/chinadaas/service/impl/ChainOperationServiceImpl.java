@@ -13,10 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description
  * @createTime 2021.07.21
@@ -53,8 +54,13 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public void chainPersistence(ChainEntity chainEntity) {
-        repository.chainPersistence(chainEntity);
+    public void parentChainPersistence(ChainEntity chainEntity) {
+        repository.parentChainPersistence(chainEntity);
+    }
+
+    @Override
+    public void finCtrlChainPersistence(ChainEntity chainEntity) {
+        repository.finCtrlChainPersistence(chainEntity);
     }
 
     @Override
@@ -88,14 +94,32 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public Set<String> calNewEntIdList() {
-        return repository.calNewEntIdList();
+    public Set<String> fullSourceEntId() {
+        return repository.fullSourceEntId();
+    }
+
+    @Override
+    public Set<String> queryFinCtrlEntIds() {
+        return repository.queryFinCtrlEntIds();
     }
 
     private void recursiveChainFix(ChainEntity chainEntity, CircularPathHandler snapshotHandler) {
 
-        while (parentIdNotUnknown(chainEntity)) {
-            chainEntity = repository.chainQuery(chainEntity.getTargetEntId());
+        while (parentIdKnown(chainEntity)) {
+            final String preTargetEntId = chainEntity.getTargetEntId();
+            final String preTargetName = chainEntity.getTargetName();
+            chainEntity = repository.chainQuery(preTargetEntId);
+
+            // zs: 解决目标节点不存在于SC_CHAIN_PARENT的问题（名单中没有提供）
+            if (Objects.isNull(chainEntity)) {
+                List<String> chainEntIds = snapshotHandler.obtainChain(preTargetEntId);
+                ChainEntity targetEntity = new ChainEntity();
+                targetEntity.setSourceEntId(preTargetEntId);
+                targetEntity.setSourceName(preTargetName);
+                doRecursiveChainFix(targetEntity, chainEntIds);
+                return;
+            }
+
             if (snapshotHandler.circularCheck(chainEntity.getSourceEntId())) {
                 log.warn("discover circular path, please see circular_record.csv detail.");
                 recordHandler.recordCircular(snapshotHandler.obtainCircularPath());
@@ -120,7 +144,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         return UNKNOWN_ID.equals(chainEntity.getTargetEntId());
     }
 
-    private boolean parentIdNotUnknown(ChainEntity chainEntity) {
+    private boolean parentIdKnown(ChainEntity chainEntity) {
         return !parentIdUnknown(chainEntity);
     }
 }

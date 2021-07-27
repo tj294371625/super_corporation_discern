@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description neo4j查询结果映射模板
  * @createTime 2021.07.01

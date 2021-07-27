@@ -1,7 +1,7 @@
 package com.chinadaas.component.mapper.exception;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description Bean实例化异常
  * @createTime 2021.07.03

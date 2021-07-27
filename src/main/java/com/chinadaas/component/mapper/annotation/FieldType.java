@@ -3,7 +3,7 @@ package com.chinadaas.component.mapper.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 字段注解
  * @createTime 2021.07.01

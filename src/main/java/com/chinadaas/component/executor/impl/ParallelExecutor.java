@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 并行执行
  * @createTime 2021.07.01

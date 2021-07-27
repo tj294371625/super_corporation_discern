@@ -6,7 +6,7 @@ import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 链路实体
  * @createTime 2021.07.01

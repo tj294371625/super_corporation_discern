@@ -1,10 +1,11 @@
-package com.chinadaas.service.algorithm.parent.impl;
+package com.chinadaas.service.algorithm.impl;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.entity.DecisionEntity;
 import com.chinadaas.model.DecisionModel;
-import com.chinadaas.model.ParentModel;
+import com.chinadaas.model.SuperCorporationModel;
 import com.chinadaas.repository.NodeOperationRepository;
-import com.chinadaas.service.algorithm.parent.ParentAlgorithm;
+import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 决策权算法
  * @createTime 2021.07.13
@@ -21,7 +22,7 @@ import java.util.List;
 @Order(2)
 @Slf4j
 @Component
-public class DecisionAlgorithm implements ParentAlgorithm {
+public class DecisionAlgorithm implements SuperCorporationAlgorithm {
 
     private final NodeOperationRepository repository;
 
@@ -31,9 +32,11 @@ public class DecisionAlgorithm implements ParentAlgorithm {
     }
 
     @Override
-    public boolean calculation(ParentModel parentModel) {
-        List<DecisionEntity> decisionEntities = repository.findDecisionNode(parentModel.getCurrentQueryId());
+    public boolean calculation(SuperCorporationModel superCorporationModel) {
+        ModelType businessType = superCorporationModel.getBusinessType();
+        List<DecisionEntity> decisionEntities = repository.findDecisionNode(superCorporationModel.getCurrentQueryId(), businessType);
         DecisionModel decisionModel = new DecisionModel().screenMaxPropNode(decisionEntities);
-        return parentModel.recordDecisionResult(decisionModel);
+        return superCorporationModel.recordDecisionResult(decisionModel, businessType);
     }
+
 }

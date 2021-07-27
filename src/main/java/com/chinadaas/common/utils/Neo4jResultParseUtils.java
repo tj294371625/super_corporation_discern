@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description neo4j结果解析
  * @createTime 2021.07.01

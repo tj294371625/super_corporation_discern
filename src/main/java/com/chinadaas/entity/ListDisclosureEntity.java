@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 上市披露实体
  * @createTime 2021.07.13

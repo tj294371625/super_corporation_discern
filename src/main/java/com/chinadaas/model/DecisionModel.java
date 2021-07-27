@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 决策权模型
  * @createTime 2021.07.01

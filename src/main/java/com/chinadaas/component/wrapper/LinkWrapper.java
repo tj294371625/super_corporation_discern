@@ -3,7 +3,7 @@ package com.chinadaas.component.wrapper;
 import com.chinadaas.commons.graph.model.RelationDto;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 边
  * @createTime 2021.07.01

@@ -1,16 +1,16 @@
-package com.chinadaas.service.algorithm.parent.impl;
+package com.chinadaas.service.algorithm.impl;
 
 import com.chinadaas.entity.SourceEntity;
-import com.chinadaas.model.ParentModel;
+import com.chinadaas.model.SuperCorporationModel;
 import com.chinadaas.repository.NodeOperationRepository;
-import com.chinadaas.service.algorithm.parent.ParentAlgorithm;
+import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 识别输入企业
  * @createTime 2021.07.13
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Order(1)
 @Slf4j
 @Component
-public class SourceAlgorithm implements ParentAlgorithm {
+public class SourceAlgorithm implements SuperCorporationAlgorithm {
 
     private final NodeOperationRepository repository;
 
@@ -28,8 +28,9 @@ public class SourceAlgorithm implements ParentAlgorithm {
     }
 
     @Override
-    public boolean calculation(ParentModel parentModel) {
-        SourceEntity sourceEntity = repository.findSourceNode(parentModel.getCurrentQueryId());
-        return parentModel.recordSourceResult(sourceEntity);
+    public boolean calculation(SuperCorporationModel superCorporationModel) {
+        SourceEntity sourceEntity = repository.findSourceNode(superCorporationModel.getCurrentQueryId());
+        return superCorporationModel.recordSourceResult(sourceEntity);
     }
+
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 企业名单持有类
  * @createTime 2021.07.01

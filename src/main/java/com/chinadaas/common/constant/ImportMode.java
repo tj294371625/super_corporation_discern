@@ -1,7 +1,7 @@
 package com.chinadaas.common.constant;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 倒入模式
  * @createTime 2021.07.20

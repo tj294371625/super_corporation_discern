@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description
  * @createTime 2021.07.20
@@ -40,35 +40,29 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     private static final String TARGET_ENT_ID = "target_entid";
     private static final String GROUP_ENT_ID = "group_entid";
     private static final String GROUP_NAME = "group_name";
-    private static final String ENT_ID = "entId";
-    private static final String MORE_INFO = "moreinfo";
 
     /**
      * 单位 second
      */
     private final long WAIT_TIME = 60L;
 
-    @Value("${db.mongodb.chainCollection}")
-    private String SC_CHAIN;
+    @Value("${db.mongodb.parentCollection}")
+    private String SC_CHAIN_PARENT;
+
+    @Value("${db.mongodb.finCtrlCollection}")
+    private String SC_CHAIN_FINCTRL;
 
     private final MongoTemplate mongoTemplate;
-    private final Neo4jTemplate neo4jTemplate;
-    private final Mapper mapper;
 
     @Autowired
-    public ChainOperationRepositoryImpl(MongoTemplate mongoTemplate,
-                                        Neo4jTemplate neo4jTemplate,
-                                        Mapper mapper) {
-
+    public ChainOperationRepositoryImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-        this.neo4jTemplate = neo4jTemplate;
-        this.mapper = mapper;
     }
 
     @Override
     public ChainEntity chainQuery(String entId) {
         Query condition = new Query(Criteria.where(SOURCE_ENT_ID).is(entId));
-        return mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN);
+        return mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN_PARENT);
     }
 
     @Override
@@ -78,7 +72,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
         List<ChainEntity> totalResults = Lists.newArrayList();
         for (List<String> batchEntId : batchEntIds) {
             Query condition = new Query(Criteria.where(SOURCE_ENT_ID).in(batchEntId));
-            List<ChainEntity> tempResults = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN);
+            List<ChainEntity> tempResults = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
             totalResults.addAll(tempResults);
         }
 
@@ -91,21 +85,42 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
         Update update = new Update()
                 .set(GROUP_ENT_ID, parentId)
                 .set(GROUP_NAME, parentName);
-        mongoTemplate.updateMulti(matchCondition, update, SC_CHAIN);
+        mongoTemplate.updateMulti(matchCondition, update, SC_CHAIN_PARENT);
     }
 
     @Override
-    public void chainPersistence(ChainEntity chainEntity) {
+    public void parentChainPersistence(ChainEntity chainEntity) {
 
         synchronized (LOCK) {
             int index = 0;
             while (index < 3) {
                 try {
-                    mongoTemplate.insert(chainEntity, SC_CHAIN);
+                    mongoTemplate.insert(chainEntity, SC_CHAIN_PARENT);
                     break;
                 } catch (Exception e) {
                     index++;
-                    log.warn("ChainOperationRepositoryImpl#chainPersistence insert fail, try insert count: [{}]", index, e);
+                    log.warn("ChainOperationRepositoryImpl#parentChainPersistence insert fail, " +
+                            "try insert count: [{}]", index, e);
+                    Assert.isFalse(3 == index, "");
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void finCtrlChainPersistence(ChainEntity chainEntity) {
+
+        synchronized (LOCK) {
+            int index = 0;
+            while (index < 3) {
+                try {
+                    mongoTemplate.insert(chainEntity, SC_CHAIN_FINCTRL);
+                    break;
+                } catch (Exception e) {
+                    index++;
+                    log.warn("ChainOperationRepositoryImpl#finCtrlChainPersistence insert fail, " +
+                            "try insert count: [{}]", index, e);
                     Assert.isFalse(3 == index, "");
                 }
             }
@@ -121,7 +136,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
             Query condition = new Query(Criteria.where(SOURCE_ENT_ID).in(batchEntId));
 
             try {
-                mongoTemplate.remove(condition, SC_CHAIN);
+                mongoTemplate.remove(condition, SC_CHAIN_PARENT);
             } catch (Exception e) {
                 log.warn("ChainOperationRepositoryImpl#chainBatchDelete delete fail", e);
             }
@@ -135,7 +150,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
         Query condition = new Query(Criteria.where(TARGET_ENT_ID).is(entId));
         condition.fields().exclude(ID).include(SOURCE_ENT_ID);
-        List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_CHAIN);
+        List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_CHAIN_PARENT);
         if (CollectionUtils.isEmpty(tempResults)) {
             return treeResults;
         }
@@ -148,12 +163,23 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> calNewEntIdList() {
+    public Set<String> fullSourceEntId() {
         Query condition = new Query();
         condition.fields().exclude(ID).include(SOURCE_ENT_ID);
-        List<ChainEntity> allRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN);
+        List<ChainEntity> allRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
 
         return allRecords.stream()
+                .map(ChainEntity::getSourceEntId)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> queryFinCtrlEntIds() {
+        Query condition = new Query(Criteria.where(GROUP_ENT_ID).is("-1"));
+        condition.fields().exclude(ID).include(SOURCE_ENT_ID);
+        List<ChainEntity> partRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
+
+        return partRecords.stream()
                 .map(ChainEntity::getSourceEntId)
                 .collect(Collectors.toSet());
     }

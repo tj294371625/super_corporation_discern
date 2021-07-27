@@ -3,7 +3,7 @@ package com.chinadaas.component.mapper.base;
 import java.util.Map;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description neo4j查询结果映射定义
  * @createTime 2021.07.01

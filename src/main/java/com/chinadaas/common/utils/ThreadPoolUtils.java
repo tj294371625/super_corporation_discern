@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 线程工具
  * @createTime 2021.07.01

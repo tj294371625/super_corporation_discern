@@ -3,7 +3,7 @@ package com.chinadaas.component.executor;
 import java.util.function.Consumer;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 执行器
  * @createTime 2021.07.01

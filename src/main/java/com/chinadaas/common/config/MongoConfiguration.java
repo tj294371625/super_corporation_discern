@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description mongodb配置
  * @createTime 2021.07.05

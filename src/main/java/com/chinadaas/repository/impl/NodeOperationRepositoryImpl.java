@@ -1,5 +1,6 @@
 package com.chinadaas.repository.impl;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description
  * @createTime 2021.07.20
@@ -48,8 +49,8 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
 
     @Value("${db.mongodb.singleCollection}")
     private String MODEL_PARENT_SINGLE;
-    @Value("${db.mongodb.chainCollection}")
-    private String SC_CHAIN;
+    @Value("${db.mongodb.parentCollection}")
+    private String SC_CHAIN_PARENT;
 
     private final RecordHandler recordHandler;
     private final Neo4jTemplate neo4jTemplate;
@@ -90,11 +91,44 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     }
 
     @Override
-    public List<DecisionEntity> findDecisionNode(String entId) {
+    public List<DecisionEntity> findDecisionNode(String entId, ModelType modelType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put(ENT_ID, entId);
 
-        final String CYPHER_PATH = "cypher/findDecisionNode.cql";
+        String cypher = createSpecialCypher(modelType);
+
+        List<Map<String, Object>> tempResultList = Lists.newArrayList();
+        try {
+            long startTime = TimeUtils.startTime();
+
+            tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
+
+            long spendTime = TimeUtils.endTime(startTime);
+            if (spendTime > 100L) {
+                log.warn("NodeOperationRepositoryImpl#findDecisionNodeOfParent method " +
+                        "entId: [{}], slow query spend time: [{}ms]", entId, spendTime);
+            }
+        } catch (QueryNeo4jTimeOutException e) {
+            recordHandler.recordTimeOut(entId);
+        }
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<DecisionEntity> decisionEntities = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            DecisionEntity decisionEntity = mapper.getBean(info, DecisionEntity.class);
+            decisionEntities.add(decisionEntity);
+        }
+        return decisionEntities;
+    }
+
+    @Override
+    public List<DecisionEntity> findDecisionNodeOfFinCtrl(String entId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put(ENT_ID, entId);
+
+        final String CYPHER_PATH = "cypher/findDecisionNodeOfFinCtrl.cql";
         String cypher = CypherBuilderFactory.getCypherBuilder(CYPHER_PATH).build();
 
         List<Map<String, Object>> tempResultList = Lists.newArrayList();
@@ -105,7 +139,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
 
             long spendTime = TimeUtils.endTime(startTime);
             if (spendTime > 100L) {
-                log.warn("DiscernMaxPropNodeRepositoryImpl#findDecisionNode method " +
+                log.warn("NodeOperationRepositoryImpl#findDecisionNodeOfFinCtrl method " +
                         "entId: [{}], slow query spend time: [{}ms]", entId, spendTime);
             }
         } catch (QueryNeo4jTimeOutException e) {
@@ -174,7 +208,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     @Override
     public void nodeFix(String entId) {
         Query condition = new Query(Criteria.where(SOURCE_ENT_ID).is(entId));
-        ChainEntity chainEntity = mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN);
+        ChainEntity chainEntity = mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN_PARENT);
         Assert.nonNull(chainEntity, "NodeAddGroupRepositoryImpl#nodeAddGroup method entId: [{}], " +
                 "not found record in mongodb", entId);
         String groupEntId = chainEntity.getGroupEntId();
@@ -210,6 +244,22 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
 
         Map<String, Object> info = moreInfo.get(0);
         return mapper.getBean(info, NodeEntity.class);
+    }
+
+
+    private String createSpecialCypher(ModelType modelType) {
+
+        final String CYPHER_PATH;
+
+        if (ModelType.FIN_CTRL.equals(modelType)) {
+            CYPHER_PATH = "cypher/findDecisionNodeOfFinCtrl.cql";
+        } else if (ModelType.PARENT.equals(modelType)) {
+            CYPHER_PATH = "cypher/findDecisionNodeOfParent.cql";
+        } else {
+            throw new IllegalArgumentException("input a illegal modelType");
+        }
+
+        return CypherBuilderFactory.getCypherBuilder(CYPHER_PATH).build();
     }
 
 }

@@ -1,11 +1,12 @@
 package com.chinadaas.repository;
 
+import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.entity.*;
 
 import java.util.List;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 节点操作
  * @createTime 2021.07.20
@@ -21,11 +22,21 @@ public interface NodeOperationRepository {
     SourceEntity findSourceNode(String entId);
 
     /**
-     * 识别决策权点
+     * 识别决策权点（母公司）
      *
+     * @param entId
+     * @param modelType
      * @return
      */
-    List<DecisionEntity> findDecisionNode(String entId);
+    List<DecisionEntity> findDecisionNode(String entId, ModelType modelType);
+
+    /**
+     * 识别决策权点（最终控股股东）
+     *
+     * @param entId
+     * @return
+     */
+    List<DecisionEntity> findDecisionNodeOfFinCtrl(String entId);
 
     /**
      * 识别单一大股东点
@@ -57,4 +68,5 @@ public interface NodeOperationRepository {
      * @return
      */
     NodeEntity nodeFind(String entId);
+
 }

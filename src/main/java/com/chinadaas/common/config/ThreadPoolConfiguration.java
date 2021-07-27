@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 线程池配置
  * @createTime 2021.07.01

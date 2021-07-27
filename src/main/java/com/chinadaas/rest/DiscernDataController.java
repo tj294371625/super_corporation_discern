@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 集团派系识别入口
  * @createTime 2021.07.01

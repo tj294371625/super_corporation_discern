@@ -1,23 +1,23 @@
-package com.chinadaas.service.algorithm.parent.impl;
+package com.chinadaas.service.algorithm.impl;
 
 import com.chinadaas.entity.SingleShareHolderEntity;
-import com.chinadaas.model.ParentModel;
+import com.chinadaas.model.SuperCorporationModel;
 import com.chinadaas.model.SingleShareHolderModel;
 import com.chinadaas.repository.NodeOperationRepository;
-import com.chinadaas.service.algorithm.parent.ParentAlgorithm;
+import com.chinadaas.service.algorithm.SuperCorporationAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 单一大股东算法
  * @createTime 2021.07.13
  */
 @Order(3)
 @Component
-public class SingleShareHolderAlgorithm implements ParentAlgorithm {
+public class SingleShareHolderAlgorithm implements SuperCorporationAlgorithm {
 
     private final NodeOperationRepository repository;
 
@@ -27,9 +27,9 @@ public class SingleShareHolderAlgorithm implements ParentAlgorithm {
     }
 
     @Override
-    public boolean calculation(ParentModel parentModel) {
-        SingleShareHolderEntity singleShareHolderEntity = repository.findSingleShareHolderNode(parentModel.getCurrentQueryId());
+    public boolean calculation(SuperCorporationModel superCorporationModel) {
+        SingleShareHolderEntity singleShareHolderEntity = repository.findSingleShareHolderNode(superCorporationModel.getCurrentQueryId());
         SingleShareHolderModel singleShareHolderModel = new SingleShareHolderModel().convertResult(singleShareHolderEntity);
-        return parentModel.recordSingleShareHolder(singleShareHolderModel);
+        return superCorporationModel.recordSingleShareHolder(singleShareHolderModel);
     }
 }

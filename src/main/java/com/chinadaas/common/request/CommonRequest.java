@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 通用请求
  * @createTime 2021.07.20

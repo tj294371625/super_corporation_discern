@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description neo4j连接配置
  * @createTime 2021.07.01

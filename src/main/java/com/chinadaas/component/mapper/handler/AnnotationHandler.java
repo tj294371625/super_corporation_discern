@@ -5,7 +5,7 @@ import com.chinadaas.component.mapper.context.HandlerContext;
 import java.lang.reflect.Field;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @Description 注解处理定义
  * @createTime 2021.07.01

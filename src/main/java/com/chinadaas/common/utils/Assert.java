@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Objects;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 断言
  * @createTime 2021.07.05

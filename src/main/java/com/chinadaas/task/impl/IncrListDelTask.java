@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 增量名单删除
  * @createTime 2021.07.23

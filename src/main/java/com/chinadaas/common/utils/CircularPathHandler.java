@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 环形路径检测器
  * @createTime 2021.07.01

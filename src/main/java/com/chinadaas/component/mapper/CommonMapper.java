@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author liubc
+ * @author lawliet
  * @version 1.0.0
  * @description 通用映射
  * @createTime 2021.07.01
