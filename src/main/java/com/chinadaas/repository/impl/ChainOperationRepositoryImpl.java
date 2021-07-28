@@ -1,5 +1,6 @@
 package com.chinadaas.repository.impl;
 
+import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
 import com.chinadaas.entity.ChainEntity;
@@ -34,16 +35,11 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     private static final Object LOCK = new Object();
 
-    private static final String ID = "_id";
+    /*private static final String ID = "_id";
     private static final String SOURCE_ENT_ID = "source_entid";
     private static final String TARGET_ENT_ID = "target_entid";
     private static final String GROUP_ENT_ID = "group_entid";
-    private static final String GROUP_NAME = "group_name";
-
-    /**
-     * 单位 second
-     */
-    private final long WAIT_TIME = 60L;
+    private static final String GROUP_NAME = "group_name";*/
 
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
@@ -60,7 +56,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public ChainEntity chainQuery(String entId, ModelType modelType) {
-        Query condition = new Query(Criteria.where(SOURCE_ENT_ID).is(entId));
+        Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).is(entId));
         String collectionName = selectCollectionName(modelType);
         return mongoTemplate.findOne(condition, ChainEntity.class, collectionName);
     }
@@ -71,7 +67,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
         List<ChainEntity> totalResults = Lists.newArrayList();
         for (List<String> batchEntId : batchEntIds) {
-            Query condition = new Query(Criteria.where(SOURCE_ENT_ID).in(batchEntId));
+            Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(batchEntId));
             List<ChainEntity> tempResults = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
             totalResults.addAll(tempResults);
         }
@@ -80,11 +76,13 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public void chainFix(String parentId, String parentName, List<String> sourceEntIds, ModelType modelType) {
-        Query matchCondition = new Query(Criteria.where(SOURCE_ENT_ID).in(sourceEntIds));
+    public void chainFix(String parentId, String parentName, String parentType, long totalChainLength, List<String> sourceEntIds, ModelType modelType) {
+        Query matchCondition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(sourceEntIds));
         Update update = new Update()
-                .set(GROUP_ENT_ID, parentId)
-                .set(GROUP_NAME, parentName);
+                .set(ChainConst.TARGET_ENT_ID, parentId)
+                .set(ChainConst.TARGET_NAME, parentName)
+                .set(ChainConst.TARGET_TYPE, parentType)
+                .set(ChainConst.SOURCE_TO_TARGET_LAYER, totalChainLength);
         String collectionName = selectCollectionName(modelType);
         mongoTemplate.updateMulti(matchCondition, update, collectionName);
     }
@@ -115,7 +113,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
         List<List<String>> batchEntIds = batchProcess(entIds);
 
         for (List<String> batchEntId : batchEntIds) {
-            Query condition = new Query(Criteria.where(SOURCE_ENT_ID).in(batchEntId));
+            Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(batchEntId));
 
             try {
                 mongoTemplate.remove(condition, SC_CHAIN_PARENT);
@@ -130,15 +128,15 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     public Set<String> treeQuery(String entId) {
         Set<String> treeResults = Sets.newHashSet();
 
-        Query condition = new Query(Criteria.where(TARGET_ENT_ID).is(entId));
-        condition.fields().exclude(ID).include(SOURCE_ENT_ID);
+        Query condition = new Query(Criteria.where(ChainConst.TARGET_ENT_ID).is(entId));
+        condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
         List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_CHAIN_PARENT);
         if (CollectionUtils.isEmpty(tempResults)) {
             return treeResults;
         }
 
         for (Map tempResult : tempResults) {
-            String sourceEntId = (String) tempResult.get(SOURCE_ENT_ID);
+            String sourceEntId = (String) tempResult.get(ChainConst.SOURCE_ENT_ID);
             treeResults.add(sourceEntId);
         }
         return treeResults;
@@ -147,7 +145,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     @Override
     public Set<String> fullSourceEntId() {
         Query condition = new Query();
-        condition.fields().exclude(ID).include(SOURCE_ENT_ID);
+        condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
         List<ChainEntity> allRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
 
         return allRecords.stream()
@@ -157,8 +155,8 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public Set<String> queryFinCtrlEntIds() {
-        Query condition = new Query(Criteria.where(GROUP_ENT_ID).is("-1"));
-        condition.fields().exclude(ID).include(SOURCE_ENT_ID);
+        Query condition = new Query(Criteria.where(ChainConst.TARGET_ENT_ID).is("-1"));
+        condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
         List<ChainEntity> partRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
 
         return partRecords.stream()

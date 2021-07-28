@@ -25,18 +25,27 @@ public class ChainEntity {
     private String sourceName;
 
     /**
-     * 目标（临时母公司）
+     * 临时目标（临时母公司 or 临时最终控股股东）
+     */
+    @Field("temp_entid")
+    private String tempEntId;
+    @Field("temp_name")
+    private String tempName;
+
+    /**
+     * 目标（母公司 or 最终控股股东）
      */
     @Field("target_entid")
     private String targetEntId;
     @Field("target_name")
     private String targetName;
 
-    /**
-     * 组（母公司）
-     */
-    @Field("group_entid")
-    private String groupEntId;
-    @Field("group_name")
-    private String groupName;
+    @Field("source_to_temp_layer")
+    private long source2TempLayer;
+
+    @Field("source_to_target_layer")
+    private long source2TargetLayer;
+
+    @Field("target_type")
+    private String targetType;
 }

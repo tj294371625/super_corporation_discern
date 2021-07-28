@@ -9,6 +9,7 @@ import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.model.ChainModel;
 import com.chinadaas.service.ChainOperationService;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithmChain;
+import com.chinadaas.task.FullTask;
 import com.chinadaas.task.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 @Slf4j
 @Order(1)
 @Component
-public class PreProcessTask implements Task {
+public class PreProcessTask implements FullTask {
 
     private final Executor singleExecutor;
     private final Executor parallelExecutor;

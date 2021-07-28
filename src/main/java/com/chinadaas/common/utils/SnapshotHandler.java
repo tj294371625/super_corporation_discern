@@ -7,24 +7,53 @@ import java.util.List;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 环形路径检测器
+ * @description 快照处理器
  * @createTime 2021.07.01
  */
-public class CircularPathHandler {
+public class SnapshotHandler {
 
     /**
-     * 快照列表
+     * 快照链表
      */
     private final List<String> snapshotList;
 
-    private CircularPathHandler() {
+    /**
+     * 链路总长度
+     */
+    private long totalChainLength;
+
+    private SnapshotHandler() {
         this.snapshotList = Lists.newArrayList();
+        this.totalChainLength = 0L;
     }
 
-    public static CircularPathHandler newInstance() {
-        return new CircularPathHandler();
+    public static SnapshotHandler newInstance() {
+        return new SnapshotHandler();
     }
 
+    /**
+     * 链路长度累加
+     *
+     * @param partChainLength
+     */
+    public void chainLengthAccum(long partChainLength) {
+        totalChainLength += partChainLength;
+    }
+
+    /**
+     * 获取总链路长度
+     * @return
+     */
+    public long obtainTotalChainLength() {
+        return totalChainLength;
+    }
+
+    /**
+     * 环路检测
+     *
+     * @param entId
+     * @return
+     */
     public boolean circularCheck(String entId) {
         if (snapshotList.contains(entId)) {
             snapshotList.add(entId);
@@ -51,7 +80,7 @@ public class CircularPathHandler {
      * @param parentId
      * @return
      */
-    public List<String> obtainChain(String parentId) {
+    public List<String> obtainChainEntIds(String parentId) {
         List<String> deepCopy = Lists.newArrayList(snapshotList.iterator());
         deepCopy.remove(parentId);
         return deepCopy;

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  */
 public class DecisionModel {
 
+    private long length;
+
     private NodeWrapper decisionNode;
 
     private ModelStatus resultStatus;
@@ -43,6 +45,7 @@ public class DecisionModel {
         if (1 == resultList.size()) {
             DecisionEntity decisionEntity = resultList.get(0);
             this.decisionNode = decisionEntity.getDecisionNode();
+            this.length = decisionEntity.getLength();
             return this;
         }
 
@@ -71,6 +74,7 @@ public class DecisionModel {
         if (1 == maxCgzbEntities.size()) {
             DecisionEntity finalMaxCgzbEntity = maxCgzbEntities.get(0);
             this.decisionNode = finalMaxCgzbEntity.getDecisionNode();
+            this.length = finalMaxCgzbEntity.getLength();
             return this;
         }
 
@@ -79,6 +83,7 @@ public class DecisionModel {
                 .min(Comparator.comparingLong(DecisionEntity::getLength))
                 .orElseThrow(RuntimeException::new);
         this.decisionNode = minLengthEntity.getDecisionNode();
+        this.length = minLengthEntity.getLength();
 
         return this;
     }
@@ -89,5 +94,9 @@ public class DecisionModel {
 
     public ModelStatus getResultStatus() {
         return resultStatus;
+    }
+
+    public long getLength() {
+        return length;
     }
 }

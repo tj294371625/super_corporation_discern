@@ -14,11 +14,17 @@ import java.util.Objects;
  */
 public class SingleShareHolderModel {
 
+    /**
+     * 单一大股东到输入点间长度默认为1
+     */
+    private long length;
+
     private NodeWrapper singleShareHolderNode;
 
     private ModelStatus resultStatus;
 
     public SingleShareHolderModel() {
+        this.length = 1L;
         this.resultStatus = ModelStatus.NO_RESULT;
     }
 
@@ -41,4 +47,7 @@ public class SingleShareHolderModel {
         return resultStatus;
     }
 
+    public long getLength() {
+        return length;
+    }
 }

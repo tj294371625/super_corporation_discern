@@ -2,6 +2,7 @@ package com.chinadaas.common.utils;
 
 
 import com.chinadaas.common.constant.ModelStatus;
+import com.chinadaas.common.constant.TargetType;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.model.ChainModel;
@@ -59,7 +60,7 @@ public abstract class AssistantUtils {
      * @return
      */
     public static String getNodeType(String invType) {
-        /**
+        /*
          * 701：境外企业
          * 702：组织机构
          * 703：组合计划
@@ -90,25 +91,30 @@ public abstract class AssistantUtils {
         ModelStatus resultStatus = chainModel.getResultStatus();
         NodeWrapper sourceNode = chainModel.getSourceNode();
         NodeWrapper targetNode = chainModel.getTargetNode();
+        TargetType targetType = chainModel.getTargetType();
+        long chainLength = chainModel.getChainLength();
 
         ChainEntity chainEntity = new ChainEntity();
         chainEntity.setSourceEntId(sourceNode.getEntId());
         chainEntity.setSourceName(sourceNode.getEntName());
+        chainEntity.setTargetType(targetType.toString());
+        chainEntity.setSource2TempLayer(chainLength);
+        chainEntity.setSource2TargetLayer(chainLength);
 
         if (ModelStatus.COMPLETE_RESULT.equals(resultStatus)) {
+            chainEntity.setTempEntId(targetNode.getEntId());
+            chainEntity.setTempName(targetNode.getEntName());
             chainEntity.setTargetEntId(targetNode.getEntId());
             chainEntity.setTargetName(targetNode.getEntName());
-            chainEntity.setGroupEntId(targetNode.getEntId());
-            chainEntity.setGroupName(targetNode.getEntName());
             return chainEntity;
         }
 
         final String UNKNOWN_ID = "-1";
         final String UNKNOWN_NAME = "";
+        chainEntity.setTempEntId(UNKNOWN_ID);
+        chainEntity.setTempName(UNKNOWN_NAME);
         chainEntity.setTargetEntId(UNKNOWN_ID);
         chainEntity.setTargetName(UNKNOWN_NAME);
-        chainEntity.setGroupEntId(UNKNOWN_ID);
-        chainEntity.setGroupName(UNKNOWN_NAME);
         return chainEntity;
     }
 

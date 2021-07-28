@@ -33,7 +33,6 @@ public class DecisionAlgorithm implements SuperCorporationAlgorithm {
 
     @Override
     public boolean calculation(ChainModel chainModel) {
-        // zs: 母公司 or 最终控股股东
         ModelType businessType = chainModel.getBusinessType();
         // zs: 违反srp，但提升了复用性，这里做了取舍
         List<DecisionEntity> decisionEntities = repository.findDecisionNode(chainModel.getCurrentQueryId(), businessType);

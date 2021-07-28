@@ -23,7 +23,7 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
 
     public void discernSuperCorporation() {
 
-        lockResouce();
+        lockResource();
 
         preDoDiscern();
 
@@ -35,7 +35,7 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
 
     }
 
-    protected void lockResouce() {
+    protected void lockResource() {
         if (BooleanUtils.isFalse(entIdListLoader.lock())) {
             throw new IllegalStateException("data processing, please do not repeat call");
         }

@@ -105,7 +105,7 @@ public class IncrListScreenTask implements IncrTask {
      * @return
      */
     private boolean notChange(ChainEntity chainEntity, ChainModel chainModel) {
-        String targetEntId = chainEntity.getTargetEntId();
+        String targetEntId = chainEntity.getTempEntId();
         NodeWrapper parentNode = chainModel.getTargetNode();
 
         if (ModelStatus.SOURCE_ONLY.equals(chainModel.getResultStatus())) {

@@ -14,11 +14,14 @@ import java.util.Objects;
  */
 public class ListDisclosureModel {
 
+    private long length;
+
     private NodeWrapper listDisclosureNode;
 
     private ModelStatus resultStatus;
 
     public ListDisclosureModel() {
+        this.length = 1L;
         this.resultStatus = ModelStatus.NO_RESULT;
     }
 
@@ -39,5 +42,9 @@ public class ListDisclosureModel {
 
     public ModelStatus getResultStatus() {
         return resultStatus;
+    }
+
+    public long getLength() {
+        return length;
     }
 }

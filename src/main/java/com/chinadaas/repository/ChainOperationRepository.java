@@ -33,13 +33,19 @@ public interface ChainOperationRepository {
 
     /**
      * 链路修复
-     *
      * @param parentId
      * @param parentName
+     * @param parentType
+     * @param totalChainLength
      * @param sourceEntIds
      * @param modelType
      */
-    void chainFix(String parentId, String parentName, List<String> sourceEntIds, ModelType modelType);
+    void chainFix(String parentId,
+                  String parentName,
+                  String parentType,
+                  long totalChainLength,
+                  List<String> sourceEntIds,
+                  ModelType modelType);
 
     /**
      * 持久化链路（母公司 or 最终控股股东）

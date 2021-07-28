@@ -2,7 +2,7 @@ package com.chinadaas.service.impl;
 
 import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
-import com.chinadaas.common.utils.CircularPathHandler;
+import com.chinadaas.common.utils.SnapshotHandler;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
@@ -33,6 +33,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     @Autowired
     public ChainOperationServiceImpl(RecordHandler recordHandler,
                                      ChainOperationRepository repository) {
+
         this.recordHandler = recordHandler;
         this.repository = repository;
     }
@@ -48,8 +49,9 @@ public class ChainOperationServiceImpl implements ChainOperationService {
             return;
         }
 
-        CircularPathHandler snapshotHandler = CircularPathHandler.newInstance();
+        SnapshotHandler snapshotHandler = SnapshotHandler.newInstance();
         snapshotHandler.circularCheck(entId);
+        snapshotHandler.chainLengthAccum(chainEntity.getSource2TempLayer());
 
         recursiveChainFix(chainEntity, snapshotHandler, modelType);
     }
@@ -99,20 +101,17 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         return repository.queryFinCtrlEntIds();
     }
 
-    private void recursiveChainFix(ChainEntity chainEntity, CircularPathHandler snapshotHandler, ModelType modelType) {
+    private void recursiveChainFix(ChainEntity chainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {
 
+        // zs: 记录上一次实体
+        ChainEntity preChainEntity = null;
         while (parentIdKnown(chainEntity)) {
-            final String preTargetEntId = chainEntity.getTargetEntId();
-            final String preTargetName = chainEntity.getTargetName();
-            chainEntity = repository.chainQuery(preTargetEntId, modelType);
+            preChainEntity = chainEntity;
+            chainEntity = repository.chainQuery(preChainEntity.getTempEntId(), modelType);
 
             // zs: 解决目标节点不存在于SC_CHAIN_*的问题（名单中未提供）
             if (Objects.isNull(chainEntity)) {
-                List<String> chainEntIds = snapshotHandler.obtainChain(preTargetEntId);
-                ChainEntity targetEntity = new ChainEntity();
-                targetEntity.setSourceEntId(preTargetEntId);
-                targetEntity.setSourceName(preTargetName);
-                doRecursiveChainFix(targetEntity, chainEntIds, modelType);
+                doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);
                 return;
             }
 
@@ -121,24 +120,32 @@ public class ChainOperationServiceImpl implements ChainOperationService {
                 recordHandler.recordCircular(snapshotHandler.obtainCircularPath());
                 return;
             }
+
+            snapshotHandler.chainLengthAccum(chainEntity.getSource2TempLayer());
         }
 
-        List<String> chainEntIds = snapshotHandler.obtainChain(chainEntity.getSourceEntId());
-        doRecursiveChainFix(chainEntity, chainEntIds, modelType);
+        doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);
     }
 
-    private void doRecursiveChainFix(ChainEntity parentEntity, List<String> sourceEntIds, ModelType modelType) {
+    private void doRecursiveChainFix(ChainEntity preChainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {
+        String parentId = preChainEntity.getTempEntId();
+        String parentName = preChainEntity.getTempName();
+        String parentType = preChainEntity.getTargetType();
+        List<String> chainEntIds = snapshotHandler.obtainChainEntIds(parentId);
+        long totalChainLength = snapshotHandler.obtainTotalChainLength();
         repository.chainFix(
-                parentEntity.getSourceEntId(),
-                parentEntity.getSourceName(),
-                sourceEntIds,
+                parentId,
+                parentName,
+                parentType,
+                totalChainLength,
+                chainEntIds,
                 modelType
         );
     }
 
     private boolean parentIdUnknown(ChainEntity chainEntity) {
         final String UNKNOWN_ID = "-1";
-        return UNKNOWN_ID.equals(chainEntity.getTargetEntId());
+        return UNKNOWN_ID.equals(chainEntity.getTempEntId());
     }
 
     private boolean parentIdKnown(ChainEntity chainEntity) {

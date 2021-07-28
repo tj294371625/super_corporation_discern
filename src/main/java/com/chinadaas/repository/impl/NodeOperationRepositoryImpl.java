@@ -177,7 +177,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
         ChainEntity chainEntity = mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN_PARENT);
         Assert.nonNull(chainEntity, "NodeAddGroupRepositoryImpl#nodeAddGroup method entId: [{}], " +
                 "not found record in mongodb", entId);
-        String groupEntId = chainEntity.getGroupEntId();
+        String groupEntId = chainEntity.getTargetEntId();
         if (StringUtils.isBlank(groupEntId)) {
             return;
         }

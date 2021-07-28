@@ -1,11 +1,13 @@
 package com.chinadaas.service.impl;
 
+import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ImportMode;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.io.EntIdListHolder;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
+import com.chinadaas.task.FullTask;
 import com.chinadaas.task.Task;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -27,16 +29,17 @@ import java.util.List;
 @Service
 public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
 
-    private static final String SOURCE_ENT_ID = "source_entid";
-
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
 
-    private final List<Task> fullTasks;
+    @Value("${db.mongodb.finCtrlCollection}")
+    private String SC_CHAIN_FINCTRL;
+
+    private final List<FullTask> fullTasks;
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public DiscernFullDataServiceImpl(List<Task> fullTasks,
+    public DiscernFullDataServiceImpl(List<FullTask> fullTasks,
                                       EntIdListLoader entIdListLoader,
                                       EntIdListHolder entIdListHolder,
                                       RecordHandler recordHandler,
@@ -51,22 +54,15 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
 
     @Override
     protected void preDoDiscern() {
-        // 全量跑数之前，清空SC_CHAIN表
-        if (mongoTemplate.collectionExists(SC_CHAIN_PARENT)) {
-            mongoTemplate.dropCollection(SC_CHAIN_PARENT);
-        }
-
-        DBObject bdo = new BasicDBObject();
-        bdo.put(SOURCE_ENT_ID, 1);
-        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(bdo);
+        resetCollection();
     }
 
     @Override
     protected void doDiscern() {
-        log.info("main task run start...");
+        log.info("main task start run...");
         long startTime = TimeUtils.startTime();
 
-        for (Task fullTask : fullTasks) {
+        for (FullTask fullTask : fullTasks) {
             fullTask.run();
         }
 
@@ -76,5 +72,32 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     @Override
     public boolean hit(ImportMode mode) {
         return ImportMode.FULL_MODE.equals(mode);
+    }
+
+    private void resetCollection() {
+        if (mongoTemplate.collectionExists(SC_CHAIN_PARENT)) {
+            mongoTemplate.dropCollection(SC_CHAIN_PARENT);
+        }
+
+        if (mongoTemplate.collectionExists(SC_CHAIN_FINCTRL)) {
+            mongoTemplate.dropCollection(SC_CHAIN_FINCTRL);
+        }
+
+        DBObject sourceEntIdIndex = new BasicDBObject();
+        sourceEntIdIndex.put(ChainConst.SOURCE_ENT_ID, 1);
+
+        DBObject tempEntIdIndex = new BasicDBObject();
+        tempEntIdIndex.put(ChainConst.TEMP_ENT_ID, 1);
+
+        DBObject targetEntIdIndex = new BasicDBObject();
+        targetEntIdIndex.put(ChainConst.TARGET_ENT_ID, 1);
+
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(sourceEntIdIndex);
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(tempEntIdIndex);
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(targetEntIdIndex);
+
+        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(sourceEntIdIndex);
+        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(tempEntIdIndex);
+        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(targetEntIdIndex);
     }
 }
