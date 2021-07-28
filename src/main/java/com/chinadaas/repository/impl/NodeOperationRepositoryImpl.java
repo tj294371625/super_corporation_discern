@@ -1,19 +1,20 @@
 package com.chinadaas.repository.impl;
 
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.utils.Assert;
+import com.chinadaas.common.utils.Neo4jResultParseUtils;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.commons.exception.QueryNeo4jTimeOutException;
 import com.chinadaas.commons.factory.CypherBuilderFactory;
 import com.chinadaas.component.mapper.base.Mapper;
 import com.chinadaas.component.template.Neo4jTemplate;
+import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.entity.*;
 import com.chinadaas.repository.NodeOperationRepository;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.neo4j.driver.v1.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -22,6 +23,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +41,9 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     private static final String ENT_ID = "entId";
     private static final String MORE_INFO = "moreinfo";
     private static final String INV_ID = "inv_id";
-    private static final String SOURCE_ENT_ID = "source_entid";
-    private static final String GROUP_ENT_ID = "groupEntId";
+    private static final String START_ID = "startId";
+    private static final String END_ID = "endId";
+    private static final String LAYER = "layer";
 
     /**
      * 单位 second
@@ -172,27 +175,6 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     }
 
     @Override
-    public void nodeFix(String entId) {
-        Query condition = new Query(Criteria.where(SOURCE_ENT_ID).is(entId));
-        ChainEntity chainEntity = mongoTemplate.findOne(condition, ChainEntity.class, SC_CHAIN_PARENT);
-        Assert.nonNull(chainEntity, "NodeAddGroupRepositoryImpl#nodeAddGroup method entId: [{}], " +
-                "not found record in mongodb", entId);
-        String groupEntId = chainEntity.getTargetEntId();
-        if (StringUtils.isBlank(groupEntId)) {
-            return;
-        }
-
-        Map<String, Object> params = Maps.newHashMap();
-        params.put(ENT_ID, entId);
-        params.put(GROUP_ENT_ID, groupEntId);
-
-        final String CYPHER_PATH = "cypher/nodeAddGroup.cql";
-        String cypher = CypherBuilderFactory.getCypherBuilder(CYPHER_PATH).build();
-
-        neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
-    }
-
-    @Override
     public NodeEntity nodeFind(String entId) {
         Map<String, Object> params = Maps.newHashMap();
         params.put(ENT_ID, entId);
@@ -212,6 +194,76 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
         return mapper.getBean(info, NodeEntity.class);
     }
 
+    @Override
+    public List<TwoNodesEntity> sourceToTargetUseInv(String sourceId, String targetId, long targetToSourceLayer) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put(START_ID, sourceId);
+        param.put(END_ID, targetId);
+        if (targetToSourceLayer < 8) {
+            targetToSourceLayer = 8;
+        }
+        param.put(LAYER, targetToSourceLayer);
+
+        String cypher = CypherBuilderFactory.getCypherBuilder("cypher/sourceToTargetUseInvQuery.cql").build();
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, param, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<TwoNodesEntity> results = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            TwoNodesEntity twoNodesEntity = mapper.getBean(info, TwoNodesEntity.class);
+            results.add(twoNodesEntity);
+        }
+        return results;
+    }
+
+    @Override
+    public List<TwoNodesEntity> sourceToPersonUseInv(String sourceId, String personId, long personToSourceLayer) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put(START_ID, sourceId);
+        param.put(END_ID, personId);
+        param.put(LAYER, personToSourceLayer);
+
+        String cypher = CypherBuilderFactory.getCypherBuilder("cypher/sourceToPersonUseInvQuery.cql").build();
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, param, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<TwoNodesEntity> results = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            TwoNodesEntity twoNodesEntity = mapper.getBean(info, TwoNodesEntity.class);
+            results.add(twoNodesEntity);
+        }
+        return results;
+    }
+
+    @Override
+    public LinkWrapper groupParentMappingTenInvMerge(long fromId, long toId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("from", fromId);
+        params.put("to", toId);
+        String cypher = CypherBuilderFactory.getCypherBuilder("cypher/groupParentMappingTenInvMergeQuery.cql").build();
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return null;
+        }
+
+        Map<String, Object> linkMap = tempResultList.get(0);
+        if (CollectionUtils.isEmpty(linkMap)) {
+            return null;
+        }
+
+        Relationship relationship = (Relationship) linkMap.get("link");
+        return Neo4jResultParseUtils.parseRelation(relationship);
+    }
 
     private String createCypherWithSpecialType(ModelType modelType) {
 

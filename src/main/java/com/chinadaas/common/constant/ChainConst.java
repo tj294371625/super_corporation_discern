@@ -3,7 +3,7 @@ package com.chinadaas.common.constant;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 链路表常量
+ * @description 链路常量
  * @createTime 2021.07.28
  */
 public class ChainConst {
@@ -57,5 +57,15 @@ public class ChainConst {
      * 目标类型: ent, disclosure, person
      */
     public static final String TARGET_TYPE = "target_type";
+
+    /**
+     * 未知目标标识
+     */
+    public static final String UNKNOWN_ID = "-1";
+
+    /**
+     * 未知目标名称
+     */
+    public static final String UNKNOWN_NAME = "";
 
 }

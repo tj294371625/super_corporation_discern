@@ -1,9 +1,10 @@
 package com.chinadaas.service.impl;
 
+import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.utils.Assert;
-import com.chinadaas.common.utils.SnapshotHandler;
 import com.chinadaas.common.utils.RecordHandler;
+import com.chinadaas.common.utils.SnapshotHandler;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.chinadaas.service.ChainOperationService;
@@ -144,8 +145,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     private boolean parentIdUnknown(ChainEntity chainEntity) {
-        final String UNKNOWN_ID = "-1";
-        return UNKNOWN_ID.equals(chainEntity.getTempEntId());
+        return ChainConst.UNKNOWN_ID.equals(chainEntity.getTempEntId());
     }
 
     private boolean parentIdKnown(ChainEntity chainEntity) {

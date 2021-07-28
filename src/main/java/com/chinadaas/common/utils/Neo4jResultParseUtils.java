@@ -5,11 +5,13 @@ import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.commons.type.RelationType;
 import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.component.wrapper.NodeWrapper;
+import com.chinadaas.component.wrapper.PathWrapper;
+import com.chinadaas.entity.TwoNodesEntity;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
+import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lawliet
@@ -71,6 +73,22 @@ public abstract class Neo4jResultParseUtils {
             return nodeWrapper;
         }
         return null;
+    }
+
+    public static NodeWrapper obtainSpecialNode(String nodeId, List<TwoNodesEntity> entityList) {
+        if (CollectionUtils.isEmpty(entityList)) {
+            return null;
+        }
+
+        TwoNodesEntity twoNodesEntity = entityList.get(0);
+        PathWrapper twoNodesPath = twoNodesEntity.getTwoNodesPath();
+        Set<NodeWrapper> nodeWrappers = twoNodesPath.getNodeWrappers();
+
+        return nodeWrappers.stream()
+                .filter(nodeWrapper -> Objects.equals(nodeId, nodeWrapper.getEntId()))
+                .findFirst()
+                .orElse(null);
+
     }
 
 }

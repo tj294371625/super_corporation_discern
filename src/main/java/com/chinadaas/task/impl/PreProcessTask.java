@@ -10,7 +10,6 @@ import com.chinadaas.model.ChainModel;
 import com.chinadaas.service.ChainOperationService;
 import com.chinadaas.service.algorithm.SuperCorporationAlgorithmChain;
 import com.chinadaas.task.FullTask;
-import com.chinadaas.task.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,7 +23,7 @@ import java.util.function.Consumer;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 前置处理任务
+ * @description 前置处理全量数据
  * @createTime 2021.07.27
  */
 @Slf4j

@@ -40,11 +40,11 @@ public class ChainEntity {
     @Field("target_name")
     private String targetName;
 
-    @Field("source_to_temp_layer")
-    private long source2TempLayer;
+    @Field("temp_to_source_layer")
+    private long temp2SourceLayer;
 
-    @Field("source_to_target_layer")
-    private long source2TargetLayer;
+    @Field("target_to_source_layer")
+    private long target2SourceLayer;
 
     @Field("target_type")
     private String targetType;

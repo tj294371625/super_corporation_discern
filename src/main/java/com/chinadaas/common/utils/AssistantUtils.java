@@ -1,6 +1,7 @@
 package com.chinadaas.common.utils;
 
 
+import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
 import com.chinadaas.component.wrapper.NodeWrapper;
@@ -109,12 +110,11 @@ public abstract class AssistantUtils {
             return chainEntity;
         }
 
-        final String UNKNOWN_ID = "-1";
-        final String UNKNOWN_NAME = "";
-        chainEntity.setTempEntId(UNKNOWN_ID);
-        chainEntity.setTempName(UNKNOWN_NAME);
-        chainEntity.setTargetEntId(UNKNOWN_ID);
-        chainEntity.setTargetName(UNKNOWN_NAME);
+
+        chainEntity.setTempEntId(ChainConst.UNKNOWN_ID);
+        chainEntity.setTempName(ChainConst.UNKNOWN_NAME);
+        chainEntity.setTargetEntId(ChainConst.UNKNOWN_ID);
+        chainEntity.setTargetName(ChainConst.UNKNOWN_NAME);
         return chainEntity;
     }
 

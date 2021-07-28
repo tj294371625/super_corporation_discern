@@ -1,6 +1,7 @@
 package com.chinadaas.repository;
 
 import com.chinadaas.common.constant.ModelType;
+import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.entity.*;
 
 import java.util.List;
@@ -47,18 +48,40 @@ public interface NodeOperationRepository {
     ListDisclosureEntity findListDisclosureNode(String entId);
 
     /**
-     * 节点修复
-     *
-     * @param entId
-     */
-    void nodeFix(String entId);
-
-    /**
      * 节点查询
      *
      * @param entId
      * @return
      */
     NodeEntity nodeFind(String entId);
+
+    /**
+     * 获取两点间信息
+     *
+     * @param sourceId
+     * @param targetId
+     * @param targetToSourceLayer
+     * @return
+     */
+    List<TwoNodesEntity> sourceToTargetUseInv(String sourceId, String targetId, long targetToSourceLayer);
+
+    /**
+     * 获取两点间信息
+     *
+     * @param sourceId
+     * @param personId
+     * @param personToSourceLayer
+     * @return
+     */
+    List<TwoNodesEntity> sourceToPersonUseInv(String sourceId, String personId, long personToSourceLayer);
+
+    /**
+     * 获取可以替换groupparent边的teninvmerge边
+     *
+     * @param fromId
+     * @param toId
+     * @return
+     */
+    LinkWrapper groupParentMappingTenInvMerge(long fromId, long toId);
 
 }
