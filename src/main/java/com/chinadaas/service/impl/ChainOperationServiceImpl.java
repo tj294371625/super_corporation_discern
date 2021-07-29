@@ -52,7 +52,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
 
         SnapshotHandler snapshotHandler = SnapshotHandler.newInstance();
         snapshotHandler.circularCheck(entId);
-        snapshotHandler.chainLengthAccum(chainEntity.getSource2TempLayer());
+        snapshotHandler.chainLengthAccum(chainEntity.getTemp2SourceLayer());
 
         recursiveChainFix(chainEntity, snapshotHandler, modelType);
     }
@@ -102,6 +102,18 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         return repository.queryFinCtrlEntIds();
     }
 
+    @Override
+    public String obtainEntBeforeDisclosure(String sourceEntId, String targetEntId) {
+        ChainEntity chainEntity = repository.chainQuery(sourceEntId, ModelType.PARENT);
+
+        String tempEntId = chainEntity.getTempEntId();
+        if (targetEntId.equals(tempEntId)) {
+            return chainEntity.getSourceEntId();
+        }
+
+        return obtainEntBeforeDisclosure(chainEntity.getSourceEntId(), targetEntId);
+    }
+
     private void recursiveChainFix(ChainEntity chainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {
 
         // zs: 记录上一次实体
@@ -122,7 +134,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
                 return;
             }
 
-            snapshotHandler.chainLengthAccum(chainEntity.getSource2TempLayer());
+            snapshotHandler.chainLengthAccum(chainEntity.getTemp2SourceLayer());
         }
 
         doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);

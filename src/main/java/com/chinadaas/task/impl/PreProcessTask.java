@@ -87,7 +87,7 @@ public class PreProcessTask implements FullTask {
                 }
 
                 try {
-                    chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntity(chainModel), ModelType.PARENT);
+                    chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntityOfChain(chainModel), ModelType.PARENT);
                 } catch (Exception e) {
                     log.warn("chainPersistence fail, entId: [{}]", entId);
                 }
@@ -145,7 +145,7 @@ public class PreProcessTask implements FullTask {
                 }
 
                 try {
-                    chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntity(chainModel), ModelType.FIN_CTRL);
+                    chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntityOfChain(chainModel), ModelType.FIN_CTRL);
                 } catch (Exception e) {
                     log.warn("chainPersistence fail, entId: [{}]", entId);
                 }

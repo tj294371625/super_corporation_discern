@@ -5,6 +5,7 @@ import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
+import com.chinadaas.task.FullTask;
 import com.chinadaas.task.IncrTask;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,10 @@ import java.util.Set;
 public class DiscernIncrDataServiceImpl extends AbstractDiscernDataService {
 
     private final List<IncrTask> incrTasks;
-    private final List<SubTask> fullTasks;
+    private final List<FullTask> fullTasks;
 
     public DiscernIncrDataServiceImpl(List<IncrTask> incrTasks,
-                                      List<SubTask> fullTasks,
+                                      List<FullTask> fullTasks,
                                       EntIdListLoader entIdListLoader,
                                       RecordHandler recordHandler) {
         this.incrTasks = incrTasks;
@@ -63,7 +64,7 @@ public class DiscernIncrDataServiceImpl extends AbstractDiscernDataService {
         // 重新载入add&update类型变更名单
         entIdListLoader.reloadEntIdList(auTypeIncrSet);
 
-        for (SubTask fullTask : fullTasks) {
+        for (FullTask fullTask : fullTasks) {
             fullTask.run();
         }
 

@@ -1,5 +1,7 @@
 package com.chinadaas.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import com.chinadaas.entity.SuperCorporationEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,10 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -62,7 +61,10 @@ public class RecordHandler {
         this.delTypeIncrSet.clear();
     }
 
-
+    @Value("${data.path.super}")
+    private String superDataPath;
+    @Value("${data.filename.super}")
+    private String superDataFileName;
     @Value("${data.path.incr}")
     private String incrListPath;
     @Value("${data.filename.incr}")
@@ -75,6 +77,18 @@ public class RecordHandler {
     private String circularPath;
     @Value("${data.filename.circular}")
     private String circularFileName;
+
+    public synchronized void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {
+        String superCorporationStr = AssistantUtils.superCorporationRecord(superCorporationEntity);
+
+        if (StringUtils.isBlank(incrListPath)
+                || StringUtils.isBlank(incrListFileName)
+                || StringUtils.isBlank(superCorporationStr)) {
+            return;
+        }
+
+        doRecord(superCorporationStr, superDataPath, superDataFileName);
+    }
 
     /**
      * 记录增量名单

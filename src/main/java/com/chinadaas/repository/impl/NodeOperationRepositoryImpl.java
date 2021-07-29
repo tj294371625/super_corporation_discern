@@ -246,6 +246,29 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     }
 
     @Override
+    public List<TwoNodesEntity> sourceToTargetUseGroupParent(String sourceId, String targetId) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put(START_ID, sourceId);
+        param.put(END_ID, targetId);
+
+        String cypher = CypherBuilderFactory.getCypherBuilder("cypher/sourceToTargetUseGroupParentQuery.cql").build();
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, param, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<TwoNodesEntity> results = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            TwoNodesEntity twoNodesEntity = mapper.getBean(info, TwoNodesEntity.class);
+            results.add(twoNodesEntity);
+        }
+        return results;
+    }
+
+    @Override
     public LinkWrapper groupParentMappingTenInvMerge(long fromId, long toId) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("from", fromId);

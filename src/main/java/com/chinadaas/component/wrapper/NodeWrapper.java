@@ -29,6 +29,9 @@ public class NodeWrapper extends NodeDto {
         Map<String, Object> properties = getProperties();
         return (String) properties.get("emc");
     }
+    public String getEmId() {
+        return (String) getProperties().get("emid");
+    }
 
     /**
      * 当前决策权点企业entId

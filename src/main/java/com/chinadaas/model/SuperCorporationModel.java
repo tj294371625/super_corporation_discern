@@ -12,10 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -29,52 +26,54 @@ public class SuperCorporationModel {
     /**
      * 输入企业唯一标识
      */
-    private String currentQueryId;
+    private final String currentQueryId;
+
+    private String parent2SourceRelation;
 
     /**
      * 输入企业
      */
-    private Map<String, Object> sourceProperty;
+    private NodeWrapper sourceNode;
 
     /**
      * 母公司
      */
-    private Map<String, Object> parentProperty;
+    private NodeWrapper parentNode;
 
     /**
      * 最终控股股东
      */
-    private Map<String, Object> finCtrlProperty;
+    private NodeWrapper finCtrlNode;
 
     /**
-     * 母公司到最终控股股东的持股占比
+     * 最终控股股东到母公司的持股占比
      */
-    private String parent2CtrlCgzb;
+    private String ctrl2ParentCgzb;
 
     /**
-     * 母公司到最终控股股东的路径
+     * 最终控股股东到母公司的路径
      */
-    private PathWrapper parent2CtrlPath;
+    private PathWrapper ctrl2ParentPath;
 
     /**
-     * 输入企业到最终控股股东的持股占比
+     * 最终控股股东到输入企业的持股占比
      */
-    private String source2CtrlCgzb;
+    private String ctrl2SourceCgzb;
 
     /**
      * 输入企业到最终控股股东的路径
      */
-    private PathWrapper source2CtrlPath;
+    private PathWrapper ctrl2SourcePath;
 
     /**
      * 输入企业到母公司的持股占比
      */
-    private String source2ParentCgzb;
+    private String parent2SourceCgzb;
 
     /**
      * 输入企业到母公司的路径
      */
-    private PathWrapper source2ParentPath;
+    private PathWrapper parent2SourcePath;
 
     private ModelStatus resultStatus;
 
@@ -89,27 +88,27 @@ public class SuperCorporationModel {
      * @param twoNodesUseInvList
      * @param twoNodesUseGroupParentList
      */
-    public SuperCorporationModel calSourceToParent(List<TwoNodesEntity> twoNodesUseInvList,
-                                                   List<TwoNodesEntity> twoNodesUseGroupParentList) {
+    public void calSourceToParent(List<TwoNodesEntity> twoNodesUseInvList,
+                                  List<TwoNodesEntity> twoNodesUseGroupParentList) {
 
-        PathWrapper source2ParentPath = new PathWrapper();
-        BigDecimal tempInvCgzb = calTotalCgzb(twoNodesUseInvList, source2ParentPath);
-        BigDecimal tempGroupCgzb = calTotalCgzb(twoNodesUseGroupParentList, source2ParentPath);
+        PathWrapper parent2SourcePath = new PathWrapper();
+        BigDecimal tempInvCgzb = calTotalCgzb(twoNodesUseInvList, parent2SourcePath);
+        BigDecimal tempGroupCgzb = calTotalCgzb(twoNodesUseGroupParentList, parent2SourcePath);
 
         BigDecimal totalCgzb;
-        if (tempInvCgzb.compareTo(new BigDecimal(0.0)) == 0) {
+        if (0 == tempInvCgzb.compareTo(new BigDecimal("0.0"))) {
             totalCgzb = tempGroupCgzb;
-        } else if (tempGroupCgzb.compareTo(new BigDecimal(0.0)) == 0) {
+        } else if (0 == tempGroupCgzb.compareTo(new BigDecimal("0.0"))) {
             totalCgzb = tempInvCgzb;
         } else {
             totalCgzb = tempInvCgzb.multiply(tempGroupCgzb);
         }
 
-        this.source2ParentPath = source2ParentPath;
-        this.source2ParentCgzb = totalCgzb.toString();
+        this.parent2SourceRelation = calParent2SourceRelation(parent2SourcePath);
+        this.parent2SourcePath = parent2SourcePath;
+        this.parent2SourceCgzb = totalCgzb.toString();
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
-        return this;
     }
 
     /**
@@ -117,15 +116,13 @@ public class SuperCorporationModel {
      *
      * @param controlPathList
      */
-    public SuperCorporationModel sourceToControlNoParent(List<TwoNodesEntity> controlPathList) {
-        PathWrapper source2CtrlPath = new PathWrapper();
-        BigDecimal totalCgzb = calTotalCgzb(controlPathList, source2CtrlPath);
+    public void sourceToControlNoParent(List<TwoNodesEntity> controlPathList) {
+        PathWrapper ctrl2SourcePath = new PathWrapper();
+        BigDecimal totalCgzb = calTotalCgzb(controlPathList, ctrl2SourcePath);
 
-        this.source2CtrlPath = source2CtrlPath;
-        this.source2CtrlCgzb = totalCgzb.toString();
+        this.ctrl2SourcePath = ctrl2SourcePath;
+        this.ctrl2SourceCgzb = totalCgzb.toString();
         this.resultStatus = ModelStatus.HAVE_RESULT;
-
-        return this;
     }
 
     /**
@@ -134,23 +131,21 @@ public class SuperCorporationModel {
      * @param replaceGroupParentLink
      * @return
      */
-    public SuperCorporationModel parentReplaceControl(Function<LinkWrapper, LinkWrapper> replaceGroupParentLink) {
+    public void parentReplaceControl(Function<LinkWrapper, LinkWrapper> replaceGroupParentLink) {
 
-        finCtrlProperty = parentProperty;
+        finCtrlNode = parentNode;
 
-        Set<NodeWrapper> nodes = this.source2ParentPath.getNodeWrappers();
-        Set<LinkWrapper> links = this.source2ParentPath.getLinkWrappers();
+        Set<NodeWrapper> nodes = this.parent2SourcePath.getNodeWrappers();
+        Set<LinkWrapper> links = this.parent2SourcePath.getLinkWrappers();
         Set<LinkWrapper> controlLinks = transferLinkIfContainGroupParent(links, replaceGroupParentLink);
 
-        PathWrapper source2CtrlPath = new PathWrapper();
-        source2CtrlPath.setNodeWrappers(nodes);
-        source2CtrlPath.setLinkWrappers(controlLinks);
+        PathWrapper ctrl2SourcePath = new PathWrapper();
+        ctrl2SourcePath.setNodeWrappers(nodes);
+        ctrl2SourcePath.setLinkWrappers(controlLinks);
 
-        this.source2CtrlPath = source2CtrlPath;
-        this.source2CtrlCgzb = this.source2ParentCgzb;
+        this.ctrl2SourcePath = ctrl2SourcePath;
+        this.ctrl2SourceCgzb = this.parent2SourceCgzb;
         this.resultStatus = ModelStatus.HAVE_RESULT;
-
-        return this;
     }
 
     /**
@@ -161,63 +156,63 @@ public class SuperCorporationModel {
      * @param parentType
      * @return
      */
-    public SuperCorporationModel sourceToControlHaveParent(List<TwoNodesEntity> sourceToControlPathList,
-                                                           List<TwoNodesEntity> parentToControlPathList,
-                                                           String parentType) {
-        PathWrapper parent2CtrlPath = new PathWrapper();
-        PathWrapper source2CtrlPath = new PathWrapper();
-        BigDecimal parent2CtrlCgzb;
-        BigDecimal source2CtrlCgzb;
+    public void sourceToControlHaveParent(List<TwoNodesEntity> sourceToControlPathList,
+                                          List<TwoNodesEntity> parentToControlPathList,
+                                          String parentType) {
 
-        parent2CtrlCgzb = calTotalCgzb(parentToControlPathList, parent2CtrlPath);
+        PathWrapper ctrl2ParentPath = new PathWrapper();
+        PathWrapper ctrl2SourcePath = new PathWrapper();
+        BigDecimal ctrl2ParentCgzb;
+        BigDecimal ctrl2SourceCgzb;
+
+        ctrl2ParentCgzb = calTotalCgzb(parentToControlPathList, ctrl2ParentPath);
 
         // 母公司是上市披露公司
         if (TargetType.DISCLOSURE.toString().equals(parentType)) {
 
             // merge path
-            Set<NodeWrapper> nodes = source2CtrlPath.getNodeWrappers();
-            Set<LinkWrapper> links = source2CtrlPath.getLinkWrappers();
-            nodes.addAll(this.source2ParentPath.getNodeWrappers());
-            nodes.addAll(parent2CtrlPath.getNodeWrappers());
-            links.addAll(this.source2ParentPath.getLinkWrappers());
-            links.addAll(parent2CtrlPath.getLinkWrappers());
-            source2CtrlPath.setNodeWrappers(nodes);
-            source2CtrlPath.setLinkWrappers(links);
+            Set<NodeWrapper> nodes = ctrl2SourcePath.getNodeWrappers();
+            Set<LinkWrapper> links = ctrl2SourcePath.getLinkWrappers();
+            nodes.addAll(this.parent2SourcePath.getNodeWrappers());
+            nodes.addAll(ctrl2ParentPath.getNodeWrappers());
+            links.addAll(this.parent2SourcePath.getLinkWrappers());
+            links.addAll(ctrl2ParentPath.getLinkWrappers());
+            ctrl2SourcePath.setNodeWrappers(nodes);
+            ctrl2SourcePath.setLinkWrappers(links);
 
             // cal cgzb
-            BigDecimal source2ParentCgzb = new BigDecimal(this.source2ParentCgzb);
-            if (parent2CtrlCgzb.compareTo(new BigDecimal(0.0)) == 0) {
-                source2CtrlCgzb = source2ParentCgzb;
-            } else if (source2ParentCgzb.compareTo(new BigDecimal(0.0)) == 0) {
-                source2CtrlCgzb = parent2CtrlCgzb;
+            BigDecimal source2ParentCgzb = new BigDecimal(this.parent2SourceCgzb);
+            if (0 == ctrl2ParentCgzb.compareTo(new BigDecimal("0.0"))) {
+                ctrl2SourceCgzb = source2ParentCgzb;
+            } else if (0 == source2ParentCgzb.compareTo(new BigDecimal("0.0"))) {
+                ctrl2SourceCgzb = ctrl2ParentCgzb;
             } else {
-                source2CtrlCgzb = parent2CtrlCgzb.multiply(source2ParentCgzb);
+                ctrl2SourceCgzb = ctrl2ParentCgzb.multiply(source2ParentCgzb);
             }
 
         } else {
-            source2CtrlCgzb = calTotalCgzb(sourceToControlPathList, source2CtrlPath);
+            ctrl2SourceCgzb = calTotalCgzb(sourceToControlPathList, ctrl2SourcePath);
         }
 
 
-        this.parent2CtrlCgzb = parent2CtrlCgzb.toString();
-        this.source2CtrlCgzb = source2CtrlCgzb.toString();
-        this.parent2CtrlPath = parent2CtrlPath;
-        this.source2CtrlPath = source2CtrlPath;
+        this.ctrl2ParentCgzb = ctrl2ParentCgzb.toString();
+        this.ctrl2SourceCgzb = ctrl2SourceCgzb.toString();
+        this.ctrl2ParentPath = ctrl2ParentPath;
+        this.ctrl2SourcePath = ctrl2SourcePath;
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
-        return this;
     }
 
     public void setSourceProperty(NodeWrapper sourceNode) {
-        this.sourceProperty = sourceNode.getProperties();
+        this.sourceNode = sourceNode;
     }
 
     public void setParentProperty(NodeWrapper parentNode) {
-        this.parentProperty = parentNode.getProperties();
+        this.parentNode = parentNode;
     }
 
     public void setFinCtrlProperty(NodeWrapper finCtrlNode) {
-        this.finCtrlProperty = finCtrlNode.getProperties();
+        this.finCtrlNode = finCtrlNode;
     }
 
     public String getCurrentQueryId() {
@@ -225,39 +220,48 @@ public class SuperCorporationModel {
     }
 
     public Map<String, Object> getSourceProperty() {
-        return sourceProperty;
+        if (Objects.nonNull(sourceNode)) {
+            return sourceNode.getProperties();
+        }
+        return null;
     }
 
     public Map<String, Object> getParentProperty() {
-        return parentProperty;
+        if (Objects.nonNull(parentNode)) {
+            return parentNode.getProperties();
+        }
+        return null;
     }
 
     public Map<String, Object> getFinCtrlProperty() {
-        return finCtrlProperty;
+        if (Objects.nonNull(finCtrlNode)) {
+            return finCtrlNode.getProperties();
+        }
+        return null;
     }
 
-    public String getParent2CtrlCgzb() {
-        return parent2CtrlCgzb;
+    public String getCtrl2ParentCgzb() {
+        return ctrl2ParentCgzb;
     }
 
-    public PathWrapper getParent2CtrlPath() {
-        return parent2CtrlPath;
+    public PathWrapper getCtrl2ParentPath() {
+        return ctrl2ParentPath;
     }
 
-    public String getSource2CtrlCgzb() {
-        return source2CtrlCgzb;
+    public String getCtrl2SourceCgzb() {
+        return ctrl2SourceCgzb;
     }
 
-    public PathWrapper getSource2CtrlPath() {
-        return source2CtrlPath;
+    public PathWrapper getCtrl2SourcePath() {
+        return ctrl2SourcePath;
     }
 
-    public String getSource2ParentCgzb() {
-        return source2ParentCgzb;
+    public String getParent2SourceCgzb() {
+        return parent2SourceCgzb;
     }
 
-    public PathWrapper getSource2ParentPath() {
-        return source2ParentPath;
+    public PathWrapper getParent2SourcePath() {
+        return parent2SourcePath;
     }
 
     public ModelStatus getResultStatus() {
@@ -266,7 +270,7 @@ public class SuperCorporationModel {
 
     /**
      * 计算两点之间持股占比
-     * todo: 违反了srp原则，在此处merge了所有path
+     * zs: 违反了srp原则，在此处merge了所有path
      *
      * @param twoNodesList
      * @param path
@@ -276,14 +280,14 @@ public class SuperCorporationModel {
         Set<NodeWrapper> nodes = path.getNodeWrappers();
         Set<LinkWrapper> links = path.getLinkWrappers();
 
-        BigDecimal tempCgzb = new BigDecimal(0.0);
+        BigDecimal tempCgzb = new BigDecimal("0.0");
         if (!CollectionUtils.isEmpty(twoNodesList)) {
             for (TwoNodesEntity twoNodesEntity : twoNodesList) {
                 PathWrapper twoNodesPath = twoNodesEntity.getTwoNodesPath();
                 nodes.addAll(twoNodesPath.getNodeWrappers());
                 links.addAll(twoNodesPath.getLinkWrappers());
 
-                BigDecimal twoNodesCgzb = new BigDecimal(twoNodesEntity.getTwoNodesCgzb());
+                BigDecimal twoNodesCgzb = new BigDecimal(String.valueOf(twoNodesEntity.getTwoNodesCgzb()));
                 tempCgzb = tempCgzb.add(twoNodesCgzb);
             }
         }
@@ -306,7 +310,7 @@ public class SuperCorporationModel {
             final int GROUP_PARENT = 13;
             if (link.getType() == GROUP_PARENT) {
                 LinkWrapper resultLink = replaceGroupParentLink.apply(link);
-                // fixme: 这里还是有可能混入groupparent边
+                // zs: 这里还是有可能混入groupparent边
                 if (Objects.isNull(resultLink)) {
                     BeanUtils.copyProperties(link, controlLink);
                 } else {
@@ -322,4 +326,108 @@ public class SuperCorporationModel {
         return controlLinks;
     }
 
+    private String calParent2SourceRelation(PathWrapper source2ParentPath) {
+        String defaultRelation = "间接";
+        String sourceId = sourceNode.getEntId();
+        String parentId = parentNode.getEntId();
+
+        if (Objects.equals(sourceId, parentId)) {
+            return "直接";
+        }
+
+        Set<NodeWrapper> nodeWrappers = source2ParentPath.getNodeWrappers();
+        NodeWrapper sourceNode = nodeWrappers.stream()
+                .filter(nodeWrapper -> sourceId.equals(nodeWrapper.getEntId()))
+                .findFirst()
+                .orElse(null);
+        NodeWrapper parentNode = nodeWrappers.stream()
+                .filter(nodeWrapper -> parentId.equals(nodeWrapper.getEntId()))
+                .findFirst()
+                .orElse(null);
+
+        Set<LinkWrapper> linkWrappers = source2ParentPath.getLinkWrappers();
+        Optional<LinkWrapper> optional = linkWrappers.stream()
+                .filter(
+                        linkWrapper -> linkWrapper.getFrom() == parentNode.getId()
+                                && linkWrapper.getTo() == sourceNode.getId()
+                )
+                .findFirst();
+
+        if (optional.isPresent()) {
+            return "直接";
+        }
+
+        return defaultRelation;
+    }
+
+    public String getEntId() {
+        if (Objects.nonNull(sourceNode)) {
+            return sourceNode.getEntId();
+        }
+        return "";
+    }
+
+    public String getEntName() {
+        if (Objects.nonNull(sourceNode)) {
+            return sourceNode.getEntName();
+        }
+        return "";
+    }
+
+    public String getFinCtrlId() {
+        if (Objects.nonNull(finCtrlNode)) {
+            int nodeType = finCtrlNode.getType();
+            if (NodeType.ENT == nodeType) {
+                return finCtrlNode.getEntId();
+            }
+            return finCtrlNode.getZsId();
+        }
+        return "";
+    }
+
+    public String getFinCtrlName() {
+        if (Objects.nonNull(finCtrlNode)) {
+            return finCtrlNode.getName();
+        }
+        return "";
+    }
+
+    public String getParent2SourceRelation() {
+        return parent2SourceRelation;
+    }
+
+    public String getParentId() {
+        if (Objects.nonNull(parentNode)) {
+            return parentNode.getEntId();
+        }
+        return "";
+    }
+
+    public String getParentName() {
+        if (Objects.nonNull(parentNode)) {
+            return parentNode.getEntName();
+        }
+        return "";
+    }
+
+    public String getParentRegno() {
+        if (Objects.nonNull(parentNode)) {
+            return parentNode.getRegNo();
+        }
+        return "";
+    }
+
+    public String getParentCreditcode() {
+        if (Objects.nonNull(parentNode)) {
+            return parentNode.getCreditCode();
+        }
+        return "";
+    }
+
+    public String getEmId() {
+        if (Objects.nonNull(finCtrlNode)) {
+            return finCtrlNode.getEmId();
+        }
+        return "";
+    }
 }

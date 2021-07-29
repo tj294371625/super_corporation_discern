@@ -44,11 +44,11 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
     }
 
     protected void preDoDiscern() {
-        // subclass do something here
+        // sub class do something here
     }
 
     protected void postDoDiscern() {
-        // subclass do something here
+        // sub class do something here
     }
 
     protected abstract void doDiscern();

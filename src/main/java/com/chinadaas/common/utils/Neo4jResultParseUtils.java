@@ -2,13 +2,14 @@ package com.chinadaas.common.utils;
 
 
 import com.chinadaas.commons.type.NodeType;
-import com.chinadaas.commons.type.RelationType;
 import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.component.wrapper.PathWrapper;
 import com.chinadaas.entity.TwoNodesEntity;
+import com.google.common.collect.Sets;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -25,6 +26,15 @@ public abstract class Neo4jResultParseUtils {
     private static final String LEGAL_KEY = "legal";
     private static final String RISK_SCORE = "riskscore";
     private static final String RELATION_ID = "relationid";
+    private static final Set<String> NODE_PROPERTIES;
+
+    static {
+        NODE_PROPERTIES = Sets.newHashSet();
+        NODE_PROPERTIES.add("name");
+        NODE_PROPERTIES.add("creditcode");
+        NODE_PROPERTIES.add("regno");
+        NODE_PROPERTIES.add("entid");
+    }
 
     public static LinkWrapper parseRelation(Relationship relationship) {
 
@@ -33,7 +43,7 @@ public abstract class Neo4jResultParseUtils {
             long startNode = relationship.startNodeId();
             long id = relationship.id();
             String type = relationship.type();
-            int relationType = RelationType.parseRelationType(type);
+            int relationType = AssistantUtils.parseRelationType(type);
             Map<String, Object> properties = relationship.asMap();
             Map<String, Object> mutableProperties = new HashMap<>(properties.size());
             mutableProperties.putAll(properties);
@@ -89,6 +99,41 @@ public abstract class Neo4jResultParseUtils {
                 .findFirst()
                 .orElse(null);
 
+    }
+
+    public static PathWrapper getFilterPath(PathWrapper path) {
+
+        if (Objects.nonNull(path)) {
+            PathWrapper filterPath = new PathWrapper();
+            Set<NodeWrapper> nodeWrappers = path.getNodeWrappers();
+            Set<NodeWrapper> filterNodes = new HashSet<>(nodeWrappers.size());
+            nodeWrappers.forEach(nodeWrapper -> {
+                NodeWrapper filterNode = new NodeWrapper();
+
+                BeanUtils.copyProperties(nodeWrapper, filterNode);
+                Map<String, Object> filterNodeProperties = filterNode.getProperties();
+
+                if (!CollectionUtils.isEmpty(filterNodeProperties)) {
+                    Set<Map.Entry<String, Object>> entries = filterNodeProperties.entrySet();
+                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, Object> next = iterator.next();
+                        String key = next.getKey();
+                        if (!NODE_PROPERTIES.contains(key)) {
+                            iterator.remove();
+                        }
+                    }
+                }
+
+                filterNodes.add(filterNode);
+            });
+
+            filterPath.setNodeWrappers(filterNodes);
+            filterPath.setLinkWrappers(path.getLinkWrappers());
+            return filterPath;
+        }
+
+        return null;
     }
 
 }

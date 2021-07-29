@@ -76,6 +76,15 @@ public interface NodeOperationRepository {
     List<TwoNodesEntity> sourceToPersonUseInv(String sourceId, String personId, long personToSourceLayer);
 
     /**
+     * 获取两点间信息（上市披露）
+     *
+     * @param sourceId
+     * @param targetId
+     * @return
+     */
+    List<TwoNodesEntity> sourceToTargetUseGroupParent(String sourceId, String targetId);
+
+    /**
      * 获取可以替换groupparent边的teninvmerge边
      *
      * @param fromId

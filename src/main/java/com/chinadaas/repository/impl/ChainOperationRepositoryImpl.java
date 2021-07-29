@@ -7,7 +7,11 @@ import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,10 +21,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -34,12 +36,6 @@ import java.util.stream.Collectors;
 public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     private static final Object LOCK = new Object();
-
-    /*private static final String ID = "_id";
-    private static final String SOURCE_ENT_ID = "source_entid";
-    private static final String TARGET_ENT_ID = "target_entid";
-    private static final String GROUP_ENT_ID = "group_entid";
-    private static final String GROUP_NAME = "group_name";*/
 
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
@@ -144,24 +140,44 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public Set<String> fullSourceEntId() {
-        Query condition = new Query();
-        condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
-        List<ChainEntity> allRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
+        Set<String> fullSourceEntIds = Sets.newHashSet();
 
-        return allRecords.stream()
-                .map(ChainEntity::getSourceEntId)
-                .collect(Collectors.toSet());
+        MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection.find()
+                .batchSize(10000)
+                .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                fullSourceEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
+                            }
+                        }
+                );
+
+        return fullSourceEntIds;
     }
 
     @Override
     public Set<String> queryFinCtrlEntIds() {
-        Query condition = new Query(Criteria.where(ChainConst.TARGET_ENT_ID).is("-1"));
-        condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
-        List<ChainEntity> partRecords = mongoTemplate.find(condition, ChainEntity.class, SC_CHAIN_PARENT);
+        Set<String> finCtrlEntIds = Sets.newHashSet();
 
-        return partRecords.stream()
-                .map(ChainEntity::getSourceEntId)
-                .collect(Collectors.toSet());
+        BasicDBObject condition = new BasicDBObject();
+        condition.put(ChainConst.TARGET_ENT_ID, "-1");
+
+        MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection
+                .find(condition)
+                .batchSize(10000)
+                .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                finCtrlEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
+                            }
+                        }
+                );
+
+        return finCtrlEntIds;
     }
 
     private List<List<String>> batchProcess(Set<String> entIds) {

@@ -9,8 +9,10 @@ import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
 import com.chinadaas.task.FullTask;
 import com.chinadaas.task.Task;
+import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.IndexModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,6 +77,7 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     }
 
     private void resetCollection() {
+
         if (mongoTemplate.collectionExists(SC_CHAIN_PARENT)) {
             mongoTemplate.dropCollection(SC_CHAIN_PARENT);
         }
@@ -83,21 +86,20 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
             mongoTemplate.dropCollection(SC_CHAIN_FINCTRL);
         }
 
-        DBObject sourceEntIdIndex = new BasicDBObject();
+        BasicDBObject sourceEntIdIndex = new BasicDBObject();
         sourceEntIdIndex.put(ChainConst.SOURCE_ENT_ID, 1);
-
-        DBObject tempEntIdIndex = new BasicDBObject();
+        BasicDBObject tempEntIdIndex = new BasicDBObject();
         tempEntIdIndex.put(ChainConst.TEMP_ENT_ID, 1);
-
-        DBObject targetEntIdIndex = new BasicDBObject();
+        BasicDBObject targetEntIdIndex = new BasicDBObject();
         targetEntIdIndex.put(ChainConst.TARGET_ENT_ID, 1);
 
-        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(sourceEntIdIndex);
-        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(tempEntIdIndex);
-        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndex(targetEntIdIndex);
+        List<IndexModel> indexModels = Lists.newArrayList();
+        indexModels.add(new IndexModel(sourceEntIdIndex));
+        indexModels.add(new IndexModel(tempEntIdIndex));
+        indexModels.add(new IndexModel(targetEntIdIndex));
 
-        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(sourceEntIdIndex);
-        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(tempEntIdIndex);
-        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndex(targetEntIdIndex);
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndexes(indexModels);
+        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndexes(indexModels);
+
     }
 }

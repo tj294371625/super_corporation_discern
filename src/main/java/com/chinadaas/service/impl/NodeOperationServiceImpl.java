@@ -49,6 +49,11 @@ public class NodeOperationServiceImpl implements NodeOperationService {
     }
 
     @Override
+    public List<TwoNodesEntity> sourceToTargetUseGroupParent(String sourceId, String targetId) {
+        return repository.sourceToTargetUseGroupParent(sourceId, targetId);
+    }
+
+    @Override
     public LinkWrapper groupParentMappingTenInvMerge(long fromId, long toId) {
         return repository.groupParentMappingTenInvMerge(fromId, toId);
     }

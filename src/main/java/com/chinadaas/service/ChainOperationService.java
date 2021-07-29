@@ -62,4 +62,12 @@ public interface ChainOperationService {
      */
     Set<String> queryFinCtrlEntIds();
 
+    /**
+     * 获取上市披露公司的前一个公司的企业标识
+     *
+     * @param sourceEntId
+     * @param targetEntId
+     * @return
+     */
+    String obtainEntBeforeDisclosure(String sourceEntId, String targetEntId);
 }
