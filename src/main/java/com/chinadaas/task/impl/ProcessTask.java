@@ -168,6 +168,7 @@ public class ProcessTask implements FullTask {
                     controlPathList = nodeOperationService.sourceToPersonUseInv(currentQueryId, finCtrlId, ctrl2SourceLayer);
                 }
 
+                superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, controlPathList));
                 superCorporationModel.setFinCtrlProperty(Neo4jResultParseUtils.obtainSpecialNode(finCtrlId, controlPathList));
                 superCorporationModel.sourceToControlNoParent(controlPathList);
                 return;
@@ -188,8 +189,8 @@ public class ProcessTask implements FullTask {
             }
 
             // zs: 3.存在母公司和最终控股股东
-            if (ChainConst.UNKNOWN_ID.equals(finCtrlId)
-                    && ChainConst.UNKNOWN_ID.equals(parentId)) {
+            if (!ChainConst.UNKNOWN_ID.equals(finCtrlId)
+                    && !ChainConst.UNKNOWN_ID.equals(parentId)) {
 
                 List<TwoNodesEntity> parentToControlPathList;
                 if (TargetType.ENT.toString().equals(ctrlType)) {

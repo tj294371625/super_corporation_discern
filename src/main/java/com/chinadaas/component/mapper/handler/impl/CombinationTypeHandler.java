@@ -59,6 +59,9 @@ public class CombinationTypeHandler extends AbstractAnnotationHandler {
             LinkWrapper linkWrapper = Neo4jResultParseUtils.parseRelation((Relationship) unKnown);
             combProperties = Maps.newHashMap(linkWrapper.getProperties());
         }
+        if (unKnown instanceof Map) {
+            combProperties = Maps.newHashMap((Map<String, Object>) unKnown);
+        }
         Class<?> combClassType = field.getType();
 
         Object combObj = handleInternalField(combProperties, combClassType);

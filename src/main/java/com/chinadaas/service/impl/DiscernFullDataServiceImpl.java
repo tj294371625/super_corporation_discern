@@ -37,6 +37,9 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
     @Value("${db.mongodb.finCtrlCollection}")
     private String SC_CHAIN_FINCTRL;
 
+    @Value("${db.mongodb.superCollection}")
+    private String SC_SUPER_CORPORATION;
+
     private final List<FullTask> fullTasks;
     private final MongoTemplate mongoTemplate;
 
@@ -84,6 +87,10 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
 
         if (mongoTemplate.collectionExists(SC_CHAIN_FINCTRL)) {
             mongoTemplate.dropCollection(SC_CHAIN_FINCTRL);
+        }
+
+        if (mongoTemplate.collectionExists(SC_SUPER_CORPORATION)) {
+            mongoTemplate.dropCollection(SC_SUPER_CORPORATION);
         }
 
         BasicDBObject sourceEntIdIndex = new BasicDBObject();

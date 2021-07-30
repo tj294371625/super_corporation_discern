@@ -1,4 +1,4 @@
-match (start:ent{nodeid: $startId}), (end:person{zsid: $endId})
+match (start:ent {nodeid: $startId}), (end:person {zsid: $endId})
 call apoc.path.expandConfig(start, {terminatorNodes: end, maxLevel: $layer, bfs:true, relationshipFilter: '<teninvmerge'})
 yield path with path as p, start, end
   where all(n in nodes(p) where (n.entstatus is null or n.entstatus = '1'))

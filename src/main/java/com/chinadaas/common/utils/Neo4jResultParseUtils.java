@@ -95,7 +95,10 @@ public abstract class Neo4jResultParseUtils {
         Set<NodeWrapper> nodeWrappers = twoNodesPath.getNodeWrappers();
 
         return nodeWrappers.stream()
-                .filter(nodeWrapper -> Objects.equals(nodeId, nodeWrapper.getEntId()))
+                .filter(
+                        nodeWrapper -> Objects.equals(nodeId, nodeWrapper.getEntId())
+                                || Objects.equals(nodeId, nodeWrapper.getZsId())
+                )
                 .findFirst()
                 .orElse(null);
 

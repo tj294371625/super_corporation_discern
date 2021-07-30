@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Set;
 
@@ -20,9 +21,11 @@ import java.util.Set;
 @ToString
 public class PathWrapper {
 
+    @Field("nodes")
     @NodesType("nodes")
     Set<NodeWrapper> nodeWrappers = Sets.newHashSet();
 
+    @Field("links")
     @LinksType("links")
     Set<LinkWrapper> linkWrappers = Sets.newHashSet();
 

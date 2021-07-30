@@ -61,6 +61,7 @@ public class EntIdListLoader {
 
         if (BooleanUtils.isTrue(status)) {
             this.status = false;
+            return;
         }
 
         throw new IllegalStateException("illegal lock status");

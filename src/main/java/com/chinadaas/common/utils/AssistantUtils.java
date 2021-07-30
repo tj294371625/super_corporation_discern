@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
+import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.commons.type.RelationType;
 import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.ChainEntity;
@@ -195,9 +196,18 @@ public abstract class AssistantUtils {
         chainEntity.setTarget2SourceLayer(chainLength);
 
         if (ModelStatus.COMPLETE_RESULT.equals(resultStatus)) {
-            chainEntity.setTempEntId(targetNode.getEntId());
+            // zs: 节点类型为自然人，特殊处理
+            int type = targetNode.getType();
+
+            if (NodeType.PERSON == type) {
+                chainEntity.setTempEntId(targetNode.getZsId());
+                chainEntity.setTargetEntId(targetNode.getZsId());
+            } else {
+                chainEntity.setTempEntId(targetNode.getEntId());
+                chainEntity.setTargetEntId(targetNode.getEntId());
+            }
+
             chainEntity.setTempName(targetNode.getEntName());
-            chainEntity.setTargetEntId(targetNode.getEntId());
             chainEntity.setTargetName(targetNode.getEntName());
             return chainEntity;
         }
