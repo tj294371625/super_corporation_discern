@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RecordHandler {
 
+    private static final Object LOCK = new Object();
+
     /**
      * 记录新增或者更新类型的增量名单
      */
@@ -78,7 +80,7 @@ public class RecordHandler {
     @Value("${data.filename.circular}")
     private String circularFileName;
 
-    public synchronized void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {
+    public void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {
         String superCorporationStr = AssistantUtils.superCorporationRecord(superCorporationEntity);
 
         if (StringUtils.isBlank(incrListPath)
@@ -87,7 +89,9 @@ public class RecordHandler {
             return;
         }
 
-        doRecord(superCorporationStr, superDataPath, superDataFileName);
+        synchronized (LOCK) {
+            doRecord(superCorporationStr, superDataPath, superDataFileName);
+        }
     }
 
     /**

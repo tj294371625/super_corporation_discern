@@ -2,6 +2,7 @@ package com.chinadaas.service.impl;
 
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ImportMode;
+import com.chinadaas.common.constant.SuperConst;
 import com.chinadaas.common.utils.RecordHandler;
 import com.chinadaas.common.utils.TimeUtils;
 import com.chinadaas.component.io.EntIdListHolder;
@@ -89,10 +90,6 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
             mongoTemplate.dropCollection(SC_CHAIN_FINCTRL);
         }
 
-        if (mongoTemplate.collectionExists(SC_SUPER_CORPORATION)) {
-            mongoTemplate.dropCollection(SC_SUPER_CORPORATION);
-        }
-
         BasicDBObject sourceEntIdIndex = new BasicDBObject();
         sourceEntIdIndex.put(ChainConst.SOURCE_ENT_ID, 1);
         BasicDBObject tempEntIdIndex = new BasicDBObject();
@@ -100,13 +97,36 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
         BasicDBObject targetEntIdIndex = new BasicDBObject();
         targetEntIdIndex.put(ChainConst.TARGET_ENT_ID, 1);
 
-        List<IndexModel> indexModels = Lists.newArrayList();
-        indexModels.add(new IndexModel(sourceEntIdIndex));
-        indexModels.add(new IndexModel(tempEntIdIndex));
-        indexModels.add(new IndexModel(targetEntIdIndex));
+        List<IndexModel> chainIndexModels = Lists.newArrayList();
+        chainIndexModels.add(new IndexModel(sourceEntIdIndex));
+        chainIndexModels.add(new IndexModel(tempEntIdIndex));
+        chainIndexModels.add(new IndexModel(targetEntIdIndex));
 
-        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndexes(indexModels);
-        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndexes(indexModels);
+        mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndexes(chainIndexModels);
+        mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndexes(chainIndexModels);
 
+        if (mongoTemplate.collectionExists(SC_SUPER_CORPORATION)) {
+            mongoTemplate.dropCollection(SC_SUPER_CORPORATION);
+        }
+
+        BasicDBObject entIdIndex = new BasicDBObject();
+        entIdIndex.put(SuperConst.ENT_ID, 1);
+        BasicDBObject finCtrlIdIndex = new BasicDBObject();
+        finCtrlIdIndex.put(SuperConst.FIN_CTRL_ID, 1);
+        BasicDBObject parentIdIndex = new BasicDBObject();
+        parentIdIndex.put(SuperConst.PARENT_ID, 1);
+        BasicDBObject entNameIndex = new BasicDBObject();
+        entNameIndex.put(SuperConst.ENT_NAME, 1);
+        BasicDBObject parentNameIndex = new BasicDBObject();
+        parentNameIndex.put(SuperConst.PARENT_NAME, 1);
+
+        List<IndexModel> superIndexModels = Lists.newArrayList();
+        superIndexModels.add(new IndexModel(entIdIndex));
+        superIndexModels.add(new IndexModel(finCtrlIdIndex));
+        superIndexModels.add(new IndexModel(parentIdIndex));
+        superIndexModels.add(new IndexModel(entNameIndex));
+        superIndexModels.add(new IndexModel(parentNameIndex));
+
+        mongoTemplate.createCollection(SC_SUPER_CORPORATION).createIndexes(superIndexModels);
     }
 }

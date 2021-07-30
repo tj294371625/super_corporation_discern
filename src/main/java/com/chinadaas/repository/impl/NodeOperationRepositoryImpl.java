@@ -271,8 +271,11 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     @Override
     public LinkWrapper groupParentMappingTenInvMerge(long fromId, long toId) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("from", fromId);
-        params.put("to", toId);
+        final String FROM = "from";
+        final String TO = "to";
+        params.put(FROM, fromId);
+        params.put(TO, toId);
+
         String cypher = CypherBuilderFactory.getCypherBuilder("cypher/groupParentMappingTenInvMergeQuery.cql").build();
         List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
         if (CollectionUtils.isEmpty(tempResultList)) {
@@ -284,7 +287,8 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
             return null;
         }
 
-        Relationship relationship = (Relationship) linkMap.get("link");
+        final String LINK_KEY = "link";
+        Relationship relationship = (Relationship) linkMap.get(LINK_KEY);
         return Neo4jResultParseUtils.parseRelation(relationship);
     }
 

@@ -33,7 +33,6 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
 
     @Override
     public void insertSuperCorporation(SuperCorporationEntity superCorporationEntity) {
-        mongoTemplate.insert(superCorporationEntity, SC_SUPER_CORPORATION);
 
         synchronized (LOCK) {
             int index = 0;
