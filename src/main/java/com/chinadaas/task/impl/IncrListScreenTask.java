@@ -113,7 +113,7 @@ public class IncrListScreenTask implements IncrTask {
             return UNKNOWN_ID.equals(targetEntId);
         }
 
-        return targetEntId.equals(parentNode.getEntId());
+        return targetEntId.equals(parentNode.obtainEntId());
     }
 }
 

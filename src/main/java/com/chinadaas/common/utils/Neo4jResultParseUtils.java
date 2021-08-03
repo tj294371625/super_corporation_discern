@@ -96,8 +96,8 @@ public abstract class Neo4jResultParseUtils {
 
         return nodeWrappers.stream()
                 .filter(
-                        nodeWrapper -> Objects.equals(nodeId, nodeWrapper.getEntId())
-                                || Objects.equals(nodeId, nodeWrapper.getZsId())
+                        nodeWrapper -> Objects.equals(nodeId, nodeWrapper.obtainEntId())
+                                || Objects.equals(nodeId, nodeWrapper.obtainZsId())
                 )
                 .findFirst()
                 .orElse(null);

@@ -1,7 +1,9 @@
 package com.chinadaas.model;
 
+import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
+import com.chinadaas.common.utils.AssistantUtils;
 import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.component.wrapper.NodeWrapper;
@@ -102,6 +104,7 @@ public class SuperCorporationModel {
             totalCgzb = tempInvCgzb;
         } else {
             totalCgzb = tempInvCgzb.multiply(tempGroupCgzb);
+            totalCgzb = roundHalfUp(totalCgzb);
         }
 
         this.parent2SourceRelation = calParent2SourceRelation(parent2SourcePath);
@@ -188,6 +191,7 @@ public class SuperCorporationModel {
                 ctrl2SourceCgzb = ctrl2ParentCgzb;
             } else {
                 ctrl2SourceCgzb = ctrl2ParentCgzb.multiply(source2ParentCgzb);
+                ctrl2SourceCgzb = roundHalfUp(ctrl2SourceCgzb);
             }
 
         } else {
@@ -204,15 +208,15 @@ public class SuperCorporationModel {
     }
 
     public void setSourceProperty(NodeWrapper sourceNode) {
-        this.sourceNode = sourceNode;
+        this.sourceNode = JSON.parseObject(JSON.toJSONString(sourceNode), NodeWrapper.class);
     }
 
     public void setParentProperty(NodeWrapper parentNode) {
-        this.parentNode = parentNode;
+        this.parentNode = JSON.parseObject(JSON.toJSONString(parentNode), NodeWrapper.class);
     }
 
     public void setFinCtrlProperty(NodeWrapper finCtrlNode) {
-        this.finCtrlNode = finCtrlNode;
+        this.finCtrlNode = JSON.parseObject(JSON.toJSONString(finCtrlNode), NodeWrapper.class);
     }
 
     public String getCurrentQueryId() {
@@ -221,21 +225,27 @@ public class SuperCorporationModel {
 
     public Map<String, Object> getSourceProperty() {
         if (Objects.nonNull(sourceNode)) {
-            return sourceNode.getProperties();
+            Map<String, Object> properties = sourceNode.getProperties();
+            AssistantUtils.filterCommonPartProperties(properties);
+            return properties;
         }
         return null;
     }
 
     public Map<String, Object> getParentProperty() {
         if (Objects.nonNull(parentNode)) {
-            return parentNode.getProperties();
+            Map<String, Object> properties = parentNode.getProperties();
+            AssistantUtils.filterCommonPartProperties(properties);
+            return properties;
         }
         return null;
     }
 
     public Map<String, Object> getFinCtrlProperty() {
         if (Objects.nonNull(finCtrlNode)) {
-            return finCtrlNode.getProperties();
+            Map<String, Object> properties = finCtrlNode.getProperties();
+            AssistantUtils.filterFinCtrlNodeProperties(properties, finCtrlNode.getType());
+            return properties;
         }
         return null;
     }
@@ -291,6 +301,9 @@ public class SuperCorporationModel {
                 tempCgzb = tempCgzb.add(twoNodesCgzb);
             }
         }
+
+        tempCgzb = roundHalfUp(tempCgzb);
+
         return tempCgzb;
     }
 
@@ -328,8 +341,8 @@ public class SuperCorporationModel {
 
     private String calParent2SourceRelation(PathWrapper source2ParentPath) {
         String defaultRelation = "间接";
-        String sourceId = sourceNode.getEntId();
-        String parentId = parentNode.getEntId();
+        String sourceId = sourceNode.obtainEntId();
+        String parentId = parentNode.obtainEntId();
 
         if (Objects.equals(sourceId, parentId)) {
             return "直接";
@@ -337,11 +350,11 @@ public class SuperCorporationModel {
 
         Set<NodeWrapper> nodeWrappers = source2ParentPath.getNodeWrappers();
         NodeWrapper sourceNode = nodeWrappers.stream()
-                .filter(nodeWrapper -> sourceId.equals(nodeWrapper.getEntId()))
+                .filter(nodeWrapper -> sourceId.equals(nodeWrapper.obtainEntId()))
                 .findFirst()
                 .orElse(null);
         NodeWrapper parentNode = nodeWrappers.stream()
-                .filter(nodeWrapper -> parentId.equals(nodeWrapper.getEntId()))
+                .filter(nodeWrapper -> parentId.equals(nodeWrapper.obtainEntId()))
                 .findFirst()
                 .orElse(null);
 
@@ -360,36 +373,40 @@ public class SuperCorporationModel {
         return defaultRelation;
     }
 
+    private BigDecimal roundHalfUp(BigDecimal totalCgzb) {
+        return totalCgzb.setScale(6, BigDecimal.ROUND_HALF_UP);
+    }
+
     public String getEntId() {
         if (Objects.nonNull(sourceNode)) {
-            return sourceNode.getEntId();
+            return sourceNode.obtainEntId();
         }
-        return "";
+        return null;
     }
 
     public String getEntName() {
         if (Objects.nonNull(sourceNode)) {
-            return sourceNode.getEntName();
+            return sourceNode.obtainEntName();
         }
-        return "";
+        return null;
     }
 
     public String getFinCtrlId() {
         if (Objects.nonNull(finCtrlNode)) {
             int nodeType = finCtrlNode.getType();
             if (NodeType.ENT == nodeType) {
-                return finCtrlNode.getEntId();
+                return finCtrlNode.obtainEntId();
             }
-            return finCtrlNode.getZsId();
+            return finCtrlNode.obtainZsId();
         }
-        return "";
+        return null;
     }
 
     public String getFinCtrlName() {
         if (Objects.nonNull(finCtrlNode)) {
             return finCtrlNode.getName();
         }
-        return "";
+        return null;
     }
 
     public String getParent2SourceRelation() {
@@ -398,36 +415,36 @@ public class SuperCorporationModel {
 
     public String getParentId() {
         if (Objects.nonNull(parentNode)) {
-            return parentNode.getEntId();
+            return parentNode.obtainEntId();
         }
-        return "";
+        return null;
     }
 
     public String getParentName() {
         if (Objects.nonNull(parentNode)) {
-            return parentNode.getEntName();
+            return parentNode.obtainEntName();
         }
-        return "";
+        return null;
     }
 
     public String getParentRegno() {
         if (Objects.nonNull(parentNode)) {
-            return parentNode.getRegNo();
+            return parentNode.obtainRegNo();
         }
-        return "";
+        return null;
     }
 
     public String getParentCreditcode() {
         if (Objects.nonNull(parentNode)) {
-            return parentNode.getCreditCode();
+            return parentNode.obtainCreditCode();
         }
-        return "";
+        return null;
     }
 
     public String getEmId() {
         if (Objects.nonNull(finCtrlNode)) {
-            return finCtrlNode.getEmId();
+            return finCtrlNode.obtainEmId();
         }
-        return "";
+        return null;
     }
 }

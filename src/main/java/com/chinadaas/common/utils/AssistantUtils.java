@@ -7,6 +7,7 @@ import com.chinadaas.common.constant.TargetType;
 import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.commons.type.RelationType;
 import com.chinadaas.component.wrapper.NodeWrapper;
+import com.chinadaas.component.wrapper.PathWrapper;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.entity.SuperCorporationEntity;
 import com.chinadaas.model.ChainModel;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author lawliet
@@ -189,8 +191,8 @@ public abstract class AssistantUtils {
         long chainLength = chainModel.getChainLength();
 
         ChainEntity chainEntity = new ChainEntity();
-        chainEntity.setSourceEntId(sourceNode.getEntId());
-        chainEntity.setSourceName(sourceNode.getEntName());
+        chainEntity.setSourceEntId(sourceNode.obtainEntId());
+        chainEntity.setSourceName(sourceNode.obtainEntName());
         chainEntity.setTargetType(targetType.toString());
         chainEntity.setTemp2SourceLayer(chainLength);
         chainEntity.setTarget2SourceLayer(chainLength);
@@ -200,15 +202,15 @@ public abstract class AssistantUtils {
             int type = targetNode.getType();
 
             if (NodeType.PERSON == type) {
-                chainEntity.setTempEntId(targetNode.getZsId());
-                chainEntity.setTargetEntId(targetNode.getZsId());
+                chainEntity.setTempEntId(targetNode.obtainZsId());
+                chainEntity.setTargetEntId(targetNode.obtainZsId());
             } else {
-                chainEntity.setTempEntId(targetNode.getEntId());
-                chainEntity.setTargetEntId(targetNode.getEntId());
+                chainEntity.setTempEntId(targetNode.obtainEntId());
+                chainEntity.setTargetEntId(targetNode.obtainEntId());
             }
 
-            chainEntity.setTempName(targetNode.getEntName());
-            chainEntity.setTargetName(targetNode.getEntName());
+            chainEntity.setTempName(targetNode.obtainEntName());
+            chainEntity.setTargetName(targetNode.obtainEntName());
             return chainEntity;
         }
 
@@ -235,9 +237,32 @@ public abstract class AssistantUtils {
         superCorporationEntity.setParentName(superCorporationModel.getParentName());
         superCorporationEntity.setParentRegno(superCorporationModel.getParentRegno());
         superCorporationEntity.setParentCreditcode(superCorporationModel.getParentCreditcode());
-        superCorporationEntity.setCtrl2ParentPath(superCorporationModel.getCtrl2ParentPath());
-        superCorporationEntity.setParent2SourcePath(superCorporationModel.getParent2SourcePath());
-        superCorporationEntity.setCtrl2SourcePath(superCorporationModel.getCtrl2SourcePath());
+
+        PathWrapper ctrl2ParentPath = superCorporationModel.getCtrl2ParentPath();
+        if (Objects.nonNull(ctrl2ParentPath)) {
+            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(ctrl2ParentPath);
+            superCorporationEntity.setCtrl2ParentPath(filterPath);
+        } else {
+            superCorporationEntity.setCtrl2ParentPath(null);
+        }
+
+        PathWrapper parent2SourcePath = superCorporationModel.getParent2SourcePath();
+        if (Objects.nonNull(parent2SourcePath)) {
+            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(parent2SourcePath);
+            superCorporationEntity.setParent2SourcePath(filterPath);
+        } else {
+            superCorporationEntity.setParent2SourcePath(null);
+        }
+
+        PathWrapper ctrl2SourcePath = superCorporationModel.getCtrl2SourcePath();
+        if (Objects.nonNull(ctrl2SourcePath)) {
+            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(ctrl2SourcePath);
+            superCorporationEntity.setCtrl2SourcePath(filterPath);
+        } else {
+            superCorporationEntity.setCtrl2SourcePath(null);
+        }
+
+
         superCorporationEntity.setParentProperty(superCorporationModel.getParentProperty());
         superCorporationEntity.setParent2SourceCgzb(superCorporationModel.getParent2SourceCgzb());
         superCorporationEntity.setCtrl2SourceCgzb(superCorporationModel.getCtrl2SourceCgzb());
@@ -263,13 +288,13 @@ public abstract class AssistantUtils {
                 StringUtils.trimToEmpty(superCorporationEntity.getParentName()),
                 StringUtils.trimToEmpty(superCorporationEntity.getParentRegno()),
                 StringUtils.trimToEmpty(superCorporationEntity.getParentCreditcode()),
-                StringUtils.trimToEmpty("null".equals(JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getCtrl2ParentPath())))
-                        ? "" : JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getCtrl2ParentPath()))),
-                StringUtils.trimToEmpty("null".equals(JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getParent2SourcePath())))
-                        ? "" : JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getParent2SourcePath()))),
+                StringUtils.trimToEmpty("null".equals(JSONObject.toJSONString(superCorporationEntity.getCtrl2ParentPath()))
+                        ? "" : JSONObject.toJSONString(superCorporationEntity.getCtrl2ParentPath())),
+                StringUtils.trimToEmpty("null".equals(JSONObject.toJSONString(superCorporationEntity.getParent2SourcePath()))
+                        ? "" : JSONObject.toJSONString(superCorporationEntity.getParent2SourcePath())),
                 StringUtils.trimToEmpty(
-                        "null".equals(JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getCtrl2SourcePath())))
-                                ? "" : JSONObject.toJSONString(Neo4jResultParseUtils.getFilterPath(superCorporationEntity.getCtrl2SourcePath()))
+                        "null".equals(JSONObject.toJSONString(superCorporationEntity.getCtrl2SourcePath()))
+                                ? "" : JSONObject.toJSONString(superCorporationEntity.getCtrl2SourcePath())
                 ),
                 StringUtils.trimToEmpty("null".equals(JSONObject.toJSONString(superCorporationEntity.getParentProperty()))
                         ? "" : JSONObject.toJSONString(superCorporationEntity.getParentProperty())),
@@ -282,6 +307,35 @@ public abstract class AssistantUtils {
 
         return String.join("\u0001", recordItems);
 
+    }
+
+    public static void filterFinCtrlNodeProperties(Map<String, Object> nodeProperties, int nodeType) {
+
+        if (NodeType.PERSON == nodeType) {
+            nodeProperties.remove("nodeid");
+            nodeProperties.put("invtype", "20");
+
+            if (nodeProperties.containsKey("encode_v1")) {
+                nodeProperties.put("palgorithmid", nodeProperties.remove("encode_v1"));
+            }
+
+        } else {
+            filterCommonPartProperties(nodeProperties);
+        }
+    }
+
+    public static void filterCommonPartProperties(Map<String, Object> nodeProperties) {
+        nodeProperties.remove("zsid");
+
+        if (nodeProperties.containsKey("nodeid")) {
+            nodeProperties.put("entid", nodeProperties.remove("nodeid"));
+        }
+
+        if (nodeProperties.containsKey("entstatus")) {
+            String entStatus = (String) nodeProperties.get("entstatus");
+            String entStatusDesc = getEntStatusDesc(entStatus);
+            nodeProperties.put("entstatus_desc", entStatusDesc);
+        }
     }
 
 }

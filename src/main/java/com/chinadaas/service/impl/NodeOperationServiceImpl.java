@@ -33,7 +33,7 @@ public class NodeOperationServiceImpl implements NodeOperationService {
     public boolean managementStatus(String entId) {
         NodeEntity nodeEntity = repository.nodeFind(entId);
         NodeWrapper node = nodeEntity.getNode();
-        String entStatus = node.getEntstatus();
+        String entStatus = node.obtainEntstatus();
         final String management = "1";
         return management.equals(entStatus);
     }

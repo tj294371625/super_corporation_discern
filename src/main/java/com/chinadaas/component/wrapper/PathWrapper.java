@@ -1,5 +1,6 @@
 package com.chinadaas.component.wrapper;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.chinadaas.component.mapper.annotation.LinksType;
 import com.chinadaas.component.mapper.annotation.NodesType;
 import com.google.common.collect.Sets;
@@ -23,10 +24,12 @@ public class PathWrapper {
 
     @Field("nodes")
     @NodesType("nodes")
+    @JSONField(name = "nodes")
     Set<NodeWrapper> nodeWrappers = Sets.newHashSet();
 
     @Field("links")
     @LinksType("links")
+    @JSONField(name = "links")
     Set<LinkWrapper> linkWrappers = Sets.newHashSet();
 
 }

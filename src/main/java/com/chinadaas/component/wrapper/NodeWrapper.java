@@ -20,16 +20,17 @@ import java.util.Objects;
 @Slf4j
 public class NodeWrapper extends NodeDto {
 
-    public String getZsId() {
+    public String obtainZsId() {
         Map<String, Object> properties = getProperties();
         return (String) properties.get("zsid");
     }
 
-    public String getEmc() {
+    public String obtainEmc() {
         Map<String, Object> properties = getProperties();
         return (String) properties.get("emc");
     }
-    public String getEmId() {
+
+    public String obtainEmId() {
         return (String) getProperties().get("emid");
     }
 
@@ -38,29 +39,29 @@ public class NodeWrapper extends NodeDto {
      *
      * @return
      */
-    public String getEntId() {
+    public String obtainEntId() {
         Map<String, Object> properties = getProperties();
         return (String) properties.get("nodeid");
     }
 
 
-    public String getEntName() {
+    public String obtainEntName() {
         return (String) getProperties().get("name");
     }
 
-    public String getCreditCode() {
+    public String obtainCreditCode() {
         return (String) getProperties().get("creditcode");
     }
 
-    public String getRegNo() {
+    public String obtainRegNo() {
         return (String) getProperties().get("regno");
     }
 
-    public String getEntstatus() {
+    public String obtainEntstatus() {
         return (String) getProperties().get("entstatus");
     }
 
-    public String getNodeType() {
+    public String obtainNodeType() {
         Map<String, Object> properties = getProperties();
         String invType = (String) properties.get("invtype");
         return AssistantUtils.getNodeType(invType);
@@ -71,7 +72,7 @@ public class NodeWrapper extends NodeDto {
      *
      * @return
      */
-    public Date getEsDate() {
+    public Date obtainEsDate() {
         Map<String, Object> properties = getProperties();
         String esDateStr = (String) properties.get("esdate");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -89,7 +90,7 @@ public class NodeWrapper extends NodeDto {
      *
      * @return
      */
-    public BigDecimal getRegCap() {
+    public BigDecimal obtainRegCap() {
         Map<String, Object> properties = getProperties();
         Object regcap = properties.get("regcap");
         return new BigDecimal(Objects.isNull(regcap) ? "0.000000" : regcap.toString());
