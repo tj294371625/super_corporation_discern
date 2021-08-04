@@ -1,4 +1,4 @@
-package com.chinadaas.common.utils;
+package com.chinadaas.common.util;
 
 /**
  * @author lawliet

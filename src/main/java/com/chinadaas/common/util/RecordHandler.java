@@ -1,6 +1,5 @@
-package com.chinadaas.common.utils;
+package com.chinadaas.common.util;
 
-import com.alibaba.fastjson.JSONObject;
 import com.chinadaas.entity.SuperCorporationEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

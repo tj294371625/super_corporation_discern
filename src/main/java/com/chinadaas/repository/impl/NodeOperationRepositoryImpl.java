@@ -1,9 +1,9 @@
 package com.chinadaas.repository.impl;
 
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.utils.Neo4jResultParseUtils;
-import com.chinadaas.common.utils.RecordHandler;
-import com.chinadaas.common.utils.TimeUtils;
+import com.chinadaas.common.util.Neo4jResultParseUtils;
+import com.chinadaas.common.util.RecordHandler;
+import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.commons.exception.QueryNeo4jTimeOutException;
 import com.chinadaas.commons.factory.CypherBuilderFactory;
 import com.chinadaas.component.mapper.base.Mapper;

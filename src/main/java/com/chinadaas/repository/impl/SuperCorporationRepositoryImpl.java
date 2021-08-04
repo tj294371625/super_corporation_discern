@@ -2,17 +2,22 @@ package com.chinadaas.repository.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.SuperConst;
-import com.chinadaas.common.utils.Assert;
-import com.chinadaas.component.wrapper.PathWrapper;
+import com.chinadaas.common.util.Assert;
 import com.chinadaas.entity.SuperCorporationEntity;
 import com.chinadaas.repository.SuperCorporationRepository;
+import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author lawliet
@@ -54,6 +59,28 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
             }
         }
 
+    }
+
+    @Override
+    public Set<String> extraParentIds() {
+        Set<String> parentIds = Sets.newHashSet();
+
+        MongoCollection<Document> collection = mongoTemplate.getCollection(SC_SUPER_CORPORATION);
+        collection
+                .find(Filters.and(
+                        Filters.ne(SuperConst.PARENT_ID, null)
+                ))
+                .batchSize(10000)
+                .projection(new Document(SuperConst._ID, 0).append(SuperConst.PARENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                parentIds.add(document.getString(SuperConst.PARENT_ID));
+                            }
+                        }
+                );
+
+        return parentIds;
     }
 
     private void doInsertSuperCorporation(SuperCorporationEntity superCorporationEntity) {

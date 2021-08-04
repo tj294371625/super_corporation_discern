@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 /**
  * @author lawliet
  * @version 1.0.0
@@ -27,5 +29,10 @@ public class SuperCorporationServiceImpl implements SuperCorporationService {
     @Override
     public void insertSuperCorporation(SuperCorporationEntity superCorporationEntity) {
         repository.insertSuperCorporation(superCorporationEntity);
+    }
+
+    @Override
+    public Set<String> extraParentIds() {
+        return repository.extraParentIds();
     }
 }

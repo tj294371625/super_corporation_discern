@@ -1,7 +1,7 @@
 package com.chinadaas.task.impl;
 
-import com.chinadaas.common.utils.RecordHandler;
-import com.chinadaas.common.utils.TimeUtils;
+import com.chinadaas.common.util.RecordHandler;
+import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.service.ChainOperationService;
 import com.chinadaas.task.IncrTask;
 import lombok.extern.slf4j.Slf4j;

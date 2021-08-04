@@ -4,10 +4,10 @@ import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.common.constant.TargetType;
-import com.chinadaas.common.utils.AssistantUtils;
-import com.chinadaas.common.utils.Neo4jResultParseUtils;
-import com.chinadaas.common.utils.RecordHandler;
-import com.chinadaas.common.utils.TimeUtils;
+import com.chinadaas.common.util.AssistantUtils;
+import com.chinadaas.common.util.Neo4jResultParseUtils;
+import com.chinadaas.common.util.RecordHandler;
+import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.component.executor.Executor;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.component.wrapper.LinkWrapper;
@@ -35,13 +35,13 @@ import java.util.function.Function;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 基于处理数据，执行业务逻辑
+ * @description 基于处理数据，执行集团母公司业务逻辑
  * @createTime 2021.07.28
  */
 @Slf4j
 @Order(2)
 @Component
-public class ProcessTask implements FullTask {
+public class ParentProcessTask implements FullTask {
 
     private final Executor parallelExecutor;
     private final RecordHandler recordHandler;
@@ -51,12 +51,12 @@ public class ProcessTask implements FullTask {
     private final SuperCorporationService superCorporationService;
 
     @Autowired
-    public ProcessTask(@Qualifier("parallelExecutor") Executor parallelExecutor,
-                       RecordHandler recordHandler,
-                       EntIdListLoader entIdListLoader,
-                       ChainOperationService chainOperationService,
-                       NodeOperationService nodeOperationService,
-                       SuperCorporationService superCorporationService) {
+    public ParentProcessTask(@Qualifier("parallelExecutor") Executor parallelExecutor,
+                             RecordHandler recordHandler,
+                             EntIdListLoader entIdListLoader,
+                             ChainOperationService chainOperationService,
+                             NodeOperationService nodeOperationService,
+                             SuperCorporationService superCorporationService) {
 
         this.parallelExecutor = parallelExecutor;
         this.recordHandler = recordHandler;

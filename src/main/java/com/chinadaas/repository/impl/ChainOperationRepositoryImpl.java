@@ -2,7 +2,7 @@ package com.chinadaas.repository.impl;
 
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.utils.Assert;
+import com.chinadaas.common.util.Assert;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
@@ -11,7 +11,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author lawliet

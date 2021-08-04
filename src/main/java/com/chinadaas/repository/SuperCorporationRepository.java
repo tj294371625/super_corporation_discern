@@ -2,6 +2,8 @@ package com.chinadaas.repository;
 
 import com.chinadaas.entity.SuperCorporationEntity;
 
+import java.util.Set;
+
 /**
  * @author lawliet
  * @version 1.0.0
@@ -11,4 +13,6 @@ import com.chinadaas.entity.SuperCorporationEntity;
 public interface SuperCorporationRepository {
 
     void insertSuperCorporation(SuperCorporationEntity superCorporationEntity);
+
+    Set<String> extraParentIds();
 }

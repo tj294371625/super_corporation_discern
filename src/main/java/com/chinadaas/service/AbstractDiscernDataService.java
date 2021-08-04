@@ -1,6 +1,6 @@
 package com.chinadaas.service;
 
-import com.chinadaas.common.utils.RecordHandler;
+import com.chinadaas.common.util.RecordHandler;
 import com.chinadaas.component.io.EntIdListHolder;
 import com.chinadaas.component.io.EntIdListLoader;
 import org.apache.commons.lang3.BooleanUtils;

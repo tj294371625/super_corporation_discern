@@ -1,6 +1,6 @@
 package com.chinadaas.component.mapper.handler.impl;
 
-import com.chinadaas.common.utils.Neo4jResultParseUtils;
+import com.chinadaas.common.util.Neo4jResultParseUtils;
 import com.chinadaas.component.mapper.annotation.NodesType;
 import com.chinadaas.component.mapper.context.HandlerContext;
 import com.chinadaas.component.mapper.exception.FieldPopulateException;

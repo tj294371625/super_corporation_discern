@@ -1,6 +1,6 @@
 package com.chinadaas.component.executor.impl;
 
-import com.chinadaas.common.utils.ThreadPoolUtils;
+import com.chinadaas.common.util.ThreadPoolUtils;
 import com.chinadaas.component.executor.Executor;
 import com.chinadaas.component.io.EntIdListHolder;
 import lombok.extern.slf4j.Slf4j;

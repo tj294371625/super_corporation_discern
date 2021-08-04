@@ -1,6 +1,6 @@
 package com.chinadaas.component.io;
 
-import com.chinadaas.common.utils.Assert;
+import com.chinadaas.common.util.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

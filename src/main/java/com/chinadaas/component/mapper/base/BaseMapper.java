@@ -1,6 +1,6 @@
 package com.chinadaas.component.mapper.base;
 
-import com.chinadaas.common.utils.BeanUtils;
+import com.chinadaas.common.util.BeanUtils;
 import com.chinadaas.component.mapper.handler.AnnotationHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;

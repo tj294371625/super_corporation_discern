@@ -2,8 +2,8 @@ package com.chinadaas.task.impl;
 
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.utils.AssistantUtils;
-import com.chinadaas.common.utils.TimeUtils;
+import com.chinadaas.common.util.AssistantUtils;
+import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.component.executor.Executor;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.model.ChainModel;

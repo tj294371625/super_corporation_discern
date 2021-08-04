@@ -1,6 +1,6 @@
 package com.chinadaas.component.wrapper;
 
-import com.chinadaas.common.utils.AssistantUtils;
+import com.chinadaas.common.util.AssistantUtils;
 import com.chinadaas.commons.graph.model.NodeDto;
 import lombok.extern.slf4j.Slf4j;
 

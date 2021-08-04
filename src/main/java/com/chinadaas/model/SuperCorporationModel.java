@@ -3,7 +3,7 @@ package com.chinadaas.model;
 import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
-import com.chinadaas.common.utils.AssistantUtils;
+import com.chinadaas.common.util.AssistantUtils;
 import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.component.wrapper.NodeWrapper;

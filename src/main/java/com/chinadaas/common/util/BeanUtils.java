@@ -1,4 +1,4 @@
-package com.chinadaas.common.utils;
+package com.chinadaas.common.util;
 
 import com.chinadaas.component.mapper.context.HandlerContext;
 import com.chinadaas.component.mapper.exception.BeanInstantiationException;
