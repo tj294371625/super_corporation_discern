@@ -7,6 +7,7 @@ import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.component.wrapper.PathWrapper;
 import com.chinadaas.entity.TwoNodesEntity;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
 import org.springframework.beans.BeanUtils;
@@ -83,6 +84,24 @@ public abstract class Neo4jResultParseUtils {
             return nodeWrapper;
         }
         return null;
+    }
+
+    /**
+     * 标记起始点
+     *
+     * @param nodes
+     * @param firstNodeId
+     */
+    public static void setFirstNode(Set<NodeWrapper> nodes, String firstNodeId) {
+
+        if (!CollectionUtils.isEmpty(nodes) && StringUtils.isNotBlank(firstNodeId)) {
+            for (NodeWrapper node : nodes) {
+                if (Objects.equals(firstNodeId, node.obtainEntId())) {
+                    node.setInnode(true);
+                }
+            }
+        }
+
     }
 
     public static NodeWrapper obtainSpecialNode(String nodeId, List<TwoNodesEntity> entityList) {

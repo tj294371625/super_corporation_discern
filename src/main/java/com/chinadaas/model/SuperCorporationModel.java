@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
 import com.chinadaas.common.utils.AssistantUtils;
+import com.chinadaas.common.utils.Neo4jResultParseUtils;
 import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.component.wrapper.LinkWrapper;
 import com.chinadaas.component.wrapper.NodeWrapper;
@@ -29,6 +30,11 @@ public class SuperCorporationModel {
      * 输入企业唯一标识
      */
     private final String currentQueryId;
+
+    /**
+     * 母公司唯一标识
+     */
+    private String parentId;
 
     private String parent2SourceRelation;
 
@@ -86,12 +92,12 @@ public class SuperCorporationModel {
 
     /**
      * 生成输入企业到母公司的路径和控股比例
-     *
-     * @param twoNodesUseInvList
+     *  @param twoNodesUseInvList
      * @param twoNodesUseGroupParentList
+     * @param targetEntId
      */
     public void calSourceToParent(List<TwoNodesEntity> twoNodesUseInvList,
-                                  List<TwoNodesEntity> twoNodesUseGroupParentList) {
+                                  List<TwoNodesEntity> twoNodesUseGroupParentList, String targetEntId) {
 
         PathWrapper parent2SourcePath = new PathWrapper();
         BigDecimal tempInvCgzb = calTotalCgzb(twoNodesUseInvList, parent2SourcePath);
@@ -107,11 +113,11 @@ public class SuperCorporationModel {
             totalCgzb = roundHalfUp(totalCgzb);
         }
 
+        this.parentId = targetEntId;
         this.parent2SourceRelation = calParent2SourceRelation(parent2SourcePath);
         this.parent2SourcePath = parent2SourcePath;
         this.parent2SourceCgzb = totalCgzb.toString();
         this.resultStatus = ModelStatus.HAVE_RESULT;
-
     }
 
     /**
@@ -136,7 +142,8 @@ public class SuperCorporationModel {
      */
     public void parentReplaceControl(Function<LinkWrapper, LinkWrapper> replaceGroupParentLink) {
 
-        finCtrlNode = parentNode;
+        // deep copy
+        this.finCtrlNode = this.parentNode;
 
         Set<NodeWrapper> nodes = this.parent2SourcePath.getNodeWrappers();
         Set<LinkWrapper> links = this.parent2SourcePath.getLinkWrappers();
@@ -198,25 +205,24 @@ public class SuperCorporationModel {
             ctrl2SourceCgzb = calTotalCgzb(sourceToControlPathList, ctrl2SourcePath);
         }
 
-
-        this.ctrl2ParentCgzb = ctrl2ParentCgzb.toString();
-        this.ctrl2SourceCgzb = ctrl2SourceCgzb.toString();
         this.ctrl2ParentPath = ctrl2ParentPath;
         this.ctrl2SourcePath = ctrl2SourcePath;
+        this.ctrl2ParentCgzb = ctrl2ParentCgzb.toString();
+        this.ctrl2SourceCgzb = ctrl2SourceCgzb.toString();
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
     }
 
     public void setSourceProperty(NodeWrapper sourceNode) {
-        this.sourceNode = JSON.parseObject(JSON.toJSONString(sourceNode), NodeWrapper.class);
+        this.sourceNode = sourceNode;
     }
 
     public void setParentProperty(NodeWrapper parentNode) {
-        this.parentNode = JSON.parseObject(JSON.toJSONString(parentNode), NodeWrapper.class);
+        this.parentNode = parentNode;
     }
 
     public void setFinCtrlProperty(NodeWrapper finCtrlNode) {
-        this.finCtrlNode = JSON.parseObject(JSON.toJSONString(finCtrlNode), NodeWrapper.class);
+        this.finCtrlNode = finCtrlNode;
     }
 
     public String getCurrentQueryId() {
@@ -224,29 +230,35 @@ public class SuperCorporationModel {
     }
 
     public Map<String, Object> getSourceProperty() {
-        if (Objects.nonNull(sourceNode)) {
-            Map<String, Object> properties = sourceNode.getProperties();
+        if (Objects.nonNull(this.sourceNode)) {
+            NodeWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.sourceNode), NodeWrapper.class);
+            Map<String, Object> properties = deepCopy.getProperties();
             AssistantUtils.filterCommonPartProperties(properties);
             return properties;
         }
+
         return null;
     }
 
     public Map<String, Object> getParentProperty() {
-        if (Objects.nonNull(parentNode)) {
-            Map<String, Object> properties = parentNode.getProperties();
+        if (Objects.nonNull(this.parentNode)) {
+            NodeWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.parentNode), NodeWrapper.class);
+            Map<String, Object> properties = deepCopy.getProperties();
             AssistantUtils.filterCommonPartProperties(properties);
             return properties;
         }
+
         return null;
     }
 
     public Map<String, Object> getFinCtrlProperty() {
-        if (Objects.nonNull(finCtrlNode)) {
-            Map<String, Object> properties = finCtrlNode.getProperties();
-            AssistantUtils.filterFinCtrlNodeProperties(properties, finCtrlNode.getType());
+        if (Objects.nonNull(this.finCtrlNode)) {
+            NodeWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.finCtrlNode), NodeWrapper.class);
+            Map<String, Object> properties = deepCopy.getProperties();
+            AssistantUtils.filterCommonPartProperties(properties);
             return properties;
         }
+
         return null;
     }
 
@@ -255,7 +267,13 @@ public class SuperCorporationModel {
     }
 
     public PathWrapper getCtrl2ParentPath() {
-        return ctrl2ParentPath;
+        if (Objects.nonNull(this.ctrl2ParentPath)) {
+            PathWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.ctrl2ParentPath), PathWrapper.class);
+            pathFixProcess(deepCopy, this.parentId);
+            return deepCopy;
+        }
+
+        return null;
     }
 
     public String getCtrl2SourceCgzb() {
@@ -263,7 +281,13 @@ public class SuperCorporationModel {
     }
 
     public PathWrapper getCtrl2SourcePath() {
-        return ctrl2SourcePath;
+        if (Objects.nonNull(this.ctrl2SourcePath)) {
+            PathWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.ctrl2SourcePath), PathWrapper.class);
+            pathFixProcess(deepCopy, this.currentQueryId);
+            return deepCopy;
+        }
+
+        return null;
     }
 
     public String getParent2SourceCgzb() {
@@ -271,7 +295,13 @@ public class SuperCorporationModel {
     }
 
     public PathWrapper getParent2SourcePath() {
-        return parent2SourcePath;
+        if (Objects.nonNull(this.parent2SourcePath)) {
+            PathWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.parent2SourcePath), PathWrapper.class);
+            pathFixProcess(deepCopy, this.currentQueryId);
+            return deepCopy;
+        }
+
+        return null;
     }
 
     public ModelStatus getResultStatus() {
@@ -341,8 +371,8 @@ public class SuperCorporationModel {
 
     private String calParent2SourceRelation(PathWrapper source2ParentPath) {
         String defaultRelation = "间接";
-        String sourceId = sourceNode.obtainEntId();
-        String parentId = parentNode.obtainEntId();
+        String sourceId = this.sourceNode.obtainEntId();
+        String parentId = this.parentNode.obtainEntId();
 
         if (Objects.equals(sourceId, parentId)) {
             return "直接";
@@ -375,6 +405,21 @@ public class SuperCorporationModel {
 
     private BigDecimal roundHalfUp(BigDecimal totalCgzb) {
         return totalCgzb.setScale(6, BigDecimal.ROUND_HALF_UP);
+    }
+
+    private void pathFixProcess(PathWrapper twoNodePath, String firstNodeId) {
+        Set<NodeWrapper> nodeWrappers = twoNodePath.getNodeWrappers();
+
+        // zs: 1.设置起始点
+        Neo4jResultParseUtils.setFirstNode(nodeWrappers, firstNodeId);
+
+        // zs: 2.属性修复
+        for (NodeWrapper nodeWrapper : nodeWrappers) {
+            AssistantUtils.filterFinCtrlNodeProperties(nodeWrapper.getProperties(), nodeWrapper.getType());
+        }
+
+        // zs: 3.属性过滤
+        Neo4jResultParseUtils.getFilterPath(twoNodePath);
     }
 
     public String getEntId() {

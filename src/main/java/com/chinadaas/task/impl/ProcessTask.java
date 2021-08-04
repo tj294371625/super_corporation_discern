@@ -124,7 +124,7 @@ public class ProcessTask implements FullTask {
                 twoNodesUseGroupParentList = nodeOperationService.sourceToTargetUseGroupParent(middleEntId, targetEntId);
                 superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
                 superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseGroupParentList));
-                superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList);
+                superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
 
                 return;
             }
@@ -133,7 +133,7 @@ public class ProcessTask implements FullTask {
             twoNodesUseInvList = nodeOperationService.sourceToTargetUseInv(currentQueryId, targetEntId, parent2SourceLayer);
             superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
             superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseInvList));
-            superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList);
+            superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
         }
     }
 

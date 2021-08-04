@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -161,18 +162,37 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     public Set<String> queryFinCtrlEntIds() {
         Set<String> finCtrlEntIds = Sets.newHashSet();
 
-        BasicDBObject condition = new BasicDBObject();
-        condition.put(ChainConst.TARGET_ENT_ID, "-1");
-
-        MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
-        parentCollection
-                .find(condition)
+        MongoCollection<Document> parentCollection0 = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection0
+                .find(
+                        Filters.and(
+                                Filters.eq(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
                 .batchSize(10000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
                             if (Objects.nonNull(document)) {
                                 finCtrlEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
+                            }
+                        }
+                );
+
+        // zs: 修复母公司点不存在的情况
+        MongoCollection<Document> parentCollection1 = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection1
+                .find(
+                        Filters.and(
+                                Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
+                .batchSize(10000)
+                .projection(new Document(ChainConst._ID, 0).append(ChainConst.TARGET_ENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                finCtrlEntIds.add(document.getString(ChainConst.TARGET_ENT_ID));
                             }
                         }
                 );

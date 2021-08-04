@@ -228,46 +228,23 @@ public abstract class AssistantUtils {
 
         superCorporationEntity.setEntId(superCorporationModel.getEntId());
         superCorporationEntity.setEntName(superCorporationModel.getEntName());
-        superCorporationEntity.setSourceProperty(superCorporationModel.getSourceProperty());
         superCorporationEntity.setFinCtrlId(superCorporationModel.getFinCtrlId());
         superCorporationEntity.setFinCtrlName(superCorporationModel.getFinCtrlName());
-        superCorporationEntity.setFinCtrlProperty(superCorporationModel.getFinCtrlProperty());
         superCorporationEntity.setParent2SourceRelation(superCorporationModel.getParent2SourceRelation());
         superCorporationEntity.setParentId(superCorporationModel.getParentId());
         superCorporationEntity.setParentName(superCorporationModel.getParentName());
         superCorporationEntity.setParentRegno(superCorporationModel.getParentRegno());
         superCorporationEntity.setParentCreditcode(superCorporationModel.getParentCreditcode());
-
-        PathWrapper ctrl2ParentPath = superCorporationModel.getCtrl2ParentPath();
-        if (Objects.nonNull(ctrl2ParentPath)) {
-            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(ctrl2ParentPath);
-            superCorporationEntity.setCtrl2ParentPath(filterPath);
-        } else {
-            superCorporationEntity.setCtrl2ParentPath(null);
-        }
-
-        PathWrapper parent2SourcePath = superCorporationModel.getParent2SourcePath();
-        if (Objects.nonNull(parent2SourcePath)) {
-            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(parent2SourcePath);
-            superCorporationEntity.setParent2SourcePath(filterPath);
-        } else {
-            superCorporationEntity.setParent2SourcePath(null);
-        }
-
-        PathWrapper ctrl2SourcePath = superCorporationModel.getCtrl2SourcePath();
-        if (Objects.nonNull(ctrl2SourcePath)) {
-            PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(ctrl2SourcePath);
-            superCorporationEntity.setCtrl2SourcePath(filterPath);
-        } else {
-            superCorporationEntity.setCtrl2SourcePath(null);
-        }
-
-
-        superCorporationEntity.setParentProperty(superCorporationModel.getParentProperty());
+        superCorporationEntity.setCtrl2ParentPath(superCorporationModel.getCtrl2ParentPath());
+        superCorporationEntity.setParent2SourcePath(superCorporationModel.getParent2SourcePath());
+        superCorporationEntity.setCtrl2SourcePath(superCorporationModel.getCtrl2SourcePath());
         superCorporationEntity.setParent2SourceCgzb(superCorporationModel.getParent2SourceCgzb());
         superCorporationEntity.setCtrl2SourceCgzb(superCorporationModel.getCtrl2SourceCgzb());
         superCorporationEntity.setCtrl2ParentCgzb(superCorporationModel.getCtrl2ParentCgzb());
         superCorporationEntity.setEmId(superCorporationModel.getEmId());
+        superCorporationEntity.setSourceProperty(superCorporationModel.getSourceProperty());
+        superCorporationEntity.setParentProperty(superCorporationModel.getParentProperty());
+        superCorporationEntity.setFinCtrlProperty(superCorporationModel.getFinCtrlProperty());
 
         return superCorporationEntity;
     }
