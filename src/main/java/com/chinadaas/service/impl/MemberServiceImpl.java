@@ -155,7 +155,7 @@ public class MemberServiceImpl implements MemberService {
         String zsId = (String) finalControlProperty.get(MemberConst.ZSID);
 
         PersonOutControlEntity entity = memberRepository.obtainPersonOutControl(zsId, parentId);
-        PersonOutControlModel model = new PersonOutControlModel(parentId, finalControlPerson).converEntity2Model(entity);
+        PersonOutControlModel model = new PersonOutControlModel(parentId, finalControlPerson).convertEntity2Model(entity);
 
         return model.processProperties();
     }
@@ -164,19 +164,33 @@ public class MemberServiceImpl implements MemberService {
      * 母公司主要投资者个人直接对外控制公司
      *
      * @param parentId
+     * @return
      */
     @Override
-    public void obtainMajorPerson(String parentId) {
-        memberRepository.obtainMajorPerson(parentId);
+    public MajorPersonModel obtainMajorPerson(String parentId) {
+        MajorPersonEntity majorPersonEntity = memberRepository.obtainMajorPerson(parentId);
+        MajorPersonModel majorPersonModel = new MajorPersonModel(parentId).convertEntity2Model(majorPersonEntity);
+
+        final BiFunction<String, String, List<Map>> commonPersonControlEnt
+                = memberRepository::commonPersonControlEnt;
+
+        return majorPersonModel.calMajorPersonModelResult(commonPersonControlEnt);
     }
 
     /**
      * 母公司关键管理人员直接对外控制公司
      *
      * @param parentId
+     * @return
      */
     @Override
-    public void obtainStaff(String parentId) {
+    public StaffModel obtainStaff(String parentId) {
+        StaffEntity staffEntity = memberRepository.obtainStaff(parentId);
+        StaffModel staffModel = new StaffModel(parentId).convertEntity2Model(staffEntity);
 
+        final BiFunction<String, String, List<Map>> commonPersonControlEnt
+                = memberRepository::commonPersonControlEnt;
+
+        return staffModel.calStaffModelResult(commonPersonControlEnt);
     }
 }

@@ -59,13 +59,15 @@ public interface MemberService {
      * 母公司主要投资者个人直接对外控制公司
      *
      * @param parentId
+     * @return
      */
-    void obtainMajorPerson(String parentId);
+    MajorPersonModel obtainMajorPerson(String parentId);
 
     /**
      * 母公司关键管理人员直接对外控制公司
      *
      * @param parentId
+     * @return
      */
-    void obtainStaff(String parentId);
+    StaffModel obtainStaff(String parentId);
 }

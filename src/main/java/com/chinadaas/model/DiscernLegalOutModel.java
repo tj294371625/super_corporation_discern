@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -40,12 +41,12 @@ public class DiscernLegalOutModel {
      */
     private List<Map<String, Object>> legalControlEnts;
 
-    private ModelStatus status;
+    private ModelStatus resultStatus;
 
     public DiscernLegalOutModel(String parentId) {
         this.parentId = parentId;
         this.legalControlEnts = Lists.newArrayList();
-        this.status = ModelStatus.NO_RESULT;
+        this.resultStatus = ModelStatus.NO_RESULT;
     }
 
     public DiscernLegalOutModel convertEntity2Model(DiscernLegalOutEntity entity) {
@@ -70,10 +71,10 @@ public class DiscernLegalOutModel {
         }
 
         // zs: 此时标记为结果存在状态
-        this.status = ModelStatus.HAVE_RESULT;
+        this.resultStatus = ModelStatus.HAVE_RESULT;
 
         // 获取法人控制的母公司
-        List<Map> controlParents = legalControlEnts.stream()
+        List<Map> controlParents = tempResultList.stream()
                 .filter(ent -> Objects.nonNull(ent.get(MemberConst.PARENT_ID)))
                 .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(controlParents)) {
@@ -83,7 +84,7 @@ public class DiscernLegalOutModel {
         }
 
         // 获取法人控制的成员公司
-        List<Map> controlMembers = legalControlEnts.stream()
+        List<Map> controlMembers = tempResultList.stream()
                 .filter(ent -> Objects.isNull(ent.get(MemberConst.PARENT_ID)))
                 .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(controlMembers)) {
@@ -95,29 +96,59 @@ public class DiscernLegalOutModel {
         return this;
     }
 
+    public List<Map<String, Object>> getLegalControlEnts() {
+        return legalControlEnts;
+    }
+
+    public ModelStatus getResultStatus() {
+        return resultStatus;
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> processEntInfo(Map entInfo, EntType type) {
         Map<String, Object> tempResult = Maps.newHashMap();
 
-        Map property;
+        Map entProperties;
         if (EntType.PARENT.equals(type)) {
-            property = (Map) entInfo.get(MemberConst.SOURCE_PROPERTY);
+            entProperties = (Map) entInfo.get(MemberConst.PARENT_PROPERTY);
             tempResult.put(MemberConst.PATH, entInfo.get(MemberConst.CTRL2PARENT_PATH));
             tempResult.put(MemberConst.FINAL_CGZB, MemberConst.CTRL2PARENT_CGZB);
         } else {
-            property = (Map) entInfo.get(MemberConst.PARENT_PROPERTY);
+            entProperties = (Map) entInfo.get(MemberConst.SOURCE_PROPERTY);
             tempResult.put(MemberConst.PATH, entInfo.get(MemberConst.CTRL2SOURCE_PATH));
             tempResult.put(MemberConst.FINAL_CGZB, MemberConst.CTRL2SOURCE_CGZB);
         }
 
-        tempResult.putAll(property);
-        tempResult.put(MemberConst.ENTNAME, tempResult.remove(MemberConst.NAME));
-        String entStatus = (String) tempResult.get(MemberConst.ENTSTATUS);
-        tempResult.put(MemberConst.ENTSTATUS_DESC, AssistantUtils.getEntStatusDesc(entStatus));
+        // 记录企业的invType
+        Object entInvType;
 
-        tempResult.putAll(legalNode.getProperties());
+        // 企业属性处理
+        entInvType = entProperties.remove(MemberConst.INVTYPE);
+        entProperties.remove(MemberConst.ZSID);
+        String entStatus = (String) entProperties.get(MemberConst.ENTSTATUS);
+        entProperties.put(MemberConst.ENTSTATUS_DESC, AssistantUtils.getEntStatusDesc(entStatus));
+        entProperties.put(MemberConst.ENTNAME, entProperties.remove(MemberConst.NAME));
+        entProperties.put(MemberConst.ENT_COUNTRY, entProperties.remove(MemberConst.COUNTRY));
+        entProperties.put(MemberConst.ENT_COUNTRY_DESC, entProperties.remove(MemberConst.COUNTRY_DESC));
+        entProperties.put(MemberConst.ENT_RISKINFO, entProperties.remove(MemberConst.RISKINFO));
 
+        // 法人属性处理
+        Map<String, Object> personProperties = legalNode.getProperties();
+        personProperties.remove(MemberConst.INVTYPE);
+        personProperties.remove(MemberConst.NODEID);
+        AssistantUtils.generateZspId(personProperties, this.parentId);
+        personProperties.put(MemberConst.PERSON_RISKINFO, personProperties.remove(MemberConst.RISKINFO));
+        personProperties.put(MemberConst.PERSON_COUNTRY, personProperties.remove(MemberConst.COUNTRY));
+        personProperties.put(MemberConst.PERSON_COUNTRY_DESC, personProperties.remove(MemberConst.COUNTRY_DESC));
+
+        tempResult.put(MemberConst.RELATION, "直接");
+        tempResult.put(MemberConst.RELATION_DENSITY, "半紧密层");
         tempResult.put(MemberConst.PARENT_ID, parentId);
+        String id = UUID.randomUUID().toString().replaceAll("-", "");
+        tempResult.put(MemberConst._ID, id);
+        tempResult.put(MemberConst.INVTYPE, entInvType);
+        tempResult.putAll(entProperties);
+        tempResult.putAll(personProperties);
 
         return tempResult;
     }

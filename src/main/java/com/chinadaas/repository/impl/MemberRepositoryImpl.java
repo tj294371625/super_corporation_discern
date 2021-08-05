@@ -231,14 +231,32 @@ public class MemberRepositoryImpl implements MemberRepository {
      * 母公司主要投资者个人直接对外控制公司
      *
      * @param parentId
+     * @return
      */
     @Override
-    public void obtainMajorPerson(String parentId) {
+    public MajorPersonEntity obtainMajorPerson(String parentId) {
         Map<String, Object> params = Maps.newHashMap();
         params.put(NODE_ID, parentId);
+
         String cypher = CypherBuilderFactory.getCypherBuilder("cypher/majorPersonQuery.cql").build();
         List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return null;
+        }
 
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<MajorPersonEntity> results = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            MajorPersonEntity majorPersonEntity = mapper.getBean(info, MajorPersonEntity.class);
+            results.add(majorPersonEntity);
+        }
+
+        if (CollectionUtils.isEmpty(results)) {
+            return null;
+        }
+        return results.get(0);
 
     }
 
@@ -246,10 +264,33 @@ public class MemberRepositoryImpl implements MemberRepository {
      * 母公司关键管理人员直接对外控制公司
      *
      * @param parentId
+     * @return
      */
     @Override
-    public void obtainStaff(String parentId) {
+    public StaffEntity obtainStaff(String parentId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put(NODE_ID, parentId);
+        params.put(STAFF_LIST_KEY, STAFF_LIST);
 
+        String cypher = CypherBuilderFactory.getCypherBuilder("cypher/staffQuery.cql").build();
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return null;
+        }
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+
+        List<StaffEntity> results = Lists.newArrayList();
+        for (Map<String, Object> info : moreInfo) {
+            StaffEntity staffEntity = mapper.getBean(info, StaffEntity.class);
+            results.add(staffEntity);
+        }
+
+        if (CollectionUtils.isEmpty(results)) {
+            return null;
+        }
+        return results.get(0);
     }
 
     /**

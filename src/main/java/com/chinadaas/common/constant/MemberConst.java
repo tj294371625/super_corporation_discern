@@ -51,5 +51,6 @@ public class MemberConst {
     public static final String HOLDERRTO_PARENT2SUB = "holderrto_parent2sub";
     public static final String POSITION = "position";
     public static final String POSITION_DESC = "position_desc";
-
+    public static final String CON_PROP = "conprop";
+    public static final String HOLD_ERRTO = "holderrto";
 }

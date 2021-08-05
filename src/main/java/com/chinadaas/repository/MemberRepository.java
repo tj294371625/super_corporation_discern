@@ -60,15 +60,17 @@ public interface MemberRepository {
      * 母公司主要投资者个人直接对外控制公司
      *
      * @param parentId
+     * @return
      */
-    void obtainMajorPerson(String parentId);
+    MajorPersonEntity obtainMajorPerson(String parentId);
 
     /**
      * 母公司关键管理人员直接对外控制公司
      *
      * @param parentId
+     * @return
      */
-    void obtainStaff(String parentId);
+    StaffEntity obtainStaff(String parentId);
 
     /**
      * 自然人控股企业通用查询
