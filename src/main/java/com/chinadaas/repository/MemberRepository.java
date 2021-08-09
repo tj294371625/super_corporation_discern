@@ -92,4 +92,16 @@ public interface MemberRepository {
     void addMembers(List<Map<String, Object>> memberRecords);
 
     void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords);
+
+    void addDiscernAndStaff(List<Map<String, Object>> discernAndStaffRecords);
+
+    void addDiscernLegalOut(List<Map<String, Object>> discernLegalOutRecords);
+
+    void addControlPersonLegal(List<Map<String, Object>> controlPersonLegalRecords);
+
+    void addPersonOutControl(List<Map<String, Object>> personOutControlRecords);
+
+    void addMajorPerson(List<Map<String, Object>> majorPersonRecords);
+
+    void addStaff(List<Map<String, Object>> staffRecords);
 }

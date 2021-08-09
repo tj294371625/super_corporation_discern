@@ -1,8 +1,7 @@
 package com.chinadaas.common.util;
 
 import com.chinadaas.entity.SuperCorporationEntity;
-import com.chinadaas.entity.old.BaseEntInfo;
-import com.chinadaas.entity.old.ParentAndMajorInvPersonInfo;
+import com.chinadaas.entity.old.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,31 +113,87 @@ public class RecordHandler {
     }
 
     public void recordDiscernAndMajorPerson(List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos) {
-        AssistantUtils.discernAndMajorPersonRecord(parentAndMajorInvPersonInfos);
+        List<String> discernAndMajorPersonRecords = AssistantUtils.discernAndMajorPersonRecord(parentAndMajorInvPersonInfos);
+
+        if (CollectionUtils.isEmpty(discernAndMajorPersonRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + discernAndMajorPersonDataFileName;
+
+        doRecord(discernAndMajorPersonRecords, memberDataPath, tempName);
     }
 
-    public void recordDiscernAndStaff() {
+    public void recordDiscernAndStaff(List<StaffAndParentCommonInfo> staffAndParentCommonInfos) {
+        List<String> discernAndStaffRecords = AssistantUtils.discernAndStaffRecord(staffAndParentCommonInfos);
 
+        if (CollectionUtils.isEmpty(discernAndStaffRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + discernAndStaffDataFileName;
+
+        doRecord(discernAndStaffRecords, memberDataPath, tempName);
     }
 
-    public void recordDiscernLegalOut() {
+    public void recordDiscernLegalOut(List<StaffAndParentCommonInfo> staffAndParentCommonInfos) {
+        List<String> discernLegalOutRecords = AssistantUtils.discernLegalOutRecord(staffAndParentCommonInfos);
 
+        if (CollectionUtils.isEmpty(discernLegalOutRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + discernLegalOutDataFileName;
+
+        doRecord(discernLegalOutRecords, memberDataPath, tempName);
     }
 
-    public void recordControlPersonLegal() {
+    public void recordControlPersonLegal(List<BasePersonInfo> basePersonInfos) {
+        List<String> controlPersonLegalRecords = AssistantUtils.controlPersonLegalRecord(basePersonInfos);
 
+        if (CollectionUtils.isEmpty(controlPersonLegalRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + controlPersonLegalDataFileName;
+
+        doRecord(controlPersonLegalRecords, memberDataPath, tempName);
     }
 
-    public void recordPersonOutControl() {
+    public void recordPersonOutControl(List<PersonOutControlInfo> personOutControlInfos) {
+        List<String> personOutControlRecords = AssistantUtils.personOutControlRecord(personOutControlInfos);
 
+        if (CollectionUtils.isEmpty(personOutControlRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + personOutControlDataFileName;
+
+        doRecord(personOutControlRecords, memberDataPath, tempName);
     }
 
-    public void recordMajorPerson() {
+    public void recordMajorPerson(List<MajorInvPersonInfo> majorInvPersonInfos) {
+        List<String> majorPersonRecords = AssistantUtils.majorPersonRecord(majorInvPersonInfos);
 
+        if (CollectionUtils.isEmpty(majorPersonRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + majorPersonDataFileName;
+
+        doRecord(majorPersonRecords, memberDataPath, tempName);
     }
 
-    public void recordStaff() {
+    public void recordStaff(List<StaffPerson> staffPeople) {
+        List<String> staffRecords = AssistantUtils.staffRecord(staffPeople);
 
+        if (CollectionUtils.isEmpty(staffRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + staffDataFileName;
+
+        doRecord(staffRecords, memberDataPath, tempName);
     }
 
     public void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {

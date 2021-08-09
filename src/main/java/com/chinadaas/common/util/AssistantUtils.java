@@ -15,8 +15,7 @@ import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.component.wrapper.PathWrapper;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.entity.SuperCorporationEntity;
-import com.chinadaas.entity.old.BaseEntInfo;
-import com.chinadaas.entity.old.ParentAndMajorInvPersonInfo;
+import com.chinadaas.entity.old.*;
 import com.chinadaas.model.ChainModel;
 import com.chinadaas.model.SuperCorporationModel;
 import com.google.common.collect.Maps;
@@ -317,63 +316,555 @@ public abstract class AssistantUtils {
     }
 
     public static List<String> memberRecord(List<BaseEntInfo> baseEntInfos) {
-        List<String> recordList = baseEntInfos.stream().map(
-                baseEntInfo -> {
-                    List<String> recordItems = Arrays.asList(
-                            StringUtils.trimToEmpty(baseEntInfo.getParent_id()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEntid()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEntname()),
-                            StringUtils.trimToEmpty(baseEntInfo.getInvtype()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRegno()),
-                            StringUtils.trimToEmpty(baseEntInfo.getCreditcode()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEsdate()),
-                            StringUtils.trimToEmpty(baseEntInfo.getIndustryphy()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRegcap()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEntstatus()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRegcapcur()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEnttype()),
-                            StringUtils.trimToEmpty(baseEntInfo.getIslist()),
-                            StringUtils.trimToEmpty(baseEntInfo.getCode()),
-                            StringUtils.trimToEmpty(baseEntInfo.getStockcode()),
-                            StringUtils.trimToEmpty(baseEntInfo.getBriefname()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEnt_country()),
-                            StringUtils.trimToEmpty(baseEntInfo.getType()),
-                            StringUtils.trimToEmpty(baseEntInfo.getIndustryco()),
-                            StringUtils.trimToEmpty(baseEntInfo.getProvince()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEnttype_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEnt_country_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRegcapcur_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getIndustryphy_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getIndustryco_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getProvince_desc()),
-                            StringUtils.trimToEmpty(baseEntInfo.getBreak_law_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getPunish_break_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getPunished_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getAbnormity_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getCaseinfo_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getCourtannoucement_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getGaccpenalty_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getJudicial_aid_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getMab_info_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getFinalcase_count()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRelation()),
-                            StringUtils.trimToEmpty(baseEntInfo.getRelation_density()),
-                            StringUtils.trimToEmpty(baseEntInfo.getEntstatus_desc()),
-                            StringUtils.trimToEmpty(
-                                    "null".equals(JSONObject.toJSONString(baseEntInfo.getPath()))
-                                            ? "" : JSONObject.toJSONString(baseEntInfo.getPath())
-                            ),
-                            StringUtils.trimToEmpty(baseEntInfo.getFinal_cgzb())
+        List<String> recordList = baseEntInfos.stream()
+                .map(
+                        baseEntInfo -> {
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(baseEntInfo.getParent_id()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEntid()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEntname()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getInvtype()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRegno()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getCreditcode()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEsdate()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getIndustryphy()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRegcap()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEntstatus()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRegcapcur()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEnttype()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getIslist()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getCode()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getStockcode()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getBriefname()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEnt_country()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getType()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getIndustryco()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getProvince()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getProvince_desc()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getPunished_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getMab_info_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRelation()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getRelation_density()),
+                                    StringUtils.trimToEmpty(baseEntInfo.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(baseEntInfo.getPath()))
+                                                    ? "" : JSONObject.toJSONString(baseEntInfo.getPath())
+                                    ),
+                                    StringUtils.trimToEmpty(baseEntInfo.getFinal_cgzb())
 
-                    );
-                    return String.join("\u0001", recordItems);
-                }
-        ).collect(Collectors.toList());
+                            );
+                            return String.join("\u0001", recordItems);
+                        }
+                )
+                .collect(Collectors.toList());
 
         return recordList;
     }
 
-    public static void discernAndMajorPersonRecord(List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos) {
+    public static List<String> discernAndMajorPersonRecord(List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos) {
+        List<String> recordList = parentAndMajorInvPersonInfos.stream()
+                .map(
+                        parentAndMajorInvPersonInfo -> {
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getParent_id()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getName()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getZsid()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getZspid()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getPerson_country()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getConprop_person2parent()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getConprop_person2sub()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getConprop_parent2sub()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEntid()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEntname()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getInvtype()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRegno()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getCreditcode()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEsdate()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getIndustryphy()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRegcap()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEntstatus()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRegcapcur()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEnttype()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getIslist()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getCode()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getStockcode()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getBriefname()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEnt_country()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getType()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getIndustryco()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getProvince()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getProvince_desc()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getPunished_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getMab_info_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRelation()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getRelation_density()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(parentAndMajorInvPersonInfo.getPath()))
+                                                    ? "" : JSONObject.toJSONString(parentAndMajorInvPersonInfo.getPath())
+                                    ),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getHolderrto_person2parent()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getHolderrto_person2sub()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getHolderrto_parent2sub()),
+                                    StringUtils.trimToEmpty(parentAndMajorInvPersonInfo.getEmid())
+
+                            );
+                            return String.join("\u0001", recordItems);
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> discernAndStaffRecord(List<StaffAndParentCommonInfo> staffAndParentCommonInfos) {
+        List<String> recordList = staffAndParentCommonInfos.stream()
+                .map(
+                        staffAndParent -> {
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(staffAndParent.getParent_id()),
+                                    StringUtils.trimToEmpty(staffAndParent.getName()),
+                                    StringUtils.trimToEmpty(staffAndParent.getZsid()),
+                                    StringUtils.trimToEmpty(staffAndParent.getZspid()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPerson_country()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPosition()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPosition_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getConprop_person2sub()),
+                                    StringUtils.trimToEmpty(staffAndParent.getConprop_parent2sub()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEntid()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEntname()),
+                                    StringUtils.trimToEmpty(staffAndParent.getInvtype()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRegno()),
+                                    StringUtils.trimToEmpty(staffAndParent.getCreditcode()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEsdate()),
+                                    StringUtils.trimToEmpty(staffAndParent.getIndustryphy()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRegcap()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEntstatus()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRegcapcur()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEnttype()),
+                                    StringUtils.trimToEmpty(staffAndParent.getIslist()),
+                                    StringUtils.trimToEmpty(staffAndParent.getCode()),
+                                    StringUtils.trimToEmpty(staffAndParent.getStockcode()),
+                                    StringUtils.trimToEmpty(staffAndParent.getBriefname()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEnt_country()),
+                                    StringUtils.trimToEmpty(staffAndParent.getType()),
+                                    StringUtils.trimToEmpty(staffAndParent.getIndustryco()),
+                                    StringUtils.trimToEmpty(staffAndParent.getProvince()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getProvince_desc()),
+                                    StringUtils.trimToEmpty(staffAndParent.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getPunished_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getMab_info_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRelation()),
+                                    StringUtils.trimToEmpty(staffAndParent.getRelation_density()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(staffAndParent.getPath()))
+                                                    ? "" : JSONObject.toJSONString(staffAndParent.getPath())
+
+                                    ),
+                                    StringUtils.trimToEmpty(staffAndParent.getHolderrto_person2sub()),
+                                    StringUtils.trimToEmpty(staffAndParent.getHolderrto_parent2sub()),
+                                    StringUtils.trimToEmpty(staffAndParent.getEmid())
+
+                            );
+                            return String.join("\u0001", recordItems);
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> discernLegalOutRecord(List<StaffAndParentCommonInfo> staffAndParentCommonInfos) {
+        List<String> recordList = staffAndParentCommonInfos.stream()
+                .map(
+                        basePersonInfo -> {
+
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(basePersonInfo.getParent_id()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getName()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getZsid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getZspid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPerson_country()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntname()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getInvtype()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegno()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCreditcode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEsdate()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryphy()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcap()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntstatus()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcapcur()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnttype()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIslist()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getStockcode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getBriefname()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnt_country()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getType()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryco()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getProvince()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getProvince_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPunished_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getMab_info_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRelation()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRelation_density()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(basePersonInfo.getPath())) ? "" : JSONObject.toJSONString(basePersonInfo.getPath())
+
+                                    ),
+                                    StringUtils.trimToEmpty(basePersonInfo.getFinal_cgzb()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEmid())
+                            );
+                            return String.join("\u0001", recordItems);
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> controlPersonLegalRecord(List<BasePersonInfo> basePersonInfos) {
+        List<String> recordList = basePersonInfos.stream()
+                .map(
+                        basePersonInfo -> {
+
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(basePersonInfo.getParent_id()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getName()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getZsid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getZspid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPerson_country()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntid()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntname()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getInvtype()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegno()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCreditcode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEsdate()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryphy()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcap()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntstatus()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcapcur()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnttype()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIslist()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getStockcode()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getBriefname()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnt_country()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getType()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryco()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getProvince()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getProvince_desc()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getPunished_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getMab_info_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRelation()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getRelation_density()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(basePersonInfo.getPath())) ? "" : JSONObject.toJSONString(basePersonInfo.getPath())
+
+                                    ),
+                                    StringUtils.trimToEmpty(basePersonInfo.getFinal_cgzb()),
+                                    StringUtils.trimToEmpty(basePersonInfo.getEmid())
+                            );
+                            return String.join("\u0001", recordItems);
+
+
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> personOutControlRecord(List<PersonOutControlInfo> personOutControlInfos) {
+
+        List<String> recordList = personOutControlInfos.stream()
+                .map(
+                        personOutControl -> {
+
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(personOutControl.getParent_id()),
+                                    StringUtils.trimToEmpty(personOutControl.getName()),
+                                    StringUtils.trimToEmpty(personOutControl.getZsid()),
+                                    StringUtils.trimToEmpty(personOutControl.getZspid()),
+                                    StringUtils.trimToEmpty(personOutControl.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(personOutControl.getPerson_country()),
+                                    StringUtils.trimToEmpty(personOutControl.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getEntid()),
+                                    StringUtils.trimToEmpty(personOutControl.getEntname()),
+                                    StringUtils.trimToEmpty(personOutControl.getInvtype()),
+                                    StringUtils.trimToEmpty(personOutControl.getRegno()),
+                                    StringUtils.trimToEmpty(personOutControl.getCreditcode()),
+                                    StringUtils.trimToEmpty(personOutControl.getEsdate()),
+                                    StringUtils.trimToEmpty(personOutControl.getIndustryphy()),
+                                    StringUtils.trimToEmpty(personOutControl.getRegcap()),
+                                    StringUtils.trimToEmpty(personOutControl.getEntstatus()),
+                                    StringUtils.trimToEmpty(personOutControl.getRegcapcur()),
+                                    StringUtils.trimToEmpty(personOutControl.getEnttype()),
+                                    StringUtils.trimToEmpty(personOutControl.getIslist()),
+                                    StringUtils.trimToEmpty(personOutControl.getCode()),
+                                    StringUtils.trimToEmpty(personOutControl.getStockcode()),
+                                    StringUtils.trimToEmpty(personOutControl.getBriefname()),
+                                    StringUtils.trimToEmpty(personOutControl.getEnt_country()),
+                                    StringUtils.trimToEmpty(personOutControl.getType()),
+                                    StringUtils.trimToEmpty(personOutControl.getIndustryco()),
+                                    StringUtils.trimToEmpty(personOutControl.getProvince()),
+                                    StringUtils.trimToEmpty(personOutControl.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getProvince_desc()),
+                                    StringUtils.trimToEmpty(personOutControl.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getPunished_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getMab_info_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(personOutControl.getRelation()),
+                                    StringUtils.trimToEmpty(personOutControl.getRelation_density()),
+                                    StringUtils.trimToEmpty(personOutControl.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(personOutControl.getCtrl2parent_path())) ? "" : JSONObject.toJSONString(personOutControl.getCtrl2parent_path())
+
+                                    ),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(personOutControl.getCtrl2source_path())) ? "" : JSONObject.toJSONString(personOutControl.getCtrl2source_path())
+
+                                    ),
+                                    StringUtils.trimToEmpty(personOutControl.getCtrl2parent_cgzb()),
+                                    StringUtils.trimToEmpty(personOutControl.getCtrl2source_cgzb()),
+                                    StringUtils.trimToEmpty(personOutControl.getEmid())
+                            );
+                            return String.join("\u0001", recordItems);
+
+
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> majorPersonRecord(List<MajorInvPersonInfo> majorInvPersonInfos) {
+
+        List<String> recordList = majorInvPersonInfos.stream()
+                .map(
+                        majorInvPerson -> {
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(majorInvPerson.getParent_id()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getName()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getZsid()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getZspid()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getPerson_country()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getConprop_person2parent()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEntid()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEntname()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getInvtype()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRegno()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getCreditcode()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEsdate()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getIndustryphy()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRegcap()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEntstatus()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRegcapcur()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEnttype()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getIslist()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getCode()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getStockcode()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getBriefname()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEnt_country()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getType()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getIndustryco()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getProvince()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getProvince_desc()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getPunished_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getMab_info_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRelation()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getRelation_density()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(majorInvPerson.getPath())) ? "" : JSONObject.toJSONString(majorInvPerson.getPath())
+
+                                    ),
+                                    StringUtils.trimToEmpty(majorInvPerson.getHolderrto_person2parent()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getFinal_cgzb()),
+                                    StringUtils.trimToEmpty(majorInvPerson.getEmid())
+
+                            );
+                            return String.join("\u0001", recordItems);
+
+
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static List<String> staffRecord(List<StaffPerson> staffPeople) {
+
+        List<String> recordList = staffPeople.stream()
+                .map(
+                        staffPerson -> {
+
+                            List<String> recordItems = Arrays.asList(
+                                    StringUtils.trimToEmpty(staffPerson.getParent_id()),
+                                    StringUtils.trimToEmpty(staffPerson.getName()),
+                                    StringUtils.trimToEmpty(staffPerson.getZsid()),
+                                    StringUtils.trimToEmpty(staffPerson.getZspid()),
+                                    StringUtils.trimToEmpty(staffPerson.getPalgorithmid()),
+                                    StringUtils.trimToEmpty(staffPerson.getPerson_country()),
+                                    StringUtils.trimToEmpty(staffPerson.getPerson_country_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getPosition()),
+                                    StringUtils.trimToEmpty(staffPerson.getPosition_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getEntid()),
+                                    StringUtils.trimToEmpty(staffPerson.getEntname()),
+                                    StringUtils.trimToEmpty(staffPerson.getInvtype()),
+                                    StringUtils.trimToEmpty(staffPerson.getRegno()),
+                                    StringUtils.trimToEmpty(staffPerson.getCreditcode()),
+                                    StringUtils.trimToEmpty(staffPerson.getEsdate()),
+                                    StringUtils.trimToEmpty(staffPerson.getIndustryphy()),
+                                    StringUtils.trimToEmpty(staffPerson.getRegcap()),
+                                    StringUtils.trimToEmpty(staffPerson.getEntstatus()),
+                                    StringUtils.trimToEmpty(staffPerson.getRegcapcur()),
+                                    StringUtils.trimToEmpty(staffPerson.getEnttype()),
+                                    StringUtils.trimToEmpty(staffPerson.getIslist()),
+                                    StringUtils.trimToEmpty(staffPerson.getCode()),
+                                    StringUtils.trimToEmpty(staffPerson.getStockcode()),
+                                    StringUtils.trimToEmpty(staffPerson.getBriefname()),
+                                    StringUtils.trimToEmpty(staffPerson.getEnt_country()),
+                                    StringUtils.trimToEmpty(staffPerson.getType()),
+                                    StringUtils.trimToEmpty(staffPerson.getIndustryco()),
+                                    StringUtils.trimToEmpty(staffPerson.getProvince()),
+                                    StringUtils.trimToEmpty(staffPerson.getEnttype_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getEnt_country_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getRegcapcur_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getIndustryphy_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getIndustryco_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getProvince_desc()),
+                                    StringUtils.trimToEmpty(staffPerson.getBreak_law_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getPunish_break_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getPunished_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getAbnormity_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getCaseinfo_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getCourtannoucement_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getGaccpenalty_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getJudicial_aid_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getMab_info_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getFinalcase_count()),
+                                    StringUtils.trimToEmpty(staffPerson.getRelation()),
+                                    StringUtils.trimToEmpty(staffPerson.getRelation_density()),
+                                    StringUtils.trimToEmpty(staffPerson.getEntstatus_desc()),
+                                    StringUtils.trimToEmpty(
+                                            "null".equals(JSONObject.toJSONString(staffPerson.getPath())) ? "" : JSONObject.toJSONString(staffPerson.getPath())
+
+                                    ),
+                                    StringUtils.trimToEmpty(staffPerson.getFinal_cgzb()),
+                                    StringUtils.trimToEmpty(staffPerson.getEmid())
+                            );
+                            return String.join("\u0001", recordItems);
+
+
+                        }
+                )
+                .collect(Collectors.toList());
+
+        return recordList;
     }
 
     public static void filterFinCtrlNodeProperties(Map<String, Object> nodeProperties, int nodeType) {

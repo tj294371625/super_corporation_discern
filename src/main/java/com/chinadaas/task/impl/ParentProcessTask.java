@@ -82,7 +82,7 @@ public class ParentProcessTask implements FullTask {
 
     @Override
     public void run() {
-        log.info("process task start run...");
+        log.info("parent process task start run...");
         long startTime = TimeUtils.startTime();
 
         Set<String> parentFixEntIds = chainOperationService.parentFixEntIds();
@@ -100,9 +100,9 @@ public class ParentProcessTask implements FullTask {
             storageTask.run(superCorporationModel);
         };
 
-        parallelExecutor.execute("process task", processTask);
+        parallelExecutor.execute("parent process task", processTask);
 
-        log.info("end the process task, spend time: [{}ms]", TimeUtils.endTime(startTime));
+        log.info("end the parent process task, spend time: [{}ms]", TimeUtils.endTime(startTime));
     }
 
     private class ParentToSourceCalTask {

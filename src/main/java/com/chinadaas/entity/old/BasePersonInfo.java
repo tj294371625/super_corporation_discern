@@ -15,7 +15,7 @@ import lombok.Data;
  * 2020-01-19     zhaolin            Create the current class
  *******************************************************************************/
 @Data
-public class BasePersonInfo extends com.chinadaas.decision.model.out.BaseEntInfo {
+public class BasePersonInfo extends BaseEntInfo {
 
     private String zspid;
     private String zsid;

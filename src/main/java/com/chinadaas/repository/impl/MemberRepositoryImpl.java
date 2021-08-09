@@ -1,5 +1,6 @@
 package com.chinadaas.repository.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.chinadaas.common.constant.SuperConst;
 import com.chinadaas.commons.factory.CypherBuilderFactory;
 import com.chinadaas.component.mapper.base.Mapper;
@@ -8,7 +9,9 @@ import com.chinadaas.entity.*;
 import com.chinadaas.repository.MemberRepository;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.client.MongoCollection;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lawliet
@@ -345,11 +349,69 @@ public class MemberRepositoryImpl implements MemberRepository {
 
     @Override
     public void addMembers(List<Map<String, Object>> memberRecords) {
-        mongoTemplate.insert(memberRecords, SC_MEMBERS);
+        doInsert(memberRecords, SC_MEMBERS);
     }
 
     @Override
     public void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords) {
-        mongoTemplate.insert(discernAndMajorPersonRecords, SC_DISCERN_AND_MAJOR_PERSON);
+        doInsertWithPath(discernAndMajorPersonRecords, SC_DISCERN_AND_MAJOR_PERSON);
+    }
+
+    @Override
+    public void addDiscernAndStaff(List<Map<String, Object>> discernAndStaffRecords) {
+        doInsertWithPath(discernAndStaffRecords, SC_DISCERN_AND_STAFF);
+    }
+
+    @Override
+    public void addDiscernLegalOut(List<Map<String, Object>> discernLegalOutRecords) {
+        doInsert(discernLegalOutRecords, SC_DISCERN_LEGAL);
+    }
+
+    @Override
+    public void addControlPersonLegal(List<Map<String, Object>> controlPersonLegalRecords) {
+        doInsert(controlPersonLegalRecords, SC_CONTROL_PERSON_LEGAL);
+    }
+
+    @Override
+    public void addPersonOutControl(List<Map<String, Object>> personOutControlRecords) {
+        doInsert(personOutControlRecords, SC_PERSON_OUT_CONTROL);
+    }
+
+    @Override
+    public void addMajorPerson(List<Map<String, Object>> majorPersonRecords) {
+        doInsert(majorPersonRecords, SC_MAJOR_PERSON);
+    }
+
+    @Override
+    public void addStaff(List<Map<String, Object>> staffRecords) {
+        doInsert(staffRecords, SC_STAFF);
+    }
+
+    private void doInsert(List<Map<String, Object>> records,
+                          String collectionName) {
+        List<Document> documents = records.stream()
+                .map(record -> Document.parse(JSONObject.toJSONString(record)))
+                .collect(Collectors.toList());
+
+        MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
+        collection.insertMany(documents);
+    }
+
+    private void doInsertWithPath(List<Map<String, Object>> records,
+                                  String collectionName) {
+
+        List<Document> documents = records.stream()
+                .map(
+                        record -> {
+                            Document parse = Document.parse(JSONObject.toJSONString(record));
+                            Object path = record.get("path");
+                            parse.put("path", path);
+                            return parse;
+                        }
+                )
+                .collect(Collectors.toList());
+
+        MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
+        collection.insertMany(documents);
     }
 }

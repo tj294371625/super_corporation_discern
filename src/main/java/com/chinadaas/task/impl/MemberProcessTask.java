@@ -2,16 +2,17 @@ package com.chinadaas.task.impl;
 
 import com.chinadaas.common.util.AssistantUtils;
 import com.chinadaas.common.util.RecordHandler;
+import com.chinadaas.common.util.TimeUtils;
+import com.chinadaas.component.executor.Executor;
 import com.chinadaas.component.io.EntIdListLoader;
-import com.chinadaas.entity.old.BaseEntInfo;
-import com.chinadaas.entity.old.ParentAndMajorInvPersonInfo;
+import com.chinadaas.entity.old.*;
 import com.chinadaas.model.*;
 import com.chinadaas.service.MemberService;
 import com.chinadaas.service.SuperCorporationService;
 import com.chinadaas.task.FullTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * @author lawliet
@@ -32,42 +33,52 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class MemberProcessTask implements FullTask {
 
+    private final Executor parallelExecutor;
     private final RecordHandler recordHandler;
     private final EntIdListLoader entIdListLoader;
     private final SuperCorporationService superCorporationService;
     private final MemberService memberService;
 
     @Autowired
-    public MemberProcessTask(RecordHandler recordHandler,
+    public MemberProcessTask(@Qualifier("parallelExecutor") Executor parallelExecutor,
+                             RecordHandler recordHandler,
                              EntIdListLoader entIdListLoader,
                              SuperCorporationService superCorporationService,
                              MemberService memberService) {
 
+        this.parallelExecutor = parallelExecutor;
         this.recordHandler = recordHandler;
         this.entIdListLoader = entIdListLoader;
         this.superCorporationService = superCorporationService;
         this.memberService = memberService;
     }
 
-    private ParentIdExtraTask parentIdExtraTask;
+    private MemberCalTask memberCalTask;
+    private DataStorageTask dataStorageTask;
 
     @PostConstruct
     public void init() {
-        parentIdExtraTask = new ParentIdExtraTask();
+        memberCalTask = new MemberCalTask();
+        dataStorageTask = new DataStorageTask();
     }
 
     @Override
     public void run() {
-        parentIdExtraTask.run();
+        log.info("member process task start run...");
+        long startTime = TimeUtils.startTime();
 
-    }
+        Set<String> parentIds = superCorporationService.extraParentIds();
+        entIdListLoader.reloadEntIdList(parentIds);
 
-    private class ParentIdExtraTask {
+        final Consumer<String> processTask = (entId) -> {
+            SuperMemberModel superMemberModel = new SuperMemberModel(entId);
+            memberCalTask.cal(superMemberModel);
+            dataStorageTask.run(superMemberModel);
+        };
 
-        public void run() {
-            Set<String> parentIds = superCorporationService.extraParentIds();
-            entIdListLoader.reloadEntIdList(parentIds);
-        }
+        parallelExecutor.execute("member process task", processTask);
+
+        log.info("end the member process task, spend time: [{}ms]", TimeUtils.endTime(startTime));
     }
 
     private class MemberCalTask {
@@ -100,6 +111,13 @@ public class MemberProcessTask implements FullTask {
 
         public void run(SuperMemberModel superMemberModel) {
             memberStorage(superMemberModel);
+            discernAndMajorPersonStorage(superMemberModel);
+            discernAndStaffStorage(superMemberModel);
+            discernLegalOut(superMemberModel);
+            controlPersonLegal(superMemberModel);
+            personOutControl(superMemberModel);
+            majorPerson(superMemberModel);
+            staff(superMemberModel);
         }
 
         private void memberStorage(SuperMemberModel superMemberModel) {
@@ -117,6 +135,53 @@ public class MemberProcessTask implements FullTask {
             List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos
                     = AssistantUtils.mapListToList(discernAndMajorPersonRecords, ParentAndMajorInvPersonInfo.class);
             recordHandler.recordDiscernAndMajorPerson(parentAndMajorInvPersonInfos);
+        }
+
+        private void discernAndStaffStorage(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> discernAndStaffRecords = superMemberModel.discernAndStaffModelRecords();
+            memberService.addDiscernAndStaff(discernAndStaffRecords);
+            List<StaffAndParentCommonInfo> staffAndParentCommonInfos
+                    = AssistantUtils.mapListToList(discernAndStaffRecords, StaffAndParentCommonInfo.class);
+            recordHandler.recordDiscernAndStaff(staffAndParentCommonInfos);
+        }
+
+        private void discernLegalOut(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> discernLegalOutRecords = superMemberModel.discernLegalOutModelRecords();
+            memberService.addDiscernLegalOut(discernLegalOutRecords);
+            List<StaffAndParentCommonInfo> staffAndParentCommonInfos
+                    = AssistantUtils.mapListToList(discernLegalOutRecords, StaffAndParentCommonInfo.class);
+            recordHandler.recordDiscernLegalOut(staffAndParentCommonInfos);
+        }
+
+        private void controlPersonLegal(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> controlPersonLegalRecords = superMemberModel.controlPersonLegalModelRecords();
+            memberService.addControlPersonLegal(controlPersonLegalRecords);
+            List<BasePersonInfo> basePersonInfos
+                    = AssistantUtils.mapListToList(controlPersonLegalRecords, BasePersonInfo.class);
+            recordHandler.recordControlPersonLegal(basePersonInfos);
+        }
+
+        private void personOutControl(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> personOutControlRecords = superMemberModel.personOutControlModelRecords();
+            memberService.addPersonOutControl(personOutControlRecords);
+            List<PersonOutControlInfo> personOutControlInfos
+                    = AssistantUtils.mapListToList(personOutControlRecords, PersonOutControlInfo.class);
+            recordHandler.recordPersonOutControl(personOutControlInfos);
+        }
+
+        private void majorPerson(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> majorPersonRecords = superMemberModel.majorPersonModelRecords();
+            memberService.addMajorPerson(majorPersonRecords);
+            List<MajorInvPersonInfo> majorInvPersonInfos
+                    = AssistantUtils.mapListToList(majorPersonRecords, MajorInvPersonInfo.class);
+            recordHandler.recordMajorPerson(majorInvPersonInfos);
+        }
+
+        private void staff(SuperMemberModel superMemberModel) {
+            List<Map<String, Object>> staffRecords = superMemberModel.staffModelRecords();
+            memberService.addStaff(staffRecords);
+            List<StaffPerson> staffPeople = AssistantUtils.mapListToList(staffRecords, StaffPerson.class);
+            recordHandler.recordStaff(staffPeople);
         }
 
     }

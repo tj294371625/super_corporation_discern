@@ -203,4 +203,34 @@ public class MemberServiceImpl implements MemberService {
     public void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords) {
         memberRepository.addDiscernAndMajorPerson(discernAndMajorPersonRecords);
     }
+
+    @Override
+    public void addDiscernAndStaff(List<Map<String, Object>> discernAndStaffRecords) {
+        memberRepository.addDiscernAndStaff(discernAndStaffRecords);
+    }
+
+    @Override
+    public void addDiscernLegalOut(List<Map<String, Object>> discernLegalOutRecords) {
+        memberRepository.addDiscernLegalOut(discernLegalOutRecords);
+    }
+
+    @Override
+    public void addControlPersonLegal(List<Map<String, Object>> controlPersonLegalRecords) {
+        memberRepository.addControlPersonLegal(controlPersonLegalRecords);
+    }
+
+    @Override
+    public void addPersonOutControl(List<Map<String, Object>> personOutControlRecords) {
+        memberRepository.addPersonOutControl(personOutControlRecords);
+    }
+
+    @Override
+    public void addMajorPerson(List<Map<String, Object>> majorPersonRecords) {
+        memberRepository.addMajorPerson(majorPersonRecords);
+    }
+
+    @Override
+    public void addStaff(List<Map<String, Object>> staffRecords) {
+        memberRepository.addStaff(staffRecords);
+    }
 }
