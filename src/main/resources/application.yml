@@ -18,6 +18,14 @@ db:
     finCtrlCollection: SC_CHAIN_FINCTRL
     singleCollection: MODEL_PARENT_SINGLE
     superCollection: SC_SUPER_CORPORATION_17173
+    memberCollection: SC_MEMBERS_17173
+    discernAndMajorPersonCollection: SC_DISCERN_AND_MAJOR_PERSON_17173
+    discernAndStaffCollection: SC_DISCERN_AND_STAFF_17173
+    discernLegalOutCollection: SC_DISCERN_LEGAL_17173
+    controlPersonLegalCollection: SC_CONTROL_PERSON_LEGAL_17173
+    personOutControl: SC_PERSON_OUT_CONTROL_17173
+    majorPersonCollection: SC_MAJOR_PERSON_17173
+    staffCollection: SC_STAFF_17173
 
 data:
   filename:
@@ -25,10 +33,19 @@ data:
     timeout: timeout_record.csv
     circular: circular_record.csv
     super: super_record.csv
+    members: members.csv
+    discernAndMajorPerson: discern_and_major_person.csv
+    discernAndStaff: discern_and_staff.csv
+    discernLegalOut: discern_legal.csv
+    controlPersonLegal: control_person_legal.csv
+    personOutControl: person_out_control.csv
+    majorPerson: major_person.csv
+    staff: staff.csv
   path:
     incr: /data/superCorporation-file/incr
     source: /data/superCorporation-file/source
     timeout: /data/superCorporation-file/timeout
     circular: /data/superCorporation-file/circular
     super: /data/superCorporation-file/super
+    members: /data/superCorporation-file/members
 

@@ -193,4 +193,14 @@ public class MemberServiceImpl implements MemberService {
 
         return staffModel.calStaffModelResult(commonPersonControlEnt);
     }
+
+    @Override
+    public void addMembers(List<Map<String, Object>> memberRecords) {
+        memberRepository.addMembers(memberRecords);
+    }
+
+    @Override
+    public void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords) {
+        memberRepository.addDiscernAndMajorPerson(discernAndMajorPersonRecords);
+    }
 }

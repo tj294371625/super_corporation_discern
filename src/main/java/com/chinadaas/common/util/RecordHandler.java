@@ -1,6 +1,8 @@
 package com.chinadaas.common.util;
 
 import com.chinadaas.entity.SuperCorporationEntity;
+import com.chinadaas.entity.old.BaseEntInfo;
+import com.chinadaas.entity.old.ParentAndMajorInvPersonInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +64,26 @@ public class RecordHandler {
         this.delTypeIncrSet.clear();
     }
 
+
+    @Value("${data.path.members}")
+    private String memberDataPath;
+    @Value("${data.filename.members}")
+    private String memberDataFileName;
+    @Value("${data.filename.discernAndMajorPerson}")
+    private String discernAndMajorPersonDataFileName;
+    @Value("${data.filename.discernAndStaff}")
+    private String discernAndStaffDataFileName;
+    @Value("${data.filename.discernLegalOut}")
+    private String discernLegalOutDataFileName;
+    @Value("${data.filename.controlPersonLegal}")
+    private String controlPersonLegalDataFileName;
+    @Value("${data.filename.personOutControl}")
+    private String personOutControlDataFileName;
+    @Value("${data.filename.majorPerson}")
+    private String majorPersonDataFileName;
+    @Value("${data.filename.staff}")
+    private String staffDataFileName;
+
     @Value("${data.path.super}")
     private String superDataPath;
     @Value("${data.filename.super}")
@@ -78,6 +100,46 @@ public class RecordHandler {
     private String circularPath;
     @Value("${data.filename.circular}")
     private String circularFileName;
+
+    public void recordMembers(List<BaseEntInfo> baseEntInfos) {
+        List<String> memberRecords = AssistantUtils.memberRecord(baseEntInfos);
+
+        if (CollectionUtils.isEmpty(memberRecords)) {
+            return;
+        }
+
+        String tempName = Thread.currentThread().getName() + "-" + memberDataFileName;
+
+        doRecord(memberRecords, memberDataPath, tempName);
+    }
+
+    public void recordDiscernAndMajorPerson(List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos) {
+        AssistantUtils.discernAndMajorPersonRecord(parentAndMajorInvPersonInfos);
+    }
+
+    public void recordDiscernAndStaff() {
+
+    }
+
+    public void recordDiscernLegalOut() {
+
+    }
+
+    public void recordControlPersonLegal() {
+
+    }
+
+    public void recordPersonOutControl() {
+
+    }
+
+    public void recordMajorPerson() {
+
+    }
+
+    public void recordStaff() {
+
+    }
 
     public void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {
         String superCorporationStr = AssistantUtils.superCorporationRecord(superCorporationEntity);
@@ -158,4 +220,24 @@ public class RecordHandler {
         }
     }
 
+    private void doRecord(List<String> messages, String path, String fileName) {
+        File fileDir = new File(path);
+        if (!fileDir.exists()) {
+            fileDir.mkdirs();
+        }
+
+        File outputFile = new File(path + File.separator + fileName);
+
+        try (
+                FileOutputStream fos = new FileOutputStream(outputFile, true);
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))
+        ) {
+            for (String message : messages) {
+                bw.write(message + "\r\n");
+                bw.flush();
+            }
+        } catch (IOException e) {
+            log.warn("write messages fail.");
+        }
+    }
 }

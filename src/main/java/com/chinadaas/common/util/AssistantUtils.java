@@ -5,6 +5,9 @@ import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.MemberConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.constant.TargetType;
+import com.chinadaas.commons.graph.model.GraphDto;
+import com.chinadaas.commons.graph.model.NodeDto;
+import com.chinadaas.commons.graph.model.RelationDto;
 import com.chinadaas.commons.type.NodeType;
 import com.chinadaas.commons.type.RelationType;
 import com.chinadaas.component.wrapper.LinkWrapper;
@@ -12,15 +15,17 @@ import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.component.wrapper.PathWrapper;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.entity.SuperCorporationEntity;
+import com.chinadaas.entity.old.BaseEntInfo;
+import com.chinadaas.entity.old.ParentAndMajorInvPersonInfo;
 import com.chinadaas.model.ChainModel;
 import com.chinadaas.model.SuperCorporationModel;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lawliet
@@ -311,6 +316,66 @@ public abstract class AssistantUtils {
 
     }
 
+    public static List<String> memberRecord(List<BaseEntInfo> baseEntInfos) {
+        List<String> recordList = baseEntInfos.stream().map(
+                baseEntInfo -> {
+                    List<String> recordItems = Arrays.asList(
+                            StringUtils.trimToEmpty(baseEntInfo.getParent_id()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEntid()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEntname()),
+                            StringUtils.trimToEmpty(baseEntInfo.getInvtype()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRegno()),
+                            StringUtils.trimToEmpty(baseEntInfo.getCreditcode()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEsdate()),
+                            StringUtils.trimToEmpty(baseEntInfo.getIndustryphy()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRegcap()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEntstatus()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRegcapcur()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEnttype()),
+                            StringUtils.trimToEmpty(baseEntInfo.getIslist()),
+                            StringUtils.trimToEmpty(baseEntInfo.getCode()),
+                            StringUtils.trimToEmpty(baseEntInfo.getStockcode()),
+                            StringUtils.trimToEmpty(baseEntInfo.getBriefname()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEnt_country()),
+                            StringUtils.trimToEmpty(baseEntInfo.getType()),
+                            StringUtils.trimToEmpty(baseEntInfo.getIndustryco()),
+                            StringUtils.trimToEmpty(baseEntInfo.getProvince()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEnttype_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEnt_country_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRegcapcur_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getIndustryphy_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getIndustryco_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getProvince_desc()),
+                            StringUtils.trimToEmpty(baseEntInfo.getBreak_law_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getPunish_break_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getPunished_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getAbnormity_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getCaseinfo_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getCourtannoucement_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getGaccpenalty_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getJudicial_aid_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getMab_info_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getFinalcase_count()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRelation()),
+                            StringUtils.trimToEmpty(baseEntInfo.getRelation_density()),
+                            StringUtils.trimToEmpty(baseEntInfo.getEntstatus_desc()),
+                            StringUtils.trimToEmpty(
+                                    "null".equals(JSONObject.toJSONString(baseEntInfo.getPath()))
+                                            ? "" : JSONObject.toJSONString(baseEntInfo.getPath())
+                            ),
+                            StringUtils.trimToEmpty(baseEntInfo.getFinal_cgzb())
+
+                    );
+                    return String.join("\u0001", recordItems);
+                }
+        ).collect(Collectors.toList());
+
+        return recordList;
+    }
+
+    public static void discernAndMajorPersonRecord(List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos) {
+    }
+
     public static void filterFinCtrlNodeProperties(Map<String, Object> nodeProperties, int nodeType) {
 
         if (NodeType.PERSON == nodeType) {
@@ -374,6 +439,212 @@ public abstract class AssistantUtils {
             }
         }
 
+    }
+
+
+
+
+    /*
+     * 旧代码迁移
+     * */
+
+    public static <T> List<T> mapListToList(List<Map<String, Object>> source, Class<T> entityClass) {
+        if (CollectionUtils.isEmpty(source)) {
+            return Collections.emptyList();
+        }
+        return source.stream().map(m -> mapToObject(m, entityClass)).collect(Collectors.toList());
+    }
+
+    /**
+     * 将map映射成对象
+     *
+     * @param source
+     * @param entityClass
+     * @param <T>
+     * @return
+     */
+    public static <T> T mapToObject(Map source, Class<T> entityClass) {
+
+        try {
+
+            Map<String, Field> nameFieldMap = new HashMap<>();
+            T t = entityClass.getDeclaredConstructor().newInstance();
+
+            if (CollectionUtils.isEmpty(source)) {
+                return t;
+            }
+            Class currentClass = entityClass;
+            Field[] fields = entityClass.getDeclaredFields();
+
+            while (true) {
+
+                for (Field field : fields) {
+                    String fieldName = getKeyName(field.getName());
+                    nameFieldMap.put(fieldName, field);
+                    org.springframework.data.mongodb.core.mapping.Field[] annotationsByType =
+                            field.getAnnotationsByType(org.springframework.data.mongodb.core.mapping.Field.class);
+
+                    for (org.springframework.data.mongodb.core.mapping.Field mapProperty : annotationsByType) {
+                        String name1 = getKeyName(mapProperty.value());
+                        if (name1.equals(fieldName)) {
+                            continue;
+                        }
+                        nameFieldMap.put(name1, field);
+                        nameFieldMap.remove(fieldName);
+                    }
+                }
+
+                currentClass = currentClass.getSuperclass();
+                if (currentClass == null) {
+                    break;
+                }
+                fields = currentClass.getDeclaredFields();
+            }
+
+            source.forEach((key, value) -> {
+                if (key instanceof String) {
+
+                    String fieldName = getKeyName((String) key);
+
+                    Field field = nameFieldMap.get(fieldName);
+
+                    if (field == null) {
+                        return;
+                    }
+
+                    if (value == null) {
+                        return;
+                    }
+                    if (formatClass(field.getType()).equals(formatClass(value.getClass()))
+                            ||
+                            isSupperclass(field.getType(), value.getClass())
+                    ) {
+                        try {
+                            field.setAccessible(true);
+                            field.set(t, value);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (value instanceof Map) {
+                        try {
+                            Object o = mapToObject((Map) value, field.getType());
+                            field.setAccessible(true);
+                            field.set(t, o);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            if (entityClass.equals(GraphDto.class)) {
+                                if ("nodes".equals(field.getName())) {
+                                    Set<NodeDto> nodes = new HashSet<>();
+                                    List list = (List) value;
+                                    for (Object o : list) {
+                                        NodeDto nodeDto = mapToObject((Map) o, NodeDto.class);
+                                        nodes.add(nodeDto);
+                                    }
+                                    field.setAccessible(true);
+                                    field.set(t, nodes);
+                                }
+
+                                if ("links".equals(field.getName())) {
+                                    Set<RelationDto> links = new HashSet<>();
+                                    List list = (List) value;
+                                    for (Object o : list) {
+                                        RelationDto relationDto = mapToObject((Map) o, RelationDto.class);
+                                        links.add(relationDto);
+                                    }
+                                    field.setAccessible(true);
+                                    field.set(t, links);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            });
+
+
+            return t;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将基本类型统一成包装类
+     *
+     * @param clazz
+     * @return
+     */
+    private static Class formatClass(Class clazz) {
+
+        if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
+            return Long.class;
+        }
+        if (clazz.equals(Long.TYPE)) {
+            return Long.class;
+        }
+        if (clazz.equals(Character.TYPE)) {
+            return Character.class;
+        }
+        if (clazz.equals(Byte.TYPE)) {
+            return Byte.class;
+        }
+        if (clazz.equals(Short.TYPE)) {
+            return Short.class;
+        }
+
+        if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
+            return Double.class;
+        }
+        if (clazz.equals(Double.TYPE)) {
+            return Double.class;
+        }
+        if (clazz.equals(Boolean.TYPE)) {
+            return Boolean.class;
+        }
+
+        return clazz;
+    }
+
+    /**
+     * 检测是否为父类
+     *
+     * @param parent
+     * @param child
+     * @return
+     */
+    private static boolean isSupperclass(Class parent, Class child) {
+
+        Class superClass = null;
+        Class[] interfaces = null;
+        while ((superClass = child.getSuperclass()) != null) {
+
+            interfaces = child.getInterfaces();
+
+            if (interfaces != null) {
+                for (Class anInterface : interfaces) {
+                    if (anInterface.equals(parent)) {
+                        return true;
+                    }
+                }
+            }
+
+            if (superClass.equals(parent)) {
+                return true;
+            }
+            child = superClass;
+        }
+
+        return false;
+    }
+
+    public static String getKeyName(String key) {
+        return key.replaceAll("_", "").toLowerCase();
     }
 
 }

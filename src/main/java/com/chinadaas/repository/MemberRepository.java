@@ -88,4 +88,8 @@ public interface MemberRepository {
      * @return
      */
     Map finalControlPerson(String parentId);
+
+    void addMembers(List<Map<String, Object>> memberRecords);
+
+    void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords);
 }

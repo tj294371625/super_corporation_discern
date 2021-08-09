@@ -33,8 +33,8 @@ public class MemberRepositoryImpl implements MemberRepository {
     private static final String NODE_ID = "nodeid";
     private static final String MORE_INFO = "moreinfo";
     private static final String STAFF_LIST_KEY = "staffList";
-    public static final String ZS_ID = "zsid";
-    public static final String ENT_ID = "entid";
+    private static final String ZS_ID = "zsid";
+    private static final String ENT_ID = "entid";
 
     /**
      * 单位 second
@@ -44,6 +44,22 @@ public class MemberRepositoryImpl implements MemberRepository {
     // zs: 临时生成的表
     @Value("${db.mongodb.superCollection}")
     private String SC_SUPER_CORPORATION;
+    @Value("${db.mongodb.memberCollection}")
+    private String SC_MEMBERS;
+    @Value("${db.mongodb.discernAndMajorPersonCollection}")
+    private String SC_DISCERN_AND_MAJOR_PERSON;
+    @Value("${db.mongodb.discernAndStaffCollection}")
+    private String SC_DISCERN_AND_STAFF;
+    @Value("${db.mongodb.discernLegalOutCollection}")
+    private String SC_DISCERN_LEGAL;
+    @Value("${db.mongodb.controlPersonLegalCollection}")
+    private String SC_CONTROL_PERSON_LEGAL;
+    @Value("${db.mongodb.personOutControl}")
+    private String SC_PERSON_OUT_CONTROL;
+    @Value("${db.mongodb.majorPersonCollection}")
+    private String SC_MAJOR_PERSON;
+    @Value("${db.mongodb.staffCollection}")
+    private String SC_STAFF;
 
     private static final List<String> STAFF_LIST = Arrays.asList("410A", "410B", "410C", "410D", "410E", "410F", "410G", "410Z",
             "430A", "431A", "432K", "433A", "433B", "434Q", "436A", "441A", "441B", "441C", "441D", "441E", "441F", "441G", "442G",
@@ -325,5 +341,15 @@ public class MemberRepositoryImpl implements MemberRepository {
         );
 
         return mongoTemplate.findOne(condition, Map.class, SC_SUPER_CORPORATION);
+    }
+
+    @Override
+    public void addMembers(List<Map<String, Object>> memberRecords) {
+        mongoTemplate.insert(memberRecords, SC_MEMBERS);
+    }
+
+    @Override
+    public void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords) {
+        mongoTemplate.insert(discernAndMajorPersonRecords, SC_DISCERN_AND_MAJOR_PERSON);
     }
 }

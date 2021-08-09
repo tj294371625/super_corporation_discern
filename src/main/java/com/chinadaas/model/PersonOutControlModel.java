@@ -29,10 +29,10 @@ public class PersonOutControlModel {
 
     private List<Map> tempResultList;
 
-    private ModelStatus status;
+    private ModelStatus resultStatus;
 
     public PersonOutControlModel(String parentId, Map finalControlPerson) {
-        this.status = ModelStatus.NO_RESULT;
+        this.resultStatus = ModelStatus.NO_RESULT;
         this.tempResultList = Lists.newArrayList();
         this.parentId = parentId;
         this.resultList = Lists.newArrayList();
@@ -49,7 +49,7 @@ public class PersonOutControlModel {
             return this;
         }
 
-        this.status = ModelStatus.HAVE_RESULT;
+        this.resultStatus = ModelStatus.HAVE_RESULT;
 
         return this;
     }
@@ -117,7 +117,7 @@ public class PersonOutControlModel {
         return resultList;
     }
 
-    public ModelStatus getStatus() {
-        return status;
+    public ModelStatus getResultStatus() {
+        return resultStatus;
     }
 }

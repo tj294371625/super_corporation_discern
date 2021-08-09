@@ -3,6 +3,7 @@ package com.chinadaas.service;
 import com.chinadaas.model.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lawliet
@@ -70,4 +71,8 @@ public interface MemberService {
      * @return
      */
     StaffModel obtainStaff(String parentId);
+    
+    void addMembers(List<Map<String, Object>> memberRecords);
+
+    void addDiscernAndMajorPerson(List<Map<String, Object>> discernAndMajorPersonRecords);
 }
