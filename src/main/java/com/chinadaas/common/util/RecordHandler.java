@@ -82,15 +82,13 @@ public class RecordHandler {
     public void recordSuperCorporation(SuperCorporationEntity superCorporationEntity) {
         String superCorporationStr = AssistantUtils.superCorporationRecord(superCorporationEntity);
 
-        if (StringUtils.isBlank(incrListPath)
-                || StringUtils.isBlank(incrListFileName)
-                || StringUtils.isBlank(superCorporationStr)) {
+        if (StringUtils.isBlank(superCorporationStr)) {
             return;
         }
 
-        synchronized (LOCK) {
-            doRecord(superCorporationStr, superDataPath, superDataFileName);
-        }
+        String tempName = Thread.currentThread().getName() + "-" + superDataFileName;
+        doRecord(superCorporationStr, superDataPath, tempName);
+
     }
 
     /**

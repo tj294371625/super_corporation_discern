@@ -3,6 +3,7 @@ package com.chinadaas.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -15,6 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @ToString
 public class ChainEntity {
+
+    @Field("_id")
+    private String id;
 
     /**
      * 源（输入企业）

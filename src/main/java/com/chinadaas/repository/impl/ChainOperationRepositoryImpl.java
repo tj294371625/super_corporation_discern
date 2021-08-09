@@ -2,13 +2,13 @@ package com.chinadaas.repository.impl;
 
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.util.Assert;
+
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,23 +83,8 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public void chainPersistence(ChainEntity chainEntity, ModelType modelType) {
-
-        synchronized (LOCK) {
-            int index = 0;
-            while (index < 3) {
-                try {
-                    String collectionName = selectCollectionName(modelType);
-                    mongoTemplate.insert(chainEntity, collectionName);
-                    break;
-                } catch (Exception e) {
-                    index++;
-                    log.warn("ChainOperationRepositoryImpl#chainPersistence insert fail, " +
-                            "try insert count: [{}]", index, e);
-                    Assert.isFalse(3 == index, "");
-                }
-            }
-        }
-
+        String collectionName = selectCollectionName(modelType);
+        mongoTemplate.insert(chainEntity, collectionName);
     }
 
     @Override
@@ -137,35 +122,41 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> fullSourceEntId() {
-        Set<String> fullSourceEntIds = Sets.newHashSet();
+    public Set<String> parentFixEntIds() {
+        Set<String> parentFixEntIds = Sets.newHashSet();
 
         MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
-        parentCollection.find()
-                .batchSize(10000)
+        parentCollection
+                .find(
+                        Filters.and(
+                                Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
+                .batchSize(50000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
                             if (Objects.nonNull(document)) {
-                                fullSourceEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
+                                parentFixEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
                             }
                         }
                 );
 
-        return fullSourceEntIds;
+        return parentFixEntIds;
     }
 
     @Override
     public Set<String> queryFinCtrlEntIds() {
         Set<String> finCtrlEntIds = Sets.newHashSet();
 
-        BasicDBObject condition = new BasicDBObject();
-        condition.put(ChainConst.TARGET_ENT_ID, "-1");
-
-        MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
-        parentCollection
-                .find(condition)
-                .batchSize(10000)
+        MongoCollection<Document> parentCollection0 = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection0
+                .find(
+                        Filters.and(
+                                Filters.eq(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
+                .batchSize(50000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
@@ -175,7 +166,49 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                         }
                 );
 
+        // zs: 修复母公司点不存在的情况
+        MongoCollection<Document> parentCollection1 = mongoTemplate.getCollection(SC_CHAIN_PARENT);
+        parentCollection1
+                .find(
+                        Filters.and(
+                                Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
+                .batchSize(50000)
+                .projection(new Document(ChainConst._ID, 0).append(ChainConst.TARGET_ENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                finCtrlEntIds.add(document.getString(ChainConst.TARGET_ENT_ID));
+                            }
+                        }
+                );
+
         return finCtrlEntIds;
+    }
+
+    @Override
+    public Set<String> finCtrlFixEntIds() {
+        Set<String> finCtrlFixEntIds = Sets.newHashSet();
+
+        MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_FINCTRL);
+        parentCollection
+                .find(
+                        Filters.and(
+                                Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
+                        )
+                )
+                .batchSize(50000)
+                .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
+                .forEach(
+                        (Consumer<? super Document>) document -> {
+                            if (Objects.nonNull(document)) {
+                                finCtrlFixEntIds.add(document.getString(ChainConst.SOURCE_ENT_ID));
+                            }
+                        }
+                );
+
+        return finCtrlFixEntIds;
     }
 
     private List<List<String>> batchProcess(Set<String> entIds) {

@@ -20,13 +20,16 @@ import com.chinadaas.service.NodeOperationService;
 import com.chinadaas.service.SuperCorporationService;
 import com.chinadaas.task.FullTask;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.*;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -82,8 +85,13 @@ public class ParentProcessTask implements FullTask {
         log.info("process task start run...");
         long startTime = TimeUtils.startTime();
 
-        Set<String> allEntIds = chainOperationService.fullSourceEntId();
+        Set<String> parentFixEntIds = chainOperationService.parentFixEntIds();
+        Set<String> finCtrlFixEntIds = chainOperationService.finCtrlFixEntIds();
+        Set<String> allEntIds = Sets.newHashSet();
+        allEntIds.addAll(parentFixEntIds);
+        allEntIds.addAll(finCtrlFixEntIds);
         entIdListLoader.reloadEntIdList(allEntIds);
+        log.info("数据开始处理，总数据量: [{}]", allEntIds.size());
 
         final Consumer<String> processTask = (entId) -> {
             SuperCorporationModel superCorporationModel = new SuperCorporationModel(entId);
@@ -124,7 +132,7 @@ public class ParentProcessTask implements FullTask {
                 twoNodesUseGroupParentList = nodeOperationService.sourceToTargetUseGroupParent(middleEntId, targetEntId);
                 superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
                 superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseGroupParentList));
-                superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList);
+                superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
 
                 return;
             }
@@ -133,7 +141,7 @@ public class ParentProcessTask implements FullTask {
             twoNodesUseInvList = nodeOperationService.sourceToTargetUseInv(currentQueryId, targetEntId, parent2SourceLayer);
             superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
             superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseInvList));
-            superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList);
+            superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
         }
     }
 
@@ -229,6 +237,8 @@ public class ParentProcessTask implements FullTask {
                 return;
             }
             SuperCorporationEntity superCorporationEntity = AssistantUtils.modelTransferToEntityOfSC(superCorporationModel);
+
+
             superCorporationService.insertSuperCorporation(superCorporationEntity);
             recordHandler.recordSuperCorporation(superCorporationEntity);
         }

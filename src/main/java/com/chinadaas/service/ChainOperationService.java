@@ -49,11 +49,11 @@ public interface ChainOperationService {
     ChainEntity chainQuery(String entId, ModelType parent);
 
     /**
-     * 获取全部source entId
+     * 获取需要修复的entId名单
      *
      * @return
      */
-    Set<String> fullSourceEntId();
+    Set<String> parentFixEntIds();
 
     /**
      * 获取用于查询最终控股股东的候选entId
@@ -70,4 +70,11 @@ public interface ChainOperationService {
      * @return
      */
     String obtainEntBeforeDisclosure(String sourceEntId, String targetEntId);
+
+    /**
+     * 获取需要修复的entId名单
+     *
+     * @return
+     */
+    Set<String> finCtrlFixEntIds();
 }

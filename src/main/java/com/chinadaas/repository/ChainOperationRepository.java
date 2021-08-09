@@ -71,11 +71,11 @@ public interface ChainOperationRepository {
     Set<String> treeQuery(String entId);
 
     /**
-     * 获取全部source entId
+     * 获取需要修复的entId名单
      *
      * @return
      */
-    Set<String> fullSourceEntId();
+    Set<String> parentFixEntIds();
 
     /**
      * 获取用于查询最终控股股东的候选entId
@@ -84,4 +84,10 @@ public interface ChainOperationRepository {
      */
     Set<String> queryFinCtrlEntIds();
 
+    /**
+     * 获取需要修复的entId名单
+     *
+     * @return
+     */
+    Set<String> finCtrlFixEntIds();
 }

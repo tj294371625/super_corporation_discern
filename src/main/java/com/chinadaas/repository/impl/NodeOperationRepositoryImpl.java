@@ -48,7 +48,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     /**
      * 单位 second
      */
-    private final long WAIT_TIME = 60L;
+    private final long WAIT_TIME = 10L;
 
     @Value("${db.mongodb.singleCollection}")
     private String MODEL_PARENT_SINGLE;

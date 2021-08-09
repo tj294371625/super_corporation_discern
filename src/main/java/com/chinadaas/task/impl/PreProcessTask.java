@@ -31,20 +31,17 @@ import java.util.function.Consumer;
 @Component
 public class PreProcessTask implements FullTask {
 
-    private final Executor singleExecutor;
     private final Executor parallelExecutor;
     private final EntIdListLoader entIdListLoader;
     private final SuperCorporationAlgorithmChain superCorporationAlgorithmChain;
     private final ChainOperationService chainOperationService;
 
     @Autowired
-    public PreProcessTask(Executor singleExecutor,
-                          @Qualifier("parallelExecutor") Executor parallelExecutor,
+    public PreProcessTask(@Qualifier("parallelExecutor") Executor parallelExecutor,
                           EntIdListLoader entIdListLoader,
                           SuperCorporationAlgorithmChain superCorporationAlgorithmChain,
                           ChainOperationService chainOperationService) {
 
-        this.singleExecutor = singleExecutor;
         this.parallelExecutor = parallelExecutor;
         this.entIdListLoader = entIdListLoader;
         this.superCorporationAlgorithmChain = superCorporationAlgorithmChain;
@@ -107,8 +104,8 @@ public class PreProcessTask implements FullTask {
             long startTime = TimeUtils.startTime();
 
             // zs: 替换企业标识名单，优化效率
-            Set<String> fullEntIdList = chainOperationService.fullSourceEntId();
-            entIdListLoader.reloadEntIdList(fullEntIdList);
+            Set<String> parentFixEntIds = chainOperationService.parentFixEntIds();
+            entIdListLoader.reloadEntIdList(parentFixEntIds);
 
             final Consumer<String> chainFixTask = (entId) -> {
 
@@ -120,7 +117,7 @@ public class PreProcessTask implements FullTask {
 
             };
 
-            singleExecutor.execute("ChainOfParentFix", chainFixTask);
+            parallelExecutor.execute("ChainOfParentFix", chainFixTask);
 
             log.info("end the ChainOfParentFix task, spend time: [{}ms]", TimeUtils.endTime(startTime));
         }
@@ -164,6 +161,10 @@ public class PreProcessTask implements FullTask {
             log.info("ChainOfCtrlFix task run start...");
             long startTime = TimeUtils.startTime();
 
+            // zs: 替换企业标识名单，优化效率
+            Set<String> finCtrlFixEntIds = chainOperationService.finCtrlFixEntIds();
+            entIdListLoader.reloadEntIdList(finCtrlFixEntIds);
+
             final Consumer<String> chainFixTask = (entId) -> {
 
                 try {
@@ -174,7 +175,7 @@ public class PreProcessTask implements FullTask {
 
             };
 
-            singleExecutor.execute("ChainOfCtrlFix", chainFixTask);
+            parallelExecutor.execute("ChainOfCtrlFix", chainFixTask);
 
             log.info("end the ChainOfCtrlFix task, spend time: [{}ms]", TimeUtils.endTime(startTime));
         }

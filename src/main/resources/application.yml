@@ -1,12 +1,34 @@
 spring:
-  profiles:
-    active: test
   application:
     name: super_corporation_discern
+  data:
+    mongodb:
+      uri: mongodb://192.168.100.44:27017/kg
 
 server:
   port: 17173
 
-annotation:
-  package:
-    path: com.chinadaas.component.mapper.annotation
+db:
+  neo4j:
+    user: neo4j
+    password: chinadaas2017
+    url: bolt://192.168.100.89:7687
+  mongodb:
+    parentCollection: SC_CHAIN_PARENT
+    finCtrlCollection: SC_CHAIN_FINCTRL
+    singleCollection: MODEL_PARENT_SINGLE
+    superCollection: SC_SUPER_CORPORATION_17173
+
+data:
+  filename:
+    incr: incr_record.csv
+    timeout: timeout_record.csv
+    circular: circular_record.csv
+    super: super_record.csv
+  path:
+    incr: /data/superCorporation-file/incr
+    source: /data/superCorporation-file/source
+    timeout: /data/superCorporation-file/timeout
+    circular: /data/superCorporation-file/circular
+    super: /data/superCorporation-file/super
+
