@@ -93,8 +93,8 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public Set<String> fullSourceEntId() {
-        return repository.fullSourceEntId();
+    public Set<String> parentFixEntIds() {
+        return repository.parentFixEntIds();
     }
 
     @Override
@@ -112,6 +112,11 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         }
 
         return obtainEntBeforeDisclosure(chainEntity.getSourceEntId(), targetEntId);
+    }
+
+    @Override
+    public Set<String> finCtrlFixEntIds() {
+        return repository.finCtrlFixEntIds();
     }
 
     private void recursiveChainFix(ChainEntity chainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {

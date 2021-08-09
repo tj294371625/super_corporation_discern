@@ -24,8 +24,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SuperCorporationRepositoryImpl implements SuperCorporationRepository {
 
-    private static final Object LOCK = new Object();
-
     @Value("${db.mongodb.superCollection}")
     private String SC_SUPER_CORPORATION;
 
@@ -39,20 +37,7 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
     @Override
     public void insertSuperCorporation(SuperCorporationEntity superCorporationEntity) {
 
-        synchronized (LOCK) {
-            int index = 0;
-            while (index < 3) {
-                try {
-                    doInsertSuperCorporation(superCorporationEntity);
-                    break;
-                } catch (Exception e) {
-                    index++;
-                    log.warn("SuperCorporationRepositoryImpl#insertSuperCorporation insert fail, " +
-                            "try insert count: [{}]", index, e);
-                    Assert.isFalse(3 == index, "");
-                }
-            }
-        }
+        doInsertSuperCorporation(superCorporationEntity);
 
     }
 

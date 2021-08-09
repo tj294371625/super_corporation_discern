@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,23 +36,35 @@ public class ParallelExecutor implements Executor {
 
     @Override
     public void execute(String taskName, Consumer<String> consumer) {
-        Set<String> entIdList = entIdListHolder.getEntIdList();
+        List<List<String>> divideEntIdList = entIdListHolder.getDivideEntIdList();
 
-        final long THRESHOLD = 100_000L;
-        AtomicLong counter = new AtomicLong(0L);
-        for (String entId : entIdList) {
-
-            if (0L == counter.addAndGet(1L) % 50_000L) {
-                log.info("task: [{}] current read records: [{}] ", taskName, counter.get());
-            }
-
-            ThreadPoolUtils.waitForLessThan(executor, THRESHOLD);
-            // task execute
-            executor.submit(() -> consumer.accept(entId));
+        for (List<String> partList : divideEntIdList) {
+            executor.submit(() -> {
+                doExecute(taskName, consumer, partList);
+            });
         }
 
         // wait task execute complete
         ThreadPoolUtils.waitForComplete(executor);
+
+    }
+
+    private void doExecute(String taskName, Consumer<String> consumer, List<String> partList) {
+
+        AtomicLong counter = new AtomicLong(0L);
+        for (String entId : partList) {
+
+            if (0L == counter.addAndGet(1L) % 50_000L) {
+                log.info("thread: [{}] task: [{}] current read records: [{}] ",
+                        Thread.currentThread().getName(),
+                        taskName,
+                        counter.get());
+            }
+
+            // task execute
+            consumer.accept(entId);
+        }
+
     }
 
 }

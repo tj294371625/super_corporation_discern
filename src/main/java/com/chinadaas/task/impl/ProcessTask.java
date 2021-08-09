@@ -20,13 +20,16 @@ import com.chinadaas.service.NodeOperationService;
 import com.chinadaas.service.SuperCorporationService;
 import com.chinadaas.task.FullTask;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.*;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -82,7 +85,11 @@ public class ProcessTask implements FullTask {
         log.info("process task start run...");
         long startTime = TimeUtils.startTime();
 
-        Set<String> allEntIds = chainOperationService.fullSourceEntId();
+        Set<String> parentFixEntIds = chainOperationService.parentFixEntIds();
+        Set<String> finCtrlFixEntIds = chainOperationService.finCtrlFixEntIds();
+        Set<String> allEntIds = Sets.newHashSet();
+        allEntIds.addAll(parentFixEntIds);
+        allEntIds.addAll(finCtrlFixEntIds);
         entIdListLoader.reloadEntIdList(allEntIds);
 
         final Consumer<String> processTask = (entId) -> {
@@ -229,6 +236,8 @@ public class ProcessTask implements FullTask {
                 return;
             }
             SuperCorporationEntity superCorporationEntity = AssistantUtils.modelTransferToEntityOfSC(superCorporationModel);
+
+
             superCorporationService.insertSuperCorporation(superCorporationEntity);
             recordHandler.recordSuperCorporation(superCorporationEntity);
         }
