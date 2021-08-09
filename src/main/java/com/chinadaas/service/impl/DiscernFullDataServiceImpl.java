@@ -58,7 +58,7 @@ public class DiscernFullDataServiceImpl extends AbstractDiscernDataService {
 
     @Override
     protected void preDoDiscern() {
-//        resetCollection();
+        resetCollection();
     }
 
     @Override
