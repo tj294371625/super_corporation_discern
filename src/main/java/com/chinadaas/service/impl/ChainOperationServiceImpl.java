@@ -108,10 +108,10 @@ public class ChainOperationServiceImpl implements ChainOperationService {
 
         String tempEntId = chainEntity.getTempEntId();
         if (targetEntId.equals(tempEntId)) {
-            return chainEntity.getSourceEntId();
+            return sourceEntId;
         }
 
-        return obtainEntBeforeDisclosure(chainEntity.getSourceEntId(), targetEntId);
+        return obtainEntBeforeDisclosure(tempEntId, targetEntId);
     }
 
     @Override

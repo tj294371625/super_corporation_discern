@@ -54,7 +54,7 @@ public class ParallelExecutor implements Executor {
         AtomicLong counter = new AtomicLong(0L);
         for (String entId : partList) {
 
-            if (0L == counter.addAndGet(1L) % 50_000L) {
+            if (0L == counter.addAndGet(1L) % 10_000L) {
                 log.info("thread: [{}] task: [{}] current read records: [{}] ",
                         Thread.currentThread().getName(),
                         taskName,

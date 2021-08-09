@@ -91,6 +91,7 @@ public class ProcessTask implements FullTask {
         allEntIds.addAll(parentFixEntIds);
         allEntIds.addAll(finCtrlFixEntIds);
         entIdListLoader.reloadEntIdList(allEntIds);
+        log.info("数据开始处理，总数据量: [{}]", allEntIds.size());
 
         final Consumer<String> processTask = (entId) -> {
             SuperCorporationModel superCorporationModel = new SuperCorporationModel(entId);
