@@ -197,6 +197,7 @@ public abstract class AssistantUtils {
         long chainLength = chainModel.getChainLength();
 
         ChainEntity chainEntity = new ChainEntity();
+        chainEntity.setId(sourceNode.obtainEntId());
         chainEntity.setSourceEntId(sourceNode.obtainEntId());
         chainEntity.setSourceName(sourceNode.obtainEntName());
         chainEntity.setTargetType(targetType.toString());

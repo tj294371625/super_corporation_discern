@@ -77,15 +77,21 @@ public class PreProcessTask implements FullTask {
             long startTime = TimeUtils.startTime();
 
             final Consumer<String> chainDiscernTask = (entId) -> {
-
-                ChainModel chainModel = superCorporationAlgorithmChain.discernSpecialTypeChain(entId, ModelType.PARENT);
-                if (ModelStatus.NO_RESULT.equals(chainModel.getResultStatus())) {
-                    return;
+                ChainModel chainModel = null;
+                try {
+                    chainModel = superCorporationAlgorithmChain.discernSpecialTypeChain(entId, ModelType.PARENT);
+                    if (ModelStatus.NO_RESULT.equals(chainModel.getResultStatus())) {
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
 
                 try {
                     chainOperationService.chainPersistence(AssistantUtils.modelTransferToEntityOfChain(chainModel), ModelType.PARENT);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log.warn("chainPersistence fail, entId: [{}]", entId);
                 }
 

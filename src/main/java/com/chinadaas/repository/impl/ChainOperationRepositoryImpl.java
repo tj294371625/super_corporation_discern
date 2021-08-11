@@ -3,6 +3,7 @@ package com.chinadaas.repository.impl;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
 
+import com.chinadaas.common.util.Assert;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
@@ -83,8 +84,24 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public void chainPersistence(ChainEntity chainEntity, ModelType modelType) {
-        String collectionName = selectCollectionName(modelType);
-        mongoTemplate.insert(chainEntity, collectionName);
+        int index = 0;
+        while (index < 3) {
+            try {
+                String collectionName = selectCollectionName(modelType);
+                mongoTemplate.insert(chainEntity, collectionName);
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+                index++;
+                try {
+                    Thread.sleep(index * 20);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+                log.error("ChainOperationRepositoryImpl#chainPersistence insert fail, try insert count: [{}]", index);
+            }
+        }
+
     }
 
     @Override
