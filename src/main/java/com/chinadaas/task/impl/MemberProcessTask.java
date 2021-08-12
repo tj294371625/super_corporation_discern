@@ -87,22 +87,22 @@ public class MemberProcessTask implements FullTask {
             String currentQueryId = superMemberModel.getCurrentQueryId();
 
             List<MemberModel> memberModels = memberService.obtainMembers(currentQueryId);
-            List<DiscernAndMajorPersonModel> discernAndMajorPersonModels = memberService.obtainDiscernAndMajorPersons(currentQueryId);
+            /*List<DiscernAndMajorPersonModel> discernAndMajorPersonModels = memberService.obtainDiscernAndMajorPersons(currentQueryId);
             List<DiscernAndStaffModel> discernAndStaffModels = memberService.obtainDiscernAndStaffs(currentQueryId);
             DiscernLegalOutModel discernLegalOutModel = memberService.obtainDiscernLegalOut(currentQueryId);
             ControlPersonLegalModel controlPersonLegalModel = memberService.obtainControlPersonLegal(currentQueryId);
             PersonOutControlModel personOutControlModel = memberService.obtainPersonOutControl(currentQueryId);
             MajorPersonModel majorPersonModel = memberService.obtainMajorPerson(currentQueryId);
-            StaffModel staffModel = memberService.obtainStaff(currentQueryId);
+            StaffModel staffModel = memberService.obtainStaff(currentQueryId);*/
 
             superMemberModel.setMemberModels(memberModels);
-            superMemberModel.setDiscernAndMajorPersonModels(discernAndMajorPersonModels);
+            /*superMemberModel.setDiscernAndMajorPersonModels(discernAndMajorPersonModels);
             superMemberModel.setDiscernAndStaffModels(discernAndStaffModels);
             superMemberModel.setDiscernLegalOutModel(discernLegalOutModel);
             superMemberModel.setControlPersonLegalModel(controlPersonLegalModel);
             superMemberModel.setPersonOutControlModel(personOutControlModel);
             superMemberModel.setMajorPersonModel(majorPersonModel);
-            superMemberModel.setStaffModel(staffModel);
+            superMemberModel.setStaffModel(staffModel);*/
         }
 
     }
@@ -111,19 +111,19 @@ public class MemberProcessTask implements FullTask {
 
         public void run(SuperMemberModel superMemberModel) {
             memberStorage(superMemberModel);
-            discernAndMajorPersonStorage(superMemberModel);
+            /*discernAndMajorPersonStorage(superMemberModel);
             discernAndStaffStorage(superMemberModel);
             discernLegalOut(superMemberModel);
             controlPersonLegal(superMemberModel);
             personOutControl(superMemberModel);
             majorPerson(superMemberModel);
-            staff(superMemberModel);
+            staff(superMemberModel);*/
         }
 
         private void memberStorage(SuperMemberModel superMemberModel) {
             List<Map<String, Object>> memberRecords = superMemberModel.memberRecords();
             // 写入数据库
-            memberService.addMembers(memberRecords);
+//            memberService.addMembers(memberRecords);
             // 写入文件
             List<BaseEntInfo> baseEntInfos = AssistantUtils.mapListToList(memberRecords, BaseEntInfo.class);
             recordHandler.recordMembers(baseEntInfos);

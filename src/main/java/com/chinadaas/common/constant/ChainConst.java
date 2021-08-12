@@ -46,12 +46,12 @@ public class ChainConst {
     /**
      * source 到 temp 层级
      */
-    public static final String SOURCE_TO_TEMP_LAYER = "source_to_temp_layer";
+    public static final String TEMP_TO_SOURCE_LAYER = "temp_to_source_layer";
 
     /**
      * source 到 target 层级
      */
-    public static final String SOURCE_TO_TARGET_LAYER = "source_to_target_layer";
+    public static final String TARGET_TO_SOURCE_LAYER = "target_to_source_layer";
 
     /**
      * 目标类型: ent, disclosure, person

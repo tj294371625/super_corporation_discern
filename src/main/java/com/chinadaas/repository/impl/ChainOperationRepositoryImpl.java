@@ -3,7 +3,6 @@ package com.chinadaas.repository.impl;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
 
-import com.chinadaas.common.util.Assert;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
@@ -71,13 +70,19 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public void chainFix(String parentId, String parentName, String parentType, long totalChainLength, List<String> sourceEntIds, ModelType modelType) {
-        Query matchCondition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(sourceEntIds));
+    public void chainFix(String parentId,
+                         String parentName,
+                         String parentType,
+                         long totalChainLength,
+                         String nodeEntId,
+                         ModelType modelType) {
+
+        Query matchCondition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).is(nodeEntId));
         Update update = new Update()
                 .set(ChainConst.TARGET_ENT_ID, parentId)
                 .set(ChainConst.TARGET_NAME, parentName)
                 .set(ChainConst.TARGET_TYPE, parentType)
-                .set(ChainConst.SOURCE_TO_TARGET_LAYER, totalChainLength);
+                .set(ChainConst.TARGET_TO_SOURCE_LAYER, totalChainLength);
         String collectionName = selectCollectionName(modelType);
         mongoTemplate.updateMulti(matchCondition, update, collectionName);
     }

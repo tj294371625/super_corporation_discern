@@ -42,6 +42,7 @@ public class SnapshotHandler {
 
     /**
      * 获取总链路长度
+     *
      * @return
      */
     public long obtainTotalChainLength() {
@@ -71,6 +72,15 @@ public class SnapshotHandler {
      */
     public List<String> obtainCircularPath() {
         return snapshotList;
+    }
+
+    /**
+     * 获取待更新点的entId
+     *
+     * @return
+     */
+    public String obtainNodeEntId() {
+        return snapshotList.get(0);
     }
 
     /**

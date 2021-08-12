@@ -149,14 +149,14 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         String parentId = preChainEntity.getTempEntId();
         String parentName = preChainEntity.getTempName();
         String parentType = preChainEntity.getTargetType();
-        List<String> chainEntIds = snapshotHandler.obtainChainEntIds(parentId);
+        String nodeEntId = snapshotHandler.obtainNodeEntId();
         long totalChainLength = snapshotHandler.obtainTotalChainLength();
         repository.chainFix(
                 parentId,
                 parentName,
                 parentType,
                 totalChainLength,
-                chainEntIds,
+                nodeEntId,
                 modelType
         );
     }

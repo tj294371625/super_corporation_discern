@@ -37,14 +37,14 @@ public interface ChainOperationRepository {
      * @param parentName
      * @param parentType
      * @param totalChainLength
-     * @param sourceEntIds
+     * @param nodeEntId
      * @param modelType
      */
     void chainFix(String parentId,
                   String parentName,
                   String parentType,
                   long totalChainLength,
-                  List<String> sourceEntIds,
+                  String nodeEntId,
                   ModelType modelType);
 
     /**
