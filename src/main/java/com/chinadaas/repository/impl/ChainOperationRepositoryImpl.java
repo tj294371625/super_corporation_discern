@@ -118,6 +118,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
             try {
                 mongoTemplate.remove(condition, SC_CHAIN_PARENT);
+                mongoTemplate.remove(condition, SC_CHAIN_FINCTRL);
             } catch (Exception e) {
                 log.warn("ChainOperationRepositoryImpl#chainBatchDelete delete fail", e);
             }

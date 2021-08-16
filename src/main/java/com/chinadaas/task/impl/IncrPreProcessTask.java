@@ -83,7 +83,18 @@ public class IncrPreProcessTask implements IncrTask {
             // 2.2 neo4j及链路表中存在该在营企业
             // 2.2.1 未发生变化，检验是否是最终控股股东发生变化
             if (notChange(chainEntity, chainModel)) {
-                return;
+                ChainModel finCtrlChainModel = superCorporationAlgorithmChain.discernSpecialTypeChain(entId, ModelType.FIN_CTRL);
+                ChainEntity finCtrlChainEntity = chainOperationService.chainQuery(entId, ModelType.FIN_CTRL);
+
+                // zs: 属于母公司未变化
+                if (Objects.isNull(finCtrlChainEntity)) {
+                    return;
+                }
+
+                if (notChange(finCtrlChainEntity, finCtrlChainModel)) {
+                    return;
+                }
+
             }
 
             // 2.2.2 发生变化，记录
