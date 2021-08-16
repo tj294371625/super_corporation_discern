@@ -21,6 +21,7 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
     protected EntIdListHolder entIdListHolder;
     protected RecordHandler recordHandler;
 
+    @Override
     public void discernSuperCorporation() {
 
         lockResource();
