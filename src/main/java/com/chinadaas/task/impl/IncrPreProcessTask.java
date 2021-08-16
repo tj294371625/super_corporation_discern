@@ -26,13 +26,13 @@ import java.util.function.Consumer;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description 增量名单筛选任务
+ * @description
  * @createTime 2021.07.21
  */
 @Slf4j
 @Order(1)
 @Component
-public class IncrListScreenTask implements IncrTask {
+public class IncrPreProcessTask implements IncrTask {
 
     private final Executor executor;
     private final RecordHandler recordHandler;
@@ -41,7 +41,7 @@ public class IncrListScreenTask implements IncrTask {
     private final NodeOperationService nodeOperationService;
 
     @Autowired
-    public IncrListScreenTask(@Qualifier("parallelExecutor") Executor executor,
+    public IncrPreProcessTask(@Qualifier("parallelExecutor") Executor executor,
                               RecordHandler recordHandler,
                               SuperCorporationAlgorithmChain superCorporationAlgorithmChain,
                               ChainOperationService chainOperationService,
@@ -57,10 +57,10 @@ public class IncrListScreenTask implements IncrTask {
 
     @Override
     public void run() {
-        log.info("incrList screen task run start...");
+        log.info("incrPreProcessTask run start...");
         long startTime = TimeUtils.startTime();
 
-        final Consumer<String> incrListScreenTask = (entId) -> {
+        final Consumer<String> incrPreProcessTask = (entId) -> {
             // 1 判断企业是否在营
             boolean managementStatus = nodeOperationService.managementStatus(entId);
             // 非在营，记录
@@ -81,7 +81,7 @@ public class IncrListScreenTask implements IncrTask {
             }
 
             // 2.2 neo4j及链路表中存在该在营企业
-            // 2.2.1 未发生变化，返回
+            // 2.2.1 未发生变化，检验是否是最终控股股东发生变化
             if (notChange(chainEntity, chainModel)) {
                 return;
             }
@@ -92,9 +92,9 @@ public class IncrListScreenTask implements IncrTask {
             recordHandler.recordDelTypeIncr(subIncrList);
         };
 
-        executor.execute("incrList screen", incrListScreenTask);
+        executor.execute("incrPreProcessTask", incrPreProcessTask);
 
-        log.info("end the incrList screen task, spend time: [{}ms]", TimeUtils.endTime(startTime));
+        log.info("end the incrPreProcessTask spend time: [{}ms]", TimeUtils.endTime(startTime));
     }
 
     /**
