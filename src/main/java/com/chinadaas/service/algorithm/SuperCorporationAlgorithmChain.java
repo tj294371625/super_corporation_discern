@@ -18,5 +18,5 @@ public interface SuperCorporationAlgorithmChain {
      * @param modelType
      * @return
      */
-    ChainModel discernSpecialTypeChain(String entId, ModelType modelType);
+    ChainModel discernSpecifyTypeChain(String entId, ModelType modelType);
 }

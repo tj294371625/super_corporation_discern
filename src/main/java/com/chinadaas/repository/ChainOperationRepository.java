@@ -66,28 +66,29 @@ public interface ChainOperationRepository {
      * 变更树查询
      *
      * @param entId
+     * @param modelType
      * @return
      */
-    Set<String> treeQuery(String entId);
+    Set<String> treeQuery(String entId, ModelType modelType);
 
     /**
      * 获取需要修复的entId名单
      *
      * @return
      */
-    Set<String> parentFixEntIds();
+    Set<String> obtainParentFixEntIds();
 
     /**
      * 获取用于查询最终控股股东的候选entId
      *
      * @return
      */
-    Set<String> queryFinCtrlEntIds();
+    Set<String> obtainFinCtrlEntIds();
 
     /**
      * 获取需要修复的entId名单
      *
      * @return
      */
-    Set<String> finCtrlFixEntIds();
+    Set<String> obtainFinCtrlFixEntIds();
 }

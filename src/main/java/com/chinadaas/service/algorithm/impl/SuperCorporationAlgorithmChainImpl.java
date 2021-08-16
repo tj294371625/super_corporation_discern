@@ -29,7 +29,7 @@ public class SuperCorporationAlgorithmChainImpl implements SuperCorporationAlgor
     }
 
     @Override
-    public ChainModel discernSpecialTypeChain(String entId, ModelType modelType) {
+    public ChainModel discernSpecifyTypeChain(String entId, ModelType modelType) {
         ChainModel chainModel = new ChainModel(entId, modelType);
 
         // 职责链

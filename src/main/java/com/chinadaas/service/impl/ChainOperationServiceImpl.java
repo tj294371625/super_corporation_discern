@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -68,8 +67,8 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public Set<String> treeQuery(String entId) {
-        Set<String> tempTreeResult = repository.treeQuery(entId);
+    public Set<String> treeQuery(String entId, ModelType modelType) {
+        Set<String> tempTreeResult = repository.treeQuery(entId, modelType);
 
         // 当前点无向下关联关系
         if (CollectionUtils.isEmpty(tempTreeResult)) {
@@ -80,7 +79,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         Set<String> treeResult = Sets.newHashSet();
         treeResult.add(entId);
         for (String sourceEntId : tempTreeResult) {
-            Set<String> recResults = this.treeQuery(sourceEntId);
+            Set<String> recResults = this.treeQuery(sourceEntId, modelType);
             treeResult.addAll(recResults);
         }
 
@@ -93,13 +92,13 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public Set<String> parentFixEntIds() {
-        return repository.parentFixEntIds();
+    public Set<String> obtainParentFixEntIds() {
+        return repository.obtainParentFixEntIds();
     }
 
     @Override
-    public Set<String> queryFinCtrlEntIds() {
-        return repository.queryFinCtrlEntIds();
+    public Set<String> obtainFinCtrlEntIds() {
+        return repository.obtainFinCtrlEntIds();
     }
 
     @Override
@@ -115,8 +114,8 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public Set<String> finCtrlFixEntIds() {
-        return repository.finCtrlFixEntIds();
+    public Set<String> obtainFinCtrlFixEntIds() {
+        return repository.obtainFinCtrlFixEntIds();
     }
 
     private void recursiveChainFix(ChainEntity chainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {

@@ -1,8 +1,10 @@
 package com.chinadaas.repository.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
-
+import com.chinadaas.common.constant.SuperConst;
+import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
@@ -32,8 +34,6 @@ import java.util.function.Consumer;
 @Slf4j
 @Repository
 public class ChainOperationRepositoryImpl implements ChainOperationRepository {
-
-    private static final Object LOCK = new Object();
 
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
@@ -89,6 +89,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
     @Override
     public void chainPersistence(ChainEntity chainEntity, ModelType modelType) {
+
         int index = 0;
         while (index < 3) {
             try {
@@ -96,14 +97,15 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                 mongoTemplate.insert(chainEntity, collectionName);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
                 index++;
-                try {
-                    Thread.sleep(index * 20);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-                log.error("ChainOperationRepositoryImpl#chainPersistence insert fail, try insert count: [{}]", index);
+                TimeUtils.sleep(index, 50);
+                log.error(
+                        "ChainOperationRepositoryImpl#chainPersistence insert fail, " +
+                                "body: [{}], modelType: [{}], try insert count: [{}]",
+                        JSON.toJSONString(chainEntity),
+                        modelType.toString(),
+                        index
+                );
             }
         }
 
@@ -127,12 +129,14 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> treeQuery(String entId) {
+    public Set<String> treeQuery(String entId, ModelType modelType) {
         Set<String> treeResults = Sets.newHashSet();
 
         Query condition = new Query(Criteria.where(ChainConst.TARGET_ENT_ID).is(entId));
         condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
-        List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_CHAIN_PARENT);
+
+        String collectionName = selectCollectionName(modelType);
+        List<Map> tempResults = mongoTemplate.find(condition, Map.class, collectionName);
         if (CollectionUtils.isEmpty(tempResults)) {
             return treeResults;
         }
@@ -145,7 +149,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> parentFixEntIds() {
+    public Set<String> obtainParentFixEntIds() {
         Set<String> parentFixEntIds = Sets.newHashSet();
 
         MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_PARENT);
@@ -169,7 +173,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> queryFinCtrlEntIds() {
+    public Set<String> obtainFinCtrlEntIds() {
         Set<String> finCtrlEntIds = Sets.newHashSet();
 
         MongoCollection<Document> parentCollection0 = mongoTemplate.getCollection(SC_CHAIN_PARENT);
@@ -211,7 +215,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public Set<String> finCtrlFixEntIds() {
+    public Set<String> obtainFinCtrlFixEntIds() {
         Set<String> finCtrlFixEntIds = Sets.newHashSet();
 
         MongoCollection<Document> parentCollection = mongoTemplate.getCollection(SC_CHAIN_FINCTRL);

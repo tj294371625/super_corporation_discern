@@ -7,13 +7,10 @@ import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
 import com.chinadaas.task.FullTask;
 import com.chinadaas.task.IncrTask;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author lawliet
@@ -26,15 +23,10 @@ import java.util.Set;
 public class DiscernIncrDataServiceImpl extends AbstractDiscernDataService {
 
     private final List<IncrTask> incrTasks;
-    private final List<FullTask> fullTasks;
 
     public DiscernIncrDataServiceImpl(List<IncrTask> incrTasks,
-                                      List<FullTask> fullTasks,
-                                      EntIdListLoader entIdListLoader,
                                       RecordHandler recordHandler) {
         this.incrTasks = incrTasks;
-        this.fullTasks = fullTasks;
-        this.entIdListLoader = entIdListLoader;
         this.recordHandler = recordHandler;
     }
 
@@ -47,29 +39,7 @@ public class DiscernIncrDataServiceImpl extends AbstractDiscernDataService {
             incrTask.run();
         }
 
-        Set<String> auTypeIncrSet = recordHandler.auTypeIncrSet();
-        if (CollectionUtils.isEmpty(auTypeIncrSet)) {
-            log.info("input incrList no change, end the main task");
-            return;
-        }
-
-        // 记录修正的变更名单
-        Set<String> fixIncrList = Sets.newHashSet();
-        fixIncrList.addAll(auTypeIncrSet);
-        fixIncrList.addAll(recordHandler.delTypeIncrSet());
-        for (String entId : fixIncrList) {
-            recordHandler.recordIncrList(entId);
-        }
-
-        // 重新载入add&update类型变更名单
-        entIdListLoader.reloadEntIdList(auTypeIncrSet);
-
-        for (FullTask fullTask : fullTasks) {
-            fullTask.run();
-        }
-
-        log.info("end the main task run, incr data size: [{}], spend time: [{}ms]",
-                fixIncrList.size(), TimeUtils.endTime(startTime));
+        log.info("end the main task run, spend time: [{}ms]", TimeUtils.endTime(startTime));
     }
 
     @Override

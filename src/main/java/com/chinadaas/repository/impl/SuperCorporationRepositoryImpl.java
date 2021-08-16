@@ -1,10 +1,11 @@
 package com.chinadaas.repository.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.SuperConst;
-import com.chinadaas.common.util.Assert;
 import com.chinadaas.entity.SuperCorporationEntity;
 import com.chinadaas.repository.SuperCorporationRepository;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -13,8 +14,12 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -68,6 +73,21 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
         return parentIds;
     }
 
+    @Override
+    public void superBatchDelete(Set<String> entIds) {
+        List<List<String>> batchEntIds = batchProcess(entIds);
+
+        for (List<String> batchEntId : batchEntIds) {
+            Query condition = new Query(Criteria.where(SuperConst.ENT_ID).in(batchEntId));
+
+            try {
+                mongoTemplate.remove(condition, SC_SUPER_CORPORATION);
+            } catch (Exception e) {
+                log.warn("SuperCorporationRepositoryImpl#superBatchDelete delete fail", e);
+            }
+        }
+    }
+
     private void doInsertSuperCorporation(SuperCorporationEntity superCorporationEntity) {
         MongoCollection<Document> collection = mongoTemplate.getCollection(SC_SUPER_CORPORATION);
 
@@ -94,6 +114,11 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
                 .append(SuperConst.EMID, superCorporationEntity.getEmId());
 
         collection.insertOne(document);
+    }
+
+    private List<List<String>> batchProcess(Set<String> entIds) {
+        final int BATCH_SIZE = 1_000;
+        return Lists.partition(new ArrayList<>(entIds), BATCH_SIZE);
     }
 
 }

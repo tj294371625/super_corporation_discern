@@ -35,9 +35,10 @@ public interface ChainOperationService {
      * 查找变更树
      *
      * @param entId
+     * @param defaultType
      * @return
      */
-    Set<String> treeQuery(String entId);
+    Set<String> treeQuery(String entId, ModelType defaultType);
 
     /**
      * 链路查询
@@ -53,14 +54,14 @@ public interface ChainOperationService {
      *
      * @return
      */
-    Set<String> parentFixEntIds();
+    Set<String> obtainParentFixEntIds();
 
     /**
      * 获取用于查询最终控股股东的候选entId
      *
      * @return
      */
-    Set<String> queryFinCtrlEntIds();
+    Set<String> obtainFinCtrlEntIds();
 
     /**
      * 获取上市披露公司的前一个公司的企业标识
@@ -76,5 +77,5 @@ public interface ChainOperationService {
      *
      * @return
      */
-    Set<String> finCtrlFixEntIds();
+    Set<String> obtainFinCtrlFixEntIds();
 }

@@ -15,4 +15,6 @@ public interface SuperCorporationRepository {
     void insertSuperCorporation(SuperCorporationEntity superCorporationEntity);
 
     Set<String> extraParentIds();
+
+    void superBatchDelete(Set<String> delTypeIncr);
 }

@@ -43,7 +43,7 @@ public class RecordHandler {
         auTypeIncrSet.addAll(entIds);
     }
 
-    public Set<String> auTypeIncrSet() {
+    public Set<String> obtainAUTypeIncrSet() {
         return this.auTypeIncrSet;
     }
 
@@ -55,7 +55,7 @@ public class RecordHandler {
         this.delTypeIncrSet.addAll(entIds);
     }
 
-    public Set<String> delTypeIncrSet() {
+    public Set<String> obtainDelTypeIncrSet() {
         return this.delTypeIncrSet;
     }
 

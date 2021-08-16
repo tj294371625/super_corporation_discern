@@ -16,4 +16,5 @@ public interface SuperCorporationService {
 
     Set<String> extraParentIds();
 
+    void superBatchDelete(Set<String> entIds);
 }

@@ -1,8 +1,11 @@
 package com.chinadaas.task.impl;
 
 import com.chinadaas.common.util.EntIdListOptHandler;
-import com.chinadaas.task.IncrTask;
-import com.chinadaas.task.subtask.*;
+import com.chinadaas.task.FullTask;
+import com.chinadaas.task.subtask.ChainOfCtrlDiscernTask;
+import com.chinadaas.task.subtask.ChainOfCtrlFixTask;
+import com.chinadaas.task.subtask.ChainOfParentDiscernTask;
+import com.chinadaas.task.subtask.ChainOfParentFixTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -11,37 +14,28 @@ import org.springframework.stereotype.Component;
 /**
  * @author lawliet
  * @version 1.0.0
- * @description
- * @createTime 2021.07.21
+ * @description 前置处理全量数据
+ * @createTime 2021.07.27
  */
 @Slf4j
 @Order(1)
 @Component
-public class IncrPreProcessTask implements IncrTask {
+public class FullPreProcessTask implements FullTask {
 
     private final EntIdListOptHandler entIdListOptHandler;
-    private final IncrListScreenTask incrListScreenTask;
-    private final IncrListDelTask incrListDelTask;
-    private final IncrListRecordTask incrListRecordTask;
     private final ChainOfParentDiscernTask chainOfParentDiscernTask;
     private final ChainOfParentFixTask chainOfParentFixTask;
     private final ChainOfCtrlDiscernTask chainOfCtrlDiscernTask;
     private final ChainOfCtrlFixTask chainOfCtrlFixTask;
 
     @Autowired
-    public IncrPreProcessTask(EntIdListOptHandler entIdListOptHandler,
-                              IncrListScreenTask incrListScreenTask,
-                              IncrListDelTask incrListDelTask,
-                              IncrListRecordTask incrListRecordTask,
+    public FullPreProcessTask(EntIdListOptHandler entIdListOptHandler,
                               ChainOfParentDiscernTask chainOfParentDiscernTask,
                               ChainOfParentFixTask chainOfParentFixTask,
                               ChainOfCtrlDiscernTask chainOfCtrlDiscernTask,
                               ChainOfCtrlFixTask chainOfCtrlFixTask) {
 
         this.entIdListOptHandler = entIdListOptHandler;
-        this.incrListScreenTask = incrListScreenTask;
-        this.incrListDelTask = incrListDelTask;
-        this.incrListRecordTask = incrListRecordTask;
         this.chainOfParentDiscernTask = chainOfParentDiscernTask;
         this.chainOfParentFixTask = chainOfParentFixTask;
         this.chainOfCtrlDiscernTask = chainOfCtrlDiscernTask;
@@ -50,8 +44,6 @@ public class IncrPreProcessTask implements IncrTask {
 
     @Override
     public void run() {
-
-        incrDataPreProcess();
 
         discernChainOfParent();
 
@@ -64,28 +56,22 @@ public class IncrPreProcessTask implements IncrTask {
     }
 
     private void fixChainOfCtrl() {
-        chainOfCtrlFixTask.fixChainOfCtrl();
+        this.entIdListOptHandler.replacePreWithFinCtrlFixEntIds();
+        this.chainOfCtrlFixTask.fixChainOfCtrl();
     }
 
     private void discernChainOfCtrl() {
-        chainOfCtrlDiscernTask.discernChainOfCtrl();
+        this.entIdListOptHandler.replacePreWithFinCtrlEntIds();
+        this.chainOfCtrlDiscernTask.discernChainOfCtrl();
     }
 
     private void fixChainOfParent() {
-        chainOfParentFixTask.fixChainOfParent();
+        this.entIdListOptHandler.replacePreWithParentFixEntIds();
+        this.chainOfParentFixTask.fixChainOfParent();
     }
 
     private void discernChainOfParent() {
-        entIdListOptHandler.replacePreWithIncrFixEntIds();
-        chainOfParentDiscernTask.discernChainOfParent();
-    }
-
-    private void incrDataPreProcess() {
-        incrListScreenTask.screenList();
-        incrListDelTask.delList();
-        incrListRecordTask.recordList();
+        this.chainOfParentDiscernTask.discernChainOfParent();
     }
 
 }
-
-
