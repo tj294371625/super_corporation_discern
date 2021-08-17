@@ -68,6 +68,10 @@ public class MajorPersonModel {
             return this;
         }
 
+        if (majorPersonEntity.getGraph().emptyPath()) {
+            return this;
+        }
+
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
         // zs: 全部图路径

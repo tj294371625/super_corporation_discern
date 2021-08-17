@@ -65,6 +65,11 @@ public class DiscernAndStaffModel {
         if (Objects.isNull(entity)) {
             return this;
         }
+
+        if (entity.getGraph().emptyPath()) {
+            return this;
+        }
+
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
         PathWrapper graph = entity.getGraph();

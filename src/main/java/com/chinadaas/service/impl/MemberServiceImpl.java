@@ -48,7 +48,7 @@ public class MemberServiceImpl implements MemberService {
         for (MemberEntity entity : entities) {
             MemberModel model = new MemberModel().convertEntity2Model(entity);
 
-            if (ModelStatus.HAVE_RESULT.equals(model.getResultStatus())) {
+            if (haveResult(model.getResultStatus())) {
                 models.add(model.calMemberResult());
             }
         }
@@ -69,7 +69,7 @@ public class MemberServiceImpl implements MemberService {
         for (DiscernAndMajorPersonEntity entity : entities) {
             DiscernAndMajorPersonModel model = new DiscernAndMajorPersonModel(parentId).convertEntity2Model(entity);
 
-            if (ModelStatus.HAVE_RESULT.equals(model.getResultStatus())) {
+            if (haveResult(model.getResultStatus())) {
                 models.add(model.calDiscernAndMajorPersonResult());
             }
 
@@ -91,7 +91,7 @@ public class MemberServiceImpl implements MemberService {
         for (DiscernAndStaffEntity entity : entities) {
             DiscernAndStaffModel model = new DiscernAndStaffModel(parentId).convertEntity2Model(entity);
 
-            if (ModelStatus.HAVE_RESULT.equals(model.getResultStatus())) {
+            if (haveResult(model.getResultStatus())) {
                 models.add(model.calDiscernAndStaffResult());
             }
 
@@ -114,7 +114,15 @@ public class MemberServiceImpl implements MemberService {
         final BiFunction<String, String, List<Map>> commonPersonControlEnt
                 = memberRepository::commonPersonControlEnt;
 
-        return model.queryLegalControlEnts(commonPersonControlEnt);
+        if (haveResult(model.getResultStatus())) {
+            return model.queryLegalControlEnts(commonPersonControlEnt);
+        }
+
+        return model;
+    }
+
+    private boolean haveResult(ModelStatus resultStatus) {
+        return ModelStatus.HAVE_RESULT.equals(resultStatus);
     }
 
     /**
@@ -134,9 +142,13 @@ public class MemberServiceImpl implements MemberService {
 
         ControlPersonLegalEntity entity = memberRepository.obtainControlPersonLegal(zsId, parentId);
         ControlPersonLegalModel model =
-                new ControlPersonLegalModel(parentId).converEntity2Model(entity, finalControlProperty);
+                new ControlPersonLegalModel(parentId).converEntity2Model(entity, finalControlPerson);
 
-        return model.processProperties();
+        if (haveResult(model.getResultStatus())) {
+            return model.processProperties();
+        }
+
+        return model;
     }
 
     /**
@@ -157,7 +169,11 @@ public class MemberServiceImpl implements MemberService {
         PersonOutControlEntity entity = memberRepository.obtainPersonOutControl(zsId, parentId);
         PersonOutControlModel model = new PersonOutControlModel(parentId, finalControlPerson).convertEntity2Model(entity);
 
-        return model.processProperties();
+        if (haveResult(model.getResultStatus())) {
+            return model.processProperties();
+        }
+
+        return model;
     }
 
     /**
@@ -174,7 +190,11 @@ public class MemberServiceImpl implements MemberService {
         final BiFunction<String, String, List<Map>> commonPersonControlEnt
                 = memberRepository::commonPersonControlEnt;
 
-        return majorPersonModel.calMajorPersonModelResult(commonPersonControlEnt);
+        if (haveResult(majorPersonModel.getResultStatus())) {
+            return majorPersonModel.calMajorPersonModelResult(commonPersonControlEnt);
+        }
+
+        return majorPersonModel;
     }
 
     /**
@@ -191,7 +211,11 @@ public class MemberServiceImpl implements MemberService {
         final BiFunction<String, String, List<Map>> commonPersonControlEnt
                 = memberRepository::commonPersonControlEnt;
 
-        return staffModel.calStaffModelResult(commonPersonControlEnt);
+        if (haveResult(staffModel.getResultStatus())) {
+            return staffModel.calStaffModelResult(commonPersonControlEnt);
+        }
+
+        return staffModel;
     }
 
     @Override

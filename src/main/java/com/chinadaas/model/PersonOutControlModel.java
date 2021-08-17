@@ -44,7 +44,12 @@ public class PersonOutControlModel {
             return this;
         }
 
-        this.tempResultList = entity.getTempResultList();
+        List<Map> tempResultList = entity.getTempResultList();
+        if (CollectionUtils.isEmpty(tempResultList)) {
+            return this;
+        }
+
+        this.tempResultList = tempResultList;
         if (CollectionUtils.isEmpty(this.tempResultList)) {
             return this;
         }

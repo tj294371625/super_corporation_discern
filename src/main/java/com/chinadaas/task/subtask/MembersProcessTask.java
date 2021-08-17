@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -90,6 +92,10 @@ public class MembersProcessTask {
 
     private void memberStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> memberRecords = superMemberModel.memberRecords();
+        if (CollectionUtils.isEmpty(memberRecords)) {
+            return;
+        }
+
         // 写入数据库
         memberService.addMembers(memberRecords);
         // 写入文件
@@ -99,6 +105,10 @@ public class MembersProcessTask {
 
     private void discernAndMajorPersonStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> discernAndMajorPersonRecords = superMemberModel.discernAndMajorPersonRecords();
+        if (CollectionUtils.isEmpty(discernAndMajorPersonRecords)) {
+            return;
+        }
+
         memberService.addDiscernAndMajorPerson(discernAndMajorPersonRecords);
         List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos
                 = AssistantUtils.mapListToList(discernAndMajorPersonRecords, ParentAndMajorInvPersonInfo.class);
@@ -107,6 +117,10 @@ public class MembersProcessTask {
 
     private void discernAndStaffStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> discernAndStaffRecords = superMemberModel.discernAndStaffModelRecords();
+        if (CollectionUtils.isEmpty(discernAndStaffRecords)) {
+            return;
+        }
+
         memberService.addDiscernAndStaff(discernAndStaffRecords);
         List<StaffAndParentCommonInfo> staffAndParentCommonInfos
                 = AssistantUtils.mapListToList(discernAndStaffRecords, StaffAndParentCommonInfo.class);
@@ -115,6 +129,10 @@ public class MembersProcessTask {
 
     private void discernLegalOutStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> discernLegalOutRecords = superMemberModel.discernLegalOutModelRecords();
+        if (CollectionUtils.isEmpty(discernLegalOutRecords)) {
+            return;
+        }
+
         memberService.addDiscernLegalOut(discernLegalOutRecords);
         List<StaffAndParentCommonInfo> staffAndParentCommonInfos
                 = AssistantUtils.mapListToList(discernLegalOutRecords, StaffAndParentCommonInfo.class);
@@ -123,6 +141,10 @@ public class MembersProcessTask {
 
     private void controlPersonLegalStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> controlPersonLegalRecords = superMemberModel.controlPersonLegalModelRecords();
+        if (CollectionUtils.isEmpty(controlPersonLegalRecords)) {
+            return;
+        }
+
         memberService.addControlPersonLegal(controlPersonLegalRecords);
         List<BasePersonInfo> basePersonInfos
                 = AssistantUtils.mapListToList(controlPersonLegalRecords, BasePersonInfo.class);
@@ -131,6 +153,10 @@ public class MembersProcessTask {
 
     private void personOutControlStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> personOutControlRecords = superMemberModel.personOutControlModelRecords();
+        if (CollectionUtils.isEmpty(personOutControlRecords)) {
+            return;
+        }
+
         memberService.addPersonOutControl(personOutControlRecords);
         List<PersonOutControlInfo> personOutControlInfos
                 = AssistantUtils.mapListToList(personOutControlRecords, PersonOutControlInfo.class);
@@ -139,6 +165,10 @@ public class MembersProcessTask {
 
     private void majorPersonStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> majorPersonRecords = superMemberModel.majorPersonModelRecords();
+        if (CollectionUtils.isEmpty(majorPersonRecords)) {
+            return;
+        }
+
         memberService.addMajorPerson(majorPersonRecords);
         List<MajorInvPersonInfo> majorInvPersonInfos
                 = AssistantUtils.mapListToList(majorPersonRecords, MajorInvPersonInfo.class);
@@ -147,6 +177,10 @@ public class MembersProcessTask {
 
     private void staffStorage(SuperMemberModel superMemberModel) {
         List<Map<String, Object>> staffRecords = superMemberModel.staffModelRecords();
+        if (CollectionUtils.isEmpty(staffRecords)) {
+            return;
+        }
+
         memberService.addStaff(staffRecords);
         List<StaffPerson> staffPeople = AssistantUtils.mapListToList(staffRecords, StaffPerson.class);
         recordHandler.recordStaff(staffPeople);

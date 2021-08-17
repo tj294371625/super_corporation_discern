@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
@@ -31,5 +32,10 @@ public class PathWrapper {
     @LinksType("links")
     @JSONField(name = "links")
     Set<LinkWrapper> linkWrappers = Sets.newHashSet();
+
+    public boolean emptyPath() {
+        return CollectionUtils.isEmpty(nodeWrappers) || CollectionUtils.isEmpty(linkWrappers);
+    }
+
 
 }

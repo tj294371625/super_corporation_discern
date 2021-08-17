@@ -256,7 +256,7 @@ public class SuperCorporationModel {
         if (Objects.nonNull(this.finCtrlNode)) {
             NodeWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.finCtrlNode), NodeWrapper.class);
             Map<String, Object> properties = deepCopy.getProperties();
-            AssistantUtils.filterCommonPartProperties(properties);
+            AssistantUtils.filterFinCtrlNodeProperties(properties, this.finCtrlNode.getType());
             return properties;
         }
 

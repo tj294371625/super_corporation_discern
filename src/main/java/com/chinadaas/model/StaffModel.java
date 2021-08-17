@@ -69,6 +69,10 @@ public class StaffModel {
             return this;
         }
 
+        if (staffEntity.getGraph().emptyPath()) {
+            return this;
+        }
+
         this.resultStatus = ModelStatus.HAVE_RESULT;
 
         // zs: 全部图路径
