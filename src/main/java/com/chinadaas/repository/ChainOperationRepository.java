@@ -91,4 +91,8 @@ public interface ChainOperationRepository {
      * @return
      */
     Set<String> obtainFinCtrlFixEntIds();
+    
+    void saveCircularEntIds(List<String> circularEntIds);
+
+    Set<String> obtainCircularEntIds();
 }

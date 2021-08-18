@@ -9,11 +9,13 @@ import com.chinadaas.commons.factory.CypherBuilderFactory;
 import com.chinadaas.component.mapper.base.Mapper;
 import com.chinadaas.component.template.Neo4jTemplate;
 import com.chinadaas.component.wrapper.LinkWrapper;
+import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.*;
 import com.chinadaas.repository.NodeOperationRepository;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     private static final String START_ID = "startId";
     private static final String END_ID = "endId";
     private static final String LAYER = "layer";
+    private static final String ENT_IDS = "entIds";
 
     /**
      * 单位 second
@@ -192,6 +195,40 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
 
         Map<String, Object> info = moreInfo.get(0);
         return mapper.getBean(info, NodeEntity.class);
+    }
+
+    @Override
+    public List<NodeWrapper> nodesFind(List<String> entIds) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put(ENT_IDS, entIds);
+
+        final String CYPHER_PATH = "cypher/findNodes.cql";
+        String cypher = CypherBuilderFactory.getCypherBuilder(CYPHER_PATH).build();
+
+        List<Map<String, Object>> tempResultList = neo4jTemplate.executeCypher(cypher, params, WAIT_TIME);
+
+        Map<String, Object> tempResult = tempResultList.get(0);
+        List<Map<String, Object>> moreInfo = (List<Map<String, Object>>) tempResult.get(MORE_INFO);
+        if (CollectionUtils.isEmpty(moreInfo)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Map<String, Object> info = moreInfo.get(0);
+        if (CollectionUtils.isEmpty(info)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<Node> nodes = (List<Node>) info.get("nodes");
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<NodeWrapper> results = Lists.newArrayList();
+        for (Node node : nodes) {
+            NodeWrapper nodeWrapper = Neo4jResultParseUtils.parseNode(node);
+            results.add(nodeWrapper);
+        }
+        return results;
     }
 
     @Override

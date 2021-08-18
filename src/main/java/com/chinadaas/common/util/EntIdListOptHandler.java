@@ -6,6 +6,7 @@ import com.chinadaas.service.SuperCorporationService;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -44,6 +45,8 @@ public class EntIdListOptHandler {
 
     public void replacePreWithFinCtrlEntIds() {
         Set<String> finCtrlEntIds = chainOperationService.obtainFinCtrlEntIds();
+        Set<String> circularEntIds = chainOperationService.obtainCircularEntIds();
+        finCtrlEntIds.addAll(circularEntIds);
         entIdListLoader.reloadEntIdList(finCtrlEntIds);
     }
 

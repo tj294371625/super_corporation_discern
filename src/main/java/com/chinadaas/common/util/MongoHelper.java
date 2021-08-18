@@ -23,6 +23,9 @@ import java.util.List;
 @Component
 public class MongoHelper {
 
+    @Value("${db.mongodb.circularCollection}")
+    private String SC_CHAIN_CIRCULAR;
+
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
 
@@ -63,6 +66,23 @@ public class MongoHelper {
 
         mongoTemplate.createCollection(SC_CHAIN_PARENT).createIndexes(chainIndexModels);
         mongoTemplate.createCollection(SC_CHAIN_FINCTRL).createIndexes(chainIndexModels);
+
+
+
+        if (mongoTemplate.collectionExists(SC_CHAIN_CIRCULAR)) {
+            mongoTemplate.dropCollection(SC_CHAIN_CIRCULAR);
+        }
+
+        BasicDBObject circularIndex = new BasicDBObject();
+        circularIndex.put(ChainConst.SOURCE_ENT_ID, 1);
+
+        List<IndexModel> circularIndexModels = Lists.newArrayList();
+        circularIndexModels.add(new IndexModel(circularIndex));
+
+        mongoTemplate.createCollection(SC_CHAIN_CIRCULAR).createIndexes(circularIndexModels);
+
+
+
 
         if (mongoTemplate.collectionExists(SC_SUPER_CORPORATION)) {
             mongoTemplate.dropCollection(SC_SUPER_CORPORATION);

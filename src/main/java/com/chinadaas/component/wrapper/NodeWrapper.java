@@ -1,6 +1,7 @@
 package com.chinadaas.component.wrapper;
 
 import com.chinadaas.common.util.AssistantUtils;
+import com.chinadaas.common.util.PinYinUtils;
 import com.chinadaas.commons.graph.model.NodeDto;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,6 +95,21 @@ public class NodeWrapper extends NodeDto {
         Map<String, Object> properties = getProperties();
         Object regcap = properties.get("regcap");
         return new BigDecimal(Objects.isNull(regcap) ? "0.000000" : regcap.toString());
+    }
+
+    /**
+     * 返回当前决策权点名称的汉语拼音
+     * 北京中数智汇 -> Bei Jing Zhong Shu Zhi Hui
+     *
+     * @return
+     */
+    public String obtainNamePinYin() {
+        Map<String, Object> properties = getProperties();
+        String name = (String) properties.get("name");
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+        return PinYinUtils.cn2Pinyin(name).trim();
     }
 
     @Override

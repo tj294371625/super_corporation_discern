@@ -78,4 +78,7 @@ public interface ChainOperationService {
      * @return
      */
     Set<String> obtainFinCtrlFixEntIds();
+
+    Set<String> obtainCircularEntIds();
+
 }

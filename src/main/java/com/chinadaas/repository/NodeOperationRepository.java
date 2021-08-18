@@ -2,6 +2,7 @@ package com.chinadaas.repository;
 
 import com.chinadaas.common.constant.ModelType;
 import com.chinadaas.component.wrapper.LinkWrapper;
+import com.chinadaas.component.wrapper.NodeWrapper;
 import com.chinadaas.entity.*;
 
 import java.util.List;
@@ -54,6 +55,8 @@ public interface NodeOperationRepository {
      * @return
      */
     NodeEntity nodeFind(String entId);
+
+    List<NodeWrapper> nodesFind(List<String> entIds);
 
     /**
      * 获取两点间信息

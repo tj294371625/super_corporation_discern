@@ -8,6 +8,7 @@ import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -34,6 +35,9 @@ import java.util.function.Consumer;
 @Slf4j
 @Repository
 public class ChainOperationRepositoryImpl implements ChainOperationRepository {
+
+    @Value("${db.mongodb.circularCollection}")
+    private String SC_CHAIN_CIRCULAR;
 
     @Value("${db.mongodb.parentCollection}")
     private String SC_CHAIN_PARENT;
@@ -236,6 +240,28 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                 );
 
         return finCtrlFixEntIds;
+    }
+
+    @Override
+    public void saveCircularEntIds(List<String> circularEntIds) {
+        for (String circularEntId : circularEntIds) {
+            Map<String, String> circularItem = Maps.newHashMap();
+            circularItem.put(ChainConst.SOURCE_ENT_ID, circularEntId);
+            mongoTemplate.insert(circularItem, SC_CHAIN_CIRCULAR);
+        }
+    }
+
+    @Override
+    public Set<String> obtainCircularEntIds() {
+        List<Map> tempResults = mongoTemplate.findAll(Map.class, SC_CHAIN_CIRCULAR);
+
+        Set<String> circularEntIds = Sets.newHashSet();
+        for (Map tempResult : tempResults) {
+            String sourceEntId = (String) tempResult.get(ChainConst.SOURCE_ENT_ID);
+            circularEntIds.add(sourceEntId);
+        }
+
+        return circularEntIds;
     }
 
     private List<List<String>> batchProcess(Set<String> entIds) {
