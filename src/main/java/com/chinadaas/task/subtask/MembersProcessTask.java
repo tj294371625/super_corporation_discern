@@ -97,7 +97,7 @@ public class MembersProcessTask {
         }
 
         // 写入数据库
-        memberService.addMembers(memberRecords);
+//        memberService.addMembers(memberRecords);
         // 写入文件
         List<BaseEntInfo> baseEntInfos = AssistantUtils.mapListToList(memberRecords, BaseEntInfo.class);
         recordHandler.recordMembers(baseEntInfos);
@@ -109,7 +109,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addDiscernAndMajorPerson(discernAndMajorPersonRecords);
+//        memberService.addDiscernAndMajorPerson(discernAndMajorPersonRecords);
         List<ParentAndMajorInvPersonInfo> parentAndMajorInvPersonInfos
                 = AssistantUtils.mapListToList(discernAndMajorPersonRecords, ParentAndMajorInvPersonInfo.class);
         recordHandler.recordDiscernAndMajorPerson(parentAndMajorInvPersonInfos);
@@ -121,7 +121,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addDiscernAndStaff(discernAndStaffRecords);
+//        memberService.addDiscernAndStaff(discernAndStaffRecords);
         List<StaffAndParentCommonInfo> staffAndParentCommonInfos
                 = AssistantUtils.mapListToList(discernAndStaffRecords, StaffAndParentCommonInfo.class);
         recordHandler.recordDiscernAndStaff(staffAndParentCommonInfos);
@@ -133,7 +133,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addDiscernLegalOut(discernLegalOutRecords);
+//        memberService.addDiscernLegalOut(discernLegalOutRecords);
         List<StaffAndParentCommonInfo> staffAndParentCommonInfos
                 = AssistantUtils.mapListToList(discernLegalOutRecords, StaffAndParentCommonInfo.class);
         recordHandler.recordDiscernLegalOut(staffAndParentCommonInfos);
@@ -145,7 +145,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addControlPersonLegal(controlPersonLegalRecords);
+//        memberService.addControlPersonLegal(controlPersonLegalRecords);
         List<BasePersonInfo> basePersonInfos
                 = AssistantUtils.mapListToList(controlPersonLegalRecords, BasePersonInfo.class);
         recordHandler.recordControlPersonLegal(basePersonInfos);
@@ -157,7 +157,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addPersonOutControl(personOutControlRecords);
+//        memberService.addPersonOutControl(personOutControlRecords);
         List<PersonOutControlInfo> personOutControlInfos
                 = AssistantUtils.mapListToList(personOutControlRecords, PersonOutControlInfo.class);
         recordHandler.recordPersonOutControl(personOutControlInfos);
@@ -169,7 +169,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addMajorPerson(majorPersonRecords);
+//        memberService.addMajorPerson(majorPersonRecords);
         List<MajorInvPersonInfo> majorInvPersonInfos
                 = AssistantUtils.mapListToList(majorPersonRecords, MajorInvPersonInfo.class);
         recordHandler.recordMajorPerson(majorInvPersonInfos);
@@ -181,7 +181,7 @@ public class MembersProcessTask {
             return;
         }
 
-        memberService.addStaff(staffRecords);
+//        memberService.addStaff(staffRecords);
         List<StaffPerson> staffPeople = AssistantUtils.mapListToList(staffRecords, StaffPerson.class);
         recordHandler.recordStaff(staffPeople);
     }
