@@ -922,18 +922,21 @@ public abstract class AssistantUtils {
 
         if (StringUtils.isNotBlank(zsId)) {
             int index = zsId.indexOf("-");
+            if (index < 0) {
+                personProperties.put(MemberConst.ZSPID, "");
+                return;
+            }
+
             String zspId = zsId.substring(0, index);
 
             if (zspId.length() > 30) {
-                if (parentId.equals(zspId)) {
+                if (!parentId.equals(zspId)) {
                     personProperties.put(MemberConst.ZSPID, zspId);
                 }
             }
         }
 
     }
-
-
 
 
     /*
