@@ -133,6 +133,17 @@ public class MajorPersonModel {
 
         }
 
+        // zs： 对结果去重
+        this.majorControlEnts = majorControlEnts.stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(
+                                        () -> new TreeSet<>(Comparator.comparing(m -> m.get("entid").toString()))
+                                ),
+                                ArrayList::new
+                        )
+                );
+
         return this;
     }
 

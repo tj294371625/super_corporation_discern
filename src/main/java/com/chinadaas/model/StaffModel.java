@@ -134,6 +134,17 @@ public class StaffModel {
 
         }
 
+        // zs： 对结果去重
+        this.staffControlEnts = staffControlEnts.stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(
+                                        () -> new TreeSet<>(Comparator.comparing(m -> m.get("entid").toString()))
+                                ),
+                                ArrayList::new
+                        )
+                );
+
         return this;
     }
 

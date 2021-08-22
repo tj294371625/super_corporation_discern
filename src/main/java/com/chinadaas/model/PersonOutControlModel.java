@@ -8,10 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lawliet
@@ -113,6 +111,17 @@ public class PersonOutControlModel {
 
             resultList.add(finalMember);
         }
+
+        // zs： 对结果去重
+        this.resultList = resultList.stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(
+                                        () -> new TreeSet<>(Comparator.comparing(m -> m.get("entid").toString()))
+                                ),
+                                ArrayList::new
+                        )
+                );
 
         return this;
     }

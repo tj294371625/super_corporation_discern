@@ -111,6 +111,17 @@ public class ControlPersonLegalModel {
             resultList.add(tempResult);
         }
 
+        // zs： 对结果去重
+        this.resultList = resultList.stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(
+                                        () -> new TreeSet<>(Comparator.comparing(m -> m.get("entid").toString()))
+                                ),
+                                ArrayList::new
+                        )
+                );
+
         return this;
     }
 
