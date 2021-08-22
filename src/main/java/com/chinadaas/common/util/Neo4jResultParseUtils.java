@@ -27,6 +27,8 @@ public abstract class Neo4jResultParseUtils {
     private static final String LEGAL_KEY = "legal";
     private static final String RISK_SCORE = "riskscore";
     private static final String RELATION_ID = "relationid";
+    private static final String ENCODE_V1 = "encode_v1";
+    private static final String PALGORITHMID = "palgorithmid";
     private static final Set<String> NODE_PROPERTIES;
 
     static {
@@ -80,6 +82,11 @@ public abstract class Neo4jResultParseUtils {
             nodeWrapper.setId(id);
             nodeWrapper.setName(name);
             nodeWrapper.setType(NodeType.parseNodeType(lable));
+
+            if (mutableProperties.containsKey(ENCODE_V1)) {
+                mutableProperties.put(PALGORITHMID, mutableProperties.remove(ENCODE_V1));
+            }
+
             nodeWrapper.setProperties(mutableProperties);
             return nodeWrapper;
         }
