@@ -75,7 +75,6 @@ public class PersonOutControlModel {
             String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
             memberProperties.put(MemberConst.ENTSTATUS_DESC, AssistantUtils.getEntStatusDesc(entStatus));
             memberProperties.put(MemberConst.ENTNAME, memberProperties.remove(MemberConst.NAME));
-            memberProperties.put(MemberConst.ENTID, memberProperties.remove(MemberConst.NODEID));
             memberProperties.put(MemberConst.ENT_COUNTRY, memberProperties.remove(MemberConst.COUNTRY));
             memberProperties.put(MemberConst.ENT_COUNTRY_DESC, memberProperties.remove(MemberConst.COUNTRY_DESC));
             memberProperties.put(MemberConst.ENT_RISKINFO, memberProperties.remove(MemberConst.RISKINFO));
