@@ -12,7 +12,7 @@ db:
   neo4j:
     user: neo4j
     password: chinadaas2017
-    url: bolt://192.168.100.89:7687
+    url: bolt://192.168.207.26:57687
   mongodb:
     circularCollection: SC_CHAIN_CIRCULAR
     parentCollection: SC_CHAIN_PARENT
@@ -43,16 +43,16 @@ data:
     majorPerson: major_person.csv
     staff: staff.csv
   path:
-    incr: /data/superCorporation-file/incr
-    source: /data/superCorporation-file/source
-    timeout: /data/superCorporation-file/timeout
-    circular: /data/superCorporation-file/circular
-    super: /data/superCorporation-file/super
-    members: /data/superCorporation-file/members
-#    incr: /Users/chinadaas/data/test/incr
-#    source: /Users/chinadaas/data/test/source
-#    timeout: /Users/chinadaas/data/test/timeout
-#    circular: /Users/chinadaas/data/test/circular
-#    super: /Users/chinadaas/data/test/super
-#    members: /Users/chinadaas/data/test/members
+#    incr: /data/superCorporation-file/incr
+#    source: /data/superCorporation-file/source
+#    timeout: /data/superCorporation-file/timeout
+#    circular: /data/superCorporation-file/circular
+#    super: /data/superCorporation-file/super
+#    members: /data/superCorporation-file/members
+    incr: /Users/chinadaas/data/test/incr
+    source: /Users/chinadaas/data/test/source
+    timeout: /Users/chinadaas/data/test/timeout
+    circular: /Users/chinadaas/data/test/circular
+    super: /Users/chinadaas/data/test/super
+    members: /Users/chinadaas/data/test/members
 

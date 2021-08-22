@@ -156,11 +156,11 @@ public class StaffModel {
         if (EntType.PARENT.equals(type)) {
             entProperties = (Map) entInfo.get(MemberConst.PARENT_PROPERTY);
             tempResult.put(MemberConst.PATH, entInfo.get(MemberConst.CTRL2PARENT_PATH));
-            tempResult.put(MemberConst.FINAL_CGZB, MemberConst.CTRL2PARENT_CGZB);
+            tempResult.put(MemberConst.FINAL_CGZB, entInfo.get(MemberConst.CTRL2PARENT_CGZB));
         } else {
             entProperties = (Map) entInfo.get(MemberConst.SOURCE_PROPERTY);
             tempResult.put(MemberConst.PATH, entInfo.get(MemberConst.CTRL2SOURCE_PATH));
-            tempResult.put(MemberConst.FINAL_CGZB, MemberConst.CTRL2SOURCE_CGZB);
+            tempResult.put(MemberConst.FINAL_CGZB, entInfo.get(MemberConst.CTRL2SOURCE_CGZB));
         }
 
         // 记录企业的invType
