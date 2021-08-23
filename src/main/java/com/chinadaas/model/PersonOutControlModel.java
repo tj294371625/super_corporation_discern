@@ -78,7 +78,8 @@ public class PersonOutControlModel {
             memberProperties.put(MemberConst.ENT_RISKINFO, memberProperties.remove(MemberConst.RISKINFO));
 
             // 自然人属性处理
-            Map personProperties = (Map) finalControlPerson.get(MemberConst.FIN_CTRL_PROPERTY);
+            Map finalCtrlPersonDeepCopy = new HashMap(finalControlPerson);
+            Map personProperties = (Map) finalCtrlPersonDeepCopy.get(MemberConst.FIN_CTRL_PROPERTY);
             personProperties.remove(MemberConst.INVTYPE);
             personProperties.remove(MemberConst.NODEID);
             AssistantUtils.generateZspId(personProperties, this.parentId);
@@ -92,8 +93,8 @@ public class PersonOutControlModel {
             String id = UUID.randomUUID().toString().replaceAll("-", "");
             finalMember.put(MemberConst._ID, id);
 
-            Map ctrl2ParentPath = (Map) finalControlPerson.get(MemberConst.CTRL2PARENT_PATH);
-            String ctrl2ParentCgzb = (String) finalControlPerson.get(MemberConst.CTRL2PARENT_CGZB);
+            Map ctrl2ParentPath = (Map) finalCtrlPersonDeepCopy.get(MemberConst.CTRL2PARENT_PATH);
+            String ctrl2ParentCgzb = (String) finalCtrlPersonDeepCopy.get(MemberConst.CTRL2PARENT_CGZB);
             finalMember.put(MemberConst.CTRL2PARENT_PATH, ctrl2ParentPath);
             finalMember.put(MemberConst.CTRL2PARENT_CGZB, ctrl2ParentCgzb);
 

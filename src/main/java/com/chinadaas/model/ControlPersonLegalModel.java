@@ -1,5 +1,6 @@
 package com.chinadaas.model;
 
+import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.MemberConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.util.AssistantUtils;
@@ -75,7 +76,8 @@ public class ControlPersonLegalModel {
             Object entInvType;
 
             // 企业属性处理
-            Map<String, Object> memberProperties = legalMemberNode.getProperties();
+            NodeWrapper legalMemberDeepCopy = JSON.parseObject(JSON.toJSONString(legalMemberNode), NodeWrapper.class);
+            Map<String, Object> memberProperties = legalMemberDeepCopy.getProperties();
             entInvType = memberProperties.remove(MemberConst.INVTYPE);
             memberProperties.remove(MemberConst.ZSID);
             String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
@@ -87,7 +89,8 @@ public class ControlPersonLegalModel {
             memberProperties.put(MemberConst.ENT_RISKINFO, memberProperties.remove(MemberConst.RISKINFO));
 
             // 自然人属性处理
-            Map personProperties = (Map) finalControlPerson.get(MemberConst.FIN_CTRL_PROPERTY);
+            Map finalControlPersonDeepCopy = new HashMap(finalControlPerson);
+            Map personProperties = (Map) finalControlPersonDeepCopy.get(MemberConst.FIN_CTRL_PROPERTY);
             personProperties.remove(MemberConst.INVTYPE);
             personProperties.remove(MemberConst.NODEID);
             AssistantUtils.generateZspId(personProperties, this.parentId);
@@ -100,8 +103,8 @@ public class ControlPersonLegalModel {
             tempResult.put(MemberConst.RELATION_DENSITY, "半紧密层");
             String id = UUID.randomUUID().toString().replaceAll("-", "");
             tempResult.put(MemberConst._ID, id);
-            Map ctrl2ParentPath = (Map) finalControlPerson.get(MemberConst.CTRL2PARENT_PATH);
-            String ctrl2ParentCgzb = (String) finalControlPerson.get(MemberConst.CTRL2PARENT_CGZB);
+            Map ctrl2ParentPath = (Map) finalControlPersonDeepCopy.get(MemberConst.CTRL2PARENT_PATH);
+            String ctrl2ParentCgzb = (String) finalControlPersonDeepCopy.get(MemberConst.CTRL2PARENT_CGZB);
             tempResult.put(MemberConst.PATH, ctrl2ParentPath);
             tempResult.put(MemberConst.FINAL_CGZB, ctrl2ParentCgzb);
             tempResult.put(MemberConst.INVTYPE, entInvType);

@@ -146,7 +146,8 @@ public class DiscernAndStaffModel {
                         Object memberInvType;
 
                         // 成员属性处理
-                        Map<String, Object> memberProperties = memberNode.getProperties();
+                        NodeWrapper memberDeepCopy = JSON.parseObject(JSON.toJSONString(memberNode), NodeWrapper.class);
+                        Map<String, Object> memberProperties = memberDeepCopy.getProperties();
                         memberInvType = memberProperties.remove(MemberConst.INVTYPE);
                         memberProperties.remove(MemberConst.ZSID);
                         String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
@@ -159,7 +160,8 @@ public class DiscernAndStaffModel {
 
 
                         // 主要投资者属性处理
-                        Map<String, Object> personProperties = staffPersonNode.getProperties();
+                        NodeWrapper staffPersonDeepCopy = JSON.parseObject(JSON.toJSONString(staffPersonNode), NodeWrapper.class);
+                        Map<String, Object> personProperties = staffPersonDeepCopy.getProperties();
                         personProperties.remove(MemberConst.INVTYPE);
                         personProperties.remove(MemberConst.NODEID);
                         AssistantUtils.generateZspId(personProperties, this.parentId);
@@ -178,24 +180,24 @@ public class DiscernAndStaffModel {
                         mergeResult.putAll(memberProperties);
 
                         // 计算结果
-                        mergeResult.put(MemberConst.POSITION, obtainPosition(staffPersonNode));
-                        mergeResult.put(MemberConst.POSITION_DESC, obtainPositionDesc(staffPersonNode));
-                        mergeResult.put(MemberConst.CONPROP_PERSON2SUB, calPerson2SubConprop(staffPersonNode, memberNode));
-                        mergeResult.put(MemberConst.CONPROP_PARENT2SUB, calParent2SubConprop(memberNode));
-                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2SUB, calPerson2SubHolderrto(staffPersonNode, memberNode));
-                        mergeResult.put(MemberConst.HOLDERRTO_PARENT2SUB, calParent2SubHolderrto(memberNode));
+                        mergeResult.put(MemberConst.POSITION, obtainPosition(staffPersonDeepCopy));
+                        mergeResult.put(MemberConst.POSITION_DESC, obtainPositionDesc(staffPersonDeepCopy));
+                        mergeResult.put(MemberConst.CONPROP_PERSON2SUB, calPerson2SubConprop(staffPersonDeepCopy, memberDeepCopy));
+                        mergeResult.put(MemberConst.CONPROP_PARENT2SUB, calParent2SubConprop(memberDeepCopy));
+                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2SUB, calPerson2SubHolderrto(staffPersonDeepCopy, memberDeepCopy));
+                        mergeResult.put(MemberConst.HOLDERRTO_PARENT2SUB, calParent2SubHolderrto(memberDeepCopy));
 
                         // 路径
                         PathWrapper pathWrapper = new PathWrapper();
                         Set<NodeWrapper> nodeWrappers = pathWrapper.getNodeWrappers();
                         Set<LinkWrapper> linkWrappers = pathWrapper.getLinkWrappers();
                         nodeWrappers.add(parentNode);
-                        nodeWrappers.add(staffPersonNode);
-                        nodeWrappers.add(memberNode);
-                        linkWrappers.add(obtainParent2SubLink(memberNode));
-                        linkWrappers.add(obtainPerson2SubLink(staffPersonNode, memberNode));
+                        nodeWrappers.add(staffPersonDeepCopy);
+                        nodeWrappers.add(memberDeepCopy);
+                        linkWrappers.add(obtainParent2SubLink(memberDeepCopy));
+                        linkWrappers.add(obtainPerson2SubLink(staffPersonDeepCopy, memberDeepCopy));
                         // zs: 任职关系有多条边
-                        linkWrappers.addAll(obtainPerson2ParentLink(staffPersonNode));
+                        linkWrappers.addAll(obtainPerson2ParentLink(staffPersonDeepCopy));
 
                         PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(pathWrapper);
                         mergeResult.put(MemberConst.PATH, JSON.toJSON(filterPath));

@@ -129,7 +129,8 @@ public class DiscernAndMajorPersonModel {
                         Object memberInvType;
 
                         // 成员属性处理
-                        Map<String, Object> memberProperties = memberNode.getProperties();
+                        NodeWrapper memberDeepCopy = JSON.parseObject(JSON.toJSONString(memberNode), NodeWrapper.class);
+                        Map<String, Object> memberProperties = memberDeepCopy.getProperties();
                         memberInvType = memberProperties.remove(MemberConst.INVTYPE);
                         memberProperties.remove(MemberConst.ZSID);
                         String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
@@ -142,7 +143,8 @@ public class DiscernAndMajorPersonModel {
 
 
                         // 主要投资者属性处理
-                        Map<String, Object> personProperties = majorInvPersonNode.getProperties();
+                        NodeWrapper majorInvPersonDeepCopy = JSON.parseObject(JSON.toJSONString(majorInvPersonNode), NodeWrapper.class);
+                        Map<String, Object> personProperties = majorInvPersonDeepCopy.getProperties();
                         personProperties.remove(MemberConst.INVTYPE);
                         personProperties.remove(MemberConst.NODEID);
                         AssistantUtils.generateZspId(personProperties, this.parentId);
@@ -161,23 +163,23 @@ public class DiscernAndMajorPersonModel {
                         mergeResult.putAll(memberProperties);
 
                         // 计算结果
-                        mergeResult.put(MemberConst.CONPROP_PERSON2PARENT, calPerson2ParentConprop(majorInvPersonNode));
-                        mergeResult.put(MemberConst.CONPROP_PERSON2SUB, calPerson2SubConprop(majorInvPersonNode, memberNode));
-                        mergeResult.put(MemberConst.CONPROP_PARENT2SUB, calParent2SubConprop(memberNode));
-                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2PARENT, calPerson2ParentHolderrto(majorInvPersonNode));
-                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2SUB, calPerson2SubHolderrto(majorInvPersonNode, memberNode));
-                        mergeResult.put(MemberConst.HOLDERRTO_PARENT2SUB, calParent2SubHolderrto(memberNode));
+                        mergeResult.put(MemberConst.CONPROP_PERSON2PARENT, calPerson2ParentConprop(majorInvPersonDeepCopy));
+                        mergeResult.put(MemberConst.CONPROP_PERSON2SUB, calPerson2SubConprop(majorInvPersonDeepCopy, memberDeepCopy));
+                        mergeResult.put(MemberConst.CONPROP_PARENT2SUB, calParent2SubConprop(memberDeepCopy));
+                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2PARENT, calPerson2ParentHolderrto(majorInvPersonDeepCopy));
+                        mergeResult.put(MemberConst.HOLDERRTO_PERSON2SUB, calPerson2SubHolderrto(majorInvPersonDeepCopy, memberDeepCopy));
+                        mergeResult.put(MemberConst.HOLDERRTO_PARENT2SUB, calParent2SubHolderrto(memberDeepCopy));
 
                         // 路径
                         PathWrapper pathWrapper = new PathWrapper();
                         Set<NodeWrapper> nodeWrappers = pathWrapper.getNodeWrappers();
                         Set<LinkWrapper> linkWrappers = pathWrapper.getLinkWrappers();
                         nodeWrappers.add(parentNode);
-                        nodeWrappers.add(majorInvPersonNode);
-                        nodeWrappers.add(memberNode);
-                        linkWrappers.add(obtainParent2SubLink(memberNode));
-                        linkWrappers.add(obtainPerson2SubLink(majorInvPersonNode, memberNode));
-                        linkWrappers.add(obtainPerson2ParentLink(majorInvPersonNode));
+                        nodeWrappers.add(majorInvPersonDeepCopy);
+                        nodeWrappers.add(memberDeepCopy);
+                        linkWrappers.add(obtainParent2SubLink(memberDeepCopy));
+                        linkWrappers.add(obtainPerson2SubLink(majorInvPersonDeepCopy, memberDeepCopy));
+                        linkWrappers.add(obtainPerson2ParentLink(majorInvPersonDeepCopy));
 
                         PathWrapper filterPath = Neo4jResultParseUtils.getFilterPath(pathWrapper);
                         mergeResult.put(MemberConst.PATH, JSON.toJSON(filterPath));

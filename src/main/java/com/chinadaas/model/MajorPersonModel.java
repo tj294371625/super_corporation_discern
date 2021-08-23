@@ -1,5 +1,6 @@
 package com.chinadaas.model;
 
+import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.MemberConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.util.AssistantUtils;
@@ -175,7 +176,8 @@ public class MajorPersonModel {
         entProperties.put(MemberConst.ENT_RISKINFO, entProperties.remove(MemberConst.RISKINFO));
 
         // 投资人属性处理
-        Map<String, Object> personProperties = personNode.getProperties();
+        NodeWrapper personDeepCopy = JSON.parseObject(JSON.toJSONString(personNode), NodeWrapper.class);
+        Map<String, Object> personProperties = personDeepCopy.getProperties();
         personProperties.remove(MemberConst.INVTYPE);
         personProperties.remove(MemberConst.NODEID);
         AssistantUtils.generateZspId(personProperties, this.parentId);

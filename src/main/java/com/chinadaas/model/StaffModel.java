@@ -188,7 +188,8 @@ public class StaffModel {
         entProperties.put(MemberConst.ENT_RISKINFO, entProperties.remove(MemberConst.RISKINFO));
 
         // 任职人属性处理
-        Map<String, Object> personProperties = personNode.getProperties();
+        NodeWrapper personDeepCopy = JSON.parseObject(JSON.toJSONString(personNode), NodeWrapper.class);
+        Map<String, Object> personProperties = personDeepCopy.getProperties();
         personProperties.remove(MemberConst.INVTYPE);
         personProperties.remove(MemberConst.NODEID);
         AssistantUtils.generateZspId(personProperties, this.parentId);

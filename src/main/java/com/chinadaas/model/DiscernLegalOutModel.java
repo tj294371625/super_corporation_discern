@@ -1,5 +1,6 @@
 package com.chinadaas.model;
 
+import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.MemberConst;
 import com.chinadaas.common.constant.ModelStatus;
 import com.chinadaas.common.util.AssistantUtils;
@@ -147,7 +148,8 @@ public class DiscernLegalOutModel {
         entProperties.put(MemberConst.ENT_RISKINFO, entProperties.remove(MemberConst.RISKINFO));
 
         // 法人属性处理
-        Map<String, Object> personProperties = legalNode.getProperties();
+        NodeWrapper legalDeepCopy = JSON.parseObject(JSON.toJSONString(legalNode), NodeWrapper.class);
+        Map<String, Object> personProperties = legalDeepCopy.getProperties();
         personProperties.remove(MemberConst.INVTYPE);
         personProperties.remove(MemberConst.NODEID);
         AssistantUtils.generateZspId(personProperties, this.parentId);
