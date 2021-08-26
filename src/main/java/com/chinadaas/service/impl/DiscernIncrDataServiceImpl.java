@@ -3,6 +3,7 @@ package com.chinadaas.service.impl;
 import com.chinadaas.common.constant.ImportMode;
 import com.chinadaas.common.util.RecordHandler;
 import com.chinadaas.common.util.TimeUtils;
+import com.chinadaas.component.io.EntIdListHolder;
 import com.chinadaas.component.io.EntIdListLoader;
 import com.chinadaas.service.AbstractDiscernDataService;
 import com.chinadaas.task.FullTask;
@@ -25,8 +26,12 @@ public class DiscernIncrDataServiceImpl extends AbstractDiscernDataService {
     private final List<IncrTask> incrTasks;
 
     public DiscernIncrDataServiceImpl(List<IncrTask> incrTasks,
+                                      EntIdListLoader entIdListLoader,
+                                      EntIdListHolder entIdListHolder,
                                       RecordHandler recordHandler) {
         this.incrTasks = incrTasks;
+        this.entIdListLoader = entIdListLoader;
+        this.entIdListHolder = entIdListHolder;
         this.recordHandler = recordHandler;
     }
 
