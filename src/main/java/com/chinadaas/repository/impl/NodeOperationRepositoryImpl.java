@@ -51,7 +51,7 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
     /**
      * 单位 second
      */
-    private final long WAIT_TIME = 10L;
+    private final long WAIT_TIME = 60L;
 
     @Value("${db.mongodb.singleCollection}")
     private String MODEL_PARENT_SINGLE;
@@ -115,7 +115,14 @@ public class NodeOperationRepositoryImpl implements NodeOperationRepository {
                         "entId: [{}], slow query spend time: [{}ms]", entId, spendTime);
             }
         } catch (QueryNeo4jTimeOutException e) {
+            log.warn(
+                    "NodeOperationRepositoryImpl#findDecisionNode call timeout, entId: [{}], modelType: [{}]",
+                    entId,
+                    modelType.toString(),
+                    e
+            );
             recordHandler.recordTimeOut(entId);
+            return Collections.EMPTY_LIST;
         }
 
         Map<String, Object> tempResult = tempResultList.get(0);
