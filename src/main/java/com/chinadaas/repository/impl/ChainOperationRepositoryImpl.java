@@ -11,11 +11,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -103,12 +105,13 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
             } catch (Exception e) {
                 index++;
                 TimeUtils.sleep(index, 50);
-                log.error(
+                log.warn(
                         "ChainOperationRepositoryImpl#chainPersistence insert fail, " +
                                 "body: [{}], modelType: [{}], try insert count: [{}]",
                         JSON.toJSONString(chainEntity),
                         modelType.toString(),
-                        index
+                        index,
+                        e
                 );
             }
         }
@@ -116,20 +119,71 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     @Override
-    public void chainBatchDelete(Set<String> entIds) {
+    public void chainBatchDeleteOfParent(Set<String> entIds) {
         List<List<String>> batchEntIds = batchProcess(entIds);
 
         for (List<String> batchEntId : batchEntIds) {
-            Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(batchEntId));
+            long startTime = TimeUtils.startTime();
 
-            try {
-                mongoTemplate.remove(condition, SC_CHAIN_PARENT);
-                mongoTemplate.remove(condition, SC_CHAIN_FINCTRL);
-            } catch (Exception e) {
-                log.warn("ChainOperationRepositoryImpl#chainBatchDelete delete fail", e);
+            int index = 0;
+            while (index < 3) {
+
+                Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(batchEntId));
+
+                try {
+                    mongoTemplate.remove(condition, SC_CHAIN_PARENT);
+                    break;
+                } catch (Exception e) {
+                    index++;
+                    TimeUtils.sleep(index, 500);
+                    log.warn(
+                            "ChainOperationRepositoryImpl#chainBatchDeleteOfParent delete fail, " +
+                                    "batch first entId: [{}], try delete count: [{}]",
+                            batchEntId.get(0),
+                            index,
+                            e
+                    );
+                }
+
             }
+
+            log.info("母公司链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
         }
 
+    }
+
+
+    @Override
+    public void chainBatchDeleteOfCtrl(Set<String> delEntIds) {
+        List<List<String>> batchEntIds = batchProcess(delEntIds);
+
+        for (List<String> batchEntId : batchEntIds) {
+            long startTime = TimeUtils.startTime();
+
+            int index = 0;
+            while (index < 3) {
+
+                Query condition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).in(batchEntId));
+
+                try {
+                    mongoTemplate.remove(condition, SC_CHAIN_FINCTRL);
+                    break;
+                } catch (Exception e) {
+                    index++;
+                    TimeUtils.sleep(index, 500);
+                    log.warn(
+                            "ChainOperationRepositoryImpl#chainBatchDeleteOfCtrl delete fail, " +
+                                    "batch first entId: [{}], try delete count: [{}]",
+                            batchEntId.get(0),
+                            index,
+                            e
+                    );
+                }
+
+            }
+
+            log.info("最终控股股东链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
+        }
     }
 
     @Override
@@ -265,7 +319,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     }
 
     private List<List<String>> batchProcess(Set<String> entIds) {
-        final int BATCH_SIZE = 1_000;
+        final int BATCH_SIZE = 500;
         return Lists.partition(new ArrayList<>(entIds), BATCH_SIZE);
     }
 

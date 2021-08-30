@@ -68,8 +68,13 @@ public class ChainOperationServiceImpl implements ChainOperationService {
     }
 
     @Override
-    public void chainBatchDelete(Set<String> entIds) {
-        chainOperationRepository.chainBatchDelete(entIds);
+    public void chainBatchDeleteOfParent(Set<String> entIds) {
+        chainOperationRepository.chainBatchDeleteOfParent(entIds);
+    }
+
+    @Override
+    public void chainBatchDeleteOfCtrl(Set<String> delEntIds) {
+        chainOperationRepository.chainBatchDeleteOfCtrl(delEntIds);
     }
 
     @Override

@@ -82,7 +82,10 @@ public class IncrPreProcessTask implements IncrTask {
 
     private void incrDataPreProcess() {
         incrListScreenTask.screenList();
+
+        entIdListOptHandler.replacePreWithIncrDelEntIds();
         incrListDelTask.delList();
+
         incrListRecordTask.recordList();
     }
 

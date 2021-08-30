@@ -3,6 +3,8 @@ package com.chinadaas.repository.impl;
 import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.SuperConst;
+import com.chinadaas.common.util.TimeUtils;
+import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.entity.SuperCorporationEntity;
 import com.chinadaas.repository.SuperCorporationRepository;
 import com.google.common.collect.Lists;
@@ -13,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -78,14 +82,33 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
         List<List<String>> batchEntIds = batchProcess(entIds);
 
         for (List<String> batchEntId : batchEntIds) {
-            Query condition = new Query(Criteria.where(SuperConst.ENT_ID).in(batchEntId));
+            long startTime = TimeUtils.startTime();
 
-            try {
-                mongoTemplate.remove(condition, SC_SUPER_CORPORATION);
-            } catch (Exception e) {
-                log.warn("SuperCorporationRepositoryImpl#superBatchDelete delete fail", e);
+            int index = 0;
+            while (index < 3) {
+
+                Query condition = new Query(Criteria.where(SuperConst.ENT_ID).in(batchEntId));
+
+                try {
+                    mongoTemplate.remove(condition, SC_SUPER_CORPORATION);
+                    break;
+                } catch (Exception e) {
+                    index++;
+                    TimeUtils.sleep(index, 1_000);
+                    log.warn(
+                            "SuperCorporationRepositoryImpl#superBatchDelete delete fail, " +
+                                    "batch first entId: [{}], try delete count: [{}]",
+                            batchEntId.get(0),
+                            index,
+                            e
+                    );
+                }
+
             }
+
+            log.info("母公司临时表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
         }
+
     }
 
     private void doInsertSuperCorporation(SuperCorporationEntity superCorporationEntity) {
@@ -117,7 +140,7 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
     }
 
     private List<List<String>> batchProcess(Set<String> entIds) {
-        final int BATCH_SIZE = 1_000;
+        final int BATCH_SIZE = 100;
         return Lists.partition(new ArrayList<>(entIds), BATCH_SIZE);
     }
 

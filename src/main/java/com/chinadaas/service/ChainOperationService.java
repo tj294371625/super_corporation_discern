@@ -29,7 +29,7 @@ public interface ChainOperationService {
      */
     void chainPersistence(ChainEntity chainEntity, ModelType modelType);
 
-    void chainBatchDelete(Set<String> entIds);
+    void chainBatchDeleteOfParent(Set<String> entIds);
 
     /**
      * 查找变更树
@@ -81,4 +81,5 @@ public interface ChainOperationService {
 
     Set<String> obtainCircularEntIds();
 
+    void chainBatchDeleteOfCtrl(Set<String> delEntIds);
 }

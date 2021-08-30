@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -72,6 +73,11 @@ public class EntIdListOptHandler {
     public void replacePreWithIncrFixEntIds() {
         Set<String> auTypeIncrSet = recordHandler.obtainAUTypeIncrSet();
         entIdListLoader.reloadEntIdList(auTypeIncrSet);
+    }
+
+    public void replacePreWithIncrDelEntIds() {
+        Set<String> delTypeIncrSet = recordHandler.obtainDelTypeIncrSet();
+        entIdListLoader.reloadEntIdList(delTypeIncrSet);
     }
 
 }

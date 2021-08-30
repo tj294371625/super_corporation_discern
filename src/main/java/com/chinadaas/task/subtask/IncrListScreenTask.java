@@ -103,6 +103,9 @@ public class IncrListScreenTask {
 
         parallelExecutor.execute("incrListScreenTask", incrPreProcessTask);
 
+        log.info("待增加、更新的数据量: [{}]", recordHandler.obtainAUTypeIncrSet().size());
+        log.info("待删除的数据量: [{}]", recordHandler.obtainDelTypeIncrSet().size());
+
         log.info("end the incrListScreenTask spend time: [{}ms]", TimeUtils.endTime(startTime));
     }
 

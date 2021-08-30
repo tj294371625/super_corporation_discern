@@ -1,5 +1,6 @@
 package com.chinadaas.component.executor;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -17,4 +18,7 @@ public interface Executor {
      * @param consumer 要执行的任务
      */
     void execute(String taskName, Consumer<String> consumer);
+
+    void executeTasks(String taskName, Consumer<Set<String>> consumer);
+
 }

@@ -60,7 +60,7 @@ public interface ChainOperationRepository {
      *
      * @param entIds
      */
-    void chainBatchDelete(Set<String> entIds);
+    void chainBatchDeleteOfParent(Set<String> entIds);
 
     /**
      * 变更树查询
@@ -95,4 +95,6 @@ public interface ChainOperationRepository {
     void saveCircularEntIds(List<String> circularEntIds);
 
     Set<String> obtainCircularEntIds();
+
+    void chainBatchDeleteOfCtrl(Set<String> delEntIds);
 }

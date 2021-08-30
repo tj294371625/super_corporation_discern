@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -47,6 +48,20 @@ public class ParallelExecutor implements Executor {
         // wait task execute complete
         ThreadPoolUtils.waitForComplete(executor);
 
+    }
+
+    @Override
+    public void executeTasks(String taskName, Consumer<Set<String>> consumer) {
+        List<List<String>> divideEntIdList = entIdListHolder.getDivideEntIdList();
+
+        for (List<String> partList : divideEntIdList) {
+            Set<String> partSet = new HashSet<>(partList);
+            executor.submit(() -> {
+                consumer.accept(partSet);
+            });
+        }
+
+        ThreadPoolUtils.waitForComplete(executor);
     }
 
     private void doExecute(String taskName, Consumer<String> consumer, List<String> partList) {

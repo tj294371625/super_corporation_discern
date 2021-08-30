@@ -34,7 +34,7 @@ public class MongoConfiguration {
 
     @Bean
     public MongoClientOptions mongoOptions() {
-        return MongoClientOptions.builder().socketTimeout(60_000).build();
+        return MongoClientOptions.builder().socketTimeout(120_000).build();
     }
 
 }

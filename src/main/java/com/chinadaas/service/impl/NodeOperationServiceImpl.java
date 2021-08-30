@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author lawliet
@@ -32,6 +33,9 @@ public class NodeOperationServiceImpl implements NodeOperationService {
     @Override
     public boolean managementStatus(String entId) {
         NodeEntity nodeEntity = repository.nodeFind(entId);
+        if (Objects.isNull(nodeEntity)) {
+            return false;
+        }
         NodeWrapper node = nodeEntity.getNode();
         String entStatus = node.obtainEntstatus();
         final String management = "1";
