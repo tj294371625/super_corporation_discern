@@ -3,7 +3,7 @@ package com.chinadaas.repository.impl;
 import com.alibaba.fastjson.JSON;
 import com.chinadaas.common.constant.ChainConst;
 import com.chinadaas.common.constant.ModelType;
-import com.chinadaas.common.constant.SuperConst;
+import com.chinadaas.common.constant.TargetType;
 import com.chinadaas.common.util.TimeUtils;
 import com.chinadaas.entity.ChainEntity;
 import com.chinadaas.repository.ChainOperationRepository;
@@ -11,13 +11,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -89,6 +87,21 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                 .set(ChainConst.TARGET_NAME, parentName)
                 .set(ChainConst.TARGET_TYPE, parentType)
                 .set(ChainConst.TARGET_TO_SOURCE_LAYER, totalChainLength);
+        String collectionName = selectCollectionName(modelType);
+        mongoTemplate.updateMulti(matchCondition, update, collectionName);
+    }
+
+    @Override
+    public void circularEndNodeFix(String nodeEntId, ModelType modelType) {
+        Query matchCondition = new Query(Criteria.where(ChainConst.SOURCE_ENT_ID).is(nodeEntId));
+        Update update = new Update()
+                .set(ChainConst.TEMP_ENT_ID, "-1")
+                .set(ChainConst.TEMP_NAME, "")
+                .set(ChainConst.TARGET_ENT_ID, "-1")
+                .set(ChainConst.TARGET_NAME, "")
+                .set(ChainConst.TEMP_TO_SOURCE_LAYER, 0)
+                .set(ChainConst.TARGET_TO_SOURCE_LAYER, 0)
+                .set(ChainConst.TARGET_TYPE, TargetType.NON_EXIST.toString());
         String collectionName = selectCollectionName(modelType);
         mongoTemplate.updateMulti(matchCondition, update, collectionName);
     }
@@ -190,7 +203,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
     public Set<String> treeQuery(String entId, ModelType modelType) {
         Set<String> treeResults = Sets.newHashSet();
 
-        Query condition = new Query(Criteria.where(ChainConst.TARGET_ENT_ID).is(entId));
+        Query condition = new Query(Criteria.where(ChainConst.TEMP_ENT_ID).is(entId));
         condition.fields().exclude(ChainConst._ID).include(ChainConst.SOURCE_ENT_ID);
 
         String collectionName = selectCollectionName(modelType);

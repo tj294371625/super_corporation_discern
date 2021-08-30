@@ -176,7 +176,17 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         List<NodeWrapper> circularNodes = nodeOperationRepository
                 .nodesFind(snapshotHandler.obtainCircularEntIds(chainEntity.getSourceEntId()));
         preChainEntity = snapshotHandler.resolveCircuit(circularNodes);
-        doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);
+
+        // zs：当前点为破除环路后的目标点，特殊处理
+        if ("-1".equals(preChainEntity.getTempEntId())) {
+            chainOperationRepository.circularEndNodeFix(
+                    snapshotHandler.obtainNodeEntId(),
+                    modelType
+            );
+        } else {
+            doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);
+        }
+
     }
 
     private void doRecursiveChainFix(ChainEntity preChainEntity, SnapshotHandler snapshotHandler, ModelType modelType) {

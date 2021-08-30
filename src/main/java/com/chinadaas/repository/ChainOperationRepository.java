@@ -33,6 +33,7 @@ public interface ChainOperationRepository {
 
     /**
      * 链路修复
+     *
      * @param parentId
      * @param parentName
      * @param parentType
@@ -46,6 +47,14 @@ public interface ChainOperationRepository {
                   long totalChainLength,
                   String nodeEntId,
                   ModelType modelType);
+
+    /**
+     * 环路终点特殊处理
+     *
+     * @param nodeEntId
+     * @param modelType
+     */
+    void circularEndNodeFix(String nodeEntId, ModelType modelType);
 
     /**
      * 持久化链路（母公司 or 最终控股股东）
@@ -91,7 +100,7 @@ public interface ChainOperationRepository {
      * @return
      */
     Set<String> obtainFinCtrlFixEntIds();
-    
+
     void saveCircularEntIds(List<String> circularEntIds);
 
     Set<String> obtainCircularEntIds();
