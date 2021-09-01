@@ -230,7 +230,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                                 Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
                         )
                 )
-                .batchSize(50000)
+                .batchSize(5_000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
@@ -254,7 +254,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                                 Filters.eq(ChainConst.TARGET_ENT_ID, "-1")
                         )
                 )
-                .batchSize(50000)
+                .batchSize(5_000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
@@ -272,7 +272,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                                 Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
                         )
                 )
-                .batchSize(50000)
+                .batchSize(5_000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.TARGET_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {
@@ -296,7 +296,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
                                 Filters.ne(ChainConst.TARGET_ENT_ID, "-1")
                         )
                 )
-                .batchSize(50000)
+                .batchSize(5_000)
                 .projection(new Document(ChainConst._ID, 0).append(ChainConst.SOURCE_ENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {

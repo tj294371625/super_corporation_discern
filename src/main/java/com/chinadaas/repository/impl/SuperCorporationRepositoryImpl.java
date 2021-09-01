@@ -64,7 +64,7 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
                 .find(Filters.and(
                         Filters.ne(SuperConst.PARENT_ID, null)
                 ))
-                .batchSize(50000)
+                .batchSize(5_000)
                 .projection(new Document(SuperConst._ID, 0).append(SuperConst.PARENT_ID, 1))
                 .forEach(
                         (Consumer<? super Document>) document -> {

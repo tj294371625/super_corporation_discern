@@ -77,7 +77,11 @@ public class EntIdListLoader {
                 doLoadEntIdList(sourceFile);
             }
 
-            log.info("end the load entId list, spend time: [{}ms]", System.currentTimeMillis() - startTime);
+            log.info(
+                    "end the load entId list, list size: [{}], spend time: [{}ms]",
+                    entIdListHolder.size(),
+                    System.currentTimeMillis() - startTime
+            );
 
         } catch (IOException e) {
             log.error("load resource fail, reason: ", e);

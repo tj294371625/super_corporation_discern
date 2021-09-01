@@ -40,6 +40,10 @@ public class EntIdListHolder {
         return entIdList;
     }
 
+    public int size() {
+        return entIdList.size();
+    }
+
     /**
      * 获取分割的名单
      *
