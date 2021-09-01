@@ -29,7 +29,7 @@ public class IncrListRecordTask {
         // 记录修正的变更名单
         Set<String> fixIncrList = Sets.newHashSet();
         fixIncrList.addAll(recordHandler.obtainAUTypeIncrSet());
-        fixIncrList.addAll(recordHandler.obtainDelTypeIncrSet());
+//        fixIncrList.addAll(recordHandler.obtainDelTypeIncrSet());
         for (String entId : fixIncrList) {
             recordHandler.recordIncrList(entId);
         }

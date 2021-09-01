@@ -25,6 +25,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -78,6 +79,9 @@ public class SuperCorporationProcessTask {
         String currentQueryId = superCorporationModel.getCurrentQueryId();
 
         ChainEntity chainEntity = chainOperationService.chainQuery(currentQueryId, ModelType.PARENT);
+        if (Objects.isNull(chainEntity)) {
+            return;
+        }
 
         String targetEntId = chainEntity.getTargetEntId();
         String targetType = chainEntity.getTargetType();
@@ -115,7 +119,11 @@ public class SuperCorporationProcessTask {
         String currentQueryId = superCorporationModel.getCurrentQueryId();
 
         ChainEntity parentEntity = chainOperationService.chainQuery(currentQueryId, ModelType.PARENT);
+        if (Objects.isNull(parentEntity)) {
+            return;
+        }
         String parentId = parentEntity.getTargetEntId();
+
         // zs: 最终控股股东两种情况
         ChainEntity finCtrlEntity;
         if (ChainConst.UNKNOWN_ID.equals(parentId)) {
@@ -123,6 +131,10 @@ public class SuperCorporationProcessTask {
         } else {
             finCtrlEntity = chainOperationService.chainQuery(parentId, ModelType.FIN_CTRL);
         }
+        if (Objects.isNull(finCtrlEntity)) {
+            return;
+        }
+
         String finCtrlId = finCtrlEntity.getTargetEntId();
         long parent2SourceLayer = parentEntity.getTarget2SourceLayer();
         long ctrl2SourceLayer = finCtrlEntity.getTarget2SourceLayer();

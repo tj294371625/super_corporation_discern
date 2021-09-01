@@ -60,7 +60,16 @@ public class IncrListScreenTask {
             boolean managementStatus = nodeOperationService.managementStatus(entId);
             // 非在营，记录
             if (!managementStatus) {
-                recordHandler.recordDelTypeIncr(Collections.singletonList(entId));
+                // zs: 非在营是母公司的情况
+                Set<String> subIncrListOfParent = chainOperationService.treeQuery(entId, ModelType.PARENT);
+                recordHandler.recordAUTypeIncr(subIncrListOfParent);
+                recordHandler.recordDelTypeIncr(subIncrListOfParent);
+
+                // zs: 非在营是最终控股股东的情况
+                Set<String> subIncrListOfCtrl = chainOperationService.treeQuery(entId, ModelType.FIN_CTRL);
+                recordHandler.recordAUTypeIncr(subIncrListOfCtrl);
+                recordHandler.recordDelTypeIncr(subIncrListOfCtrl);
+
                 return;
             }
 
