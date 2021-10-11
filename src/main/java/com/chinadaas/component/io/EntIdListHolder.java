@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +51,17 @@ public class EntIdListHolder {
      * @return
      */
     public List<List<String>> getDivideEntIdList() {
-        int partitionSize = Runtime.getRuntime().availableProcessors() * 2;
+        int availableCoreSize = Runtime.getRuntime().availableProcessors();
+        int entIdSize = size();
+        BigDecimal entIdSizeDecimal = new BigDecimal(String.valueOf(entIdSize));
+        BigDecimal availableDecimal = new BigDecimal(String.valueOf(availableCoreSize));
+        int partitionSize = entIdSizeDecimal
+                .divide(availableDecimal)
+                .setScale(0, BigDecimal.ROUND_HALF_UP)
+                .intValue();
+        if (0 == partitionSize) {
+            partitionSize = 1;
+        }
 
         log.info("将企业标识名单分割: [{}]份", partitionSize);
 
