@@ -51,7 +51,7 @@ public class ChainOperationServiceImpl implements ChainOperationService {
                 "call ChainOperationRepository#chainQuery, entId: [{}] not found in mongodb.", entId);
 
         // 首次查询获得的结果无法穿透，则return
-        if (parentIdUnknown(chainEntity)) {
+        if (notThrough(chainEntity)) {
             return;
         }
 
@@ -138,8 +138,15 @@ public class ChainOperationServiceImpl implements ChainOperationService {
 
         // zs: 记录上一次实体
         ChainEntity preChainEntity = null;
-        while (parentIdKnown(chainEntity)) {
+        while (canThrough(chainEntity)) {
             preChainEntity = chainEntity;
+
+            // zs: 解决上市披露公司继续向后穿透的问题
+            if (isDisclosureEnt(preChainEntity)) {
+                doRecursiveChainFix(preChainEntity, snapshotHandler, modelType);
+                return;
+            }
+
             chainEntity = chainOperationRepository.chainQuery(preChainEntity.getTempEntId(), modelType);
 
             // zs: 解决目标节点不存在于SC_CHAIN_*的问题（名单中未提供）
@@ -205,11 +212,15 @@ public class ChainOperationServiceImpl implements ChainOperationService {
         );
     }
 
-    private boolean parentIdUnknown(ChainEntity chainEntity) {
+    private boolean notThrough(ChainEntity chainEntity) {
         return ChainConst.UNKNOWN_ID.equals(chainEntity.getTempEntId());
     }
 
-    private boolean parentIdKnown(ChainEntity chainEntity) {
-        return !parentIdUnknown(chainEntity);
+    private boolean canThrough(ChainEntity chainEntity) {
+        return !notThrough(chainEntity);
+    }
+
+    private boolean isDisclosureEnt(ChainEntity preChainEntity) {
+        return ChainConst.DISCLOSURE.equals(preChainEntity.getTargetType());
     }
 }

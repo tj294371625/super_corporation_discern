@@ -160,7 +160,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
             }
 
-            log.info("母公司链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
+            log.debug("母公司链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
         }
 
     }
@@ -195,7 +195,7 @@ public class ChainOperationRepositoryImpl implements ChainOperationRepository {
 
             }
 
-            log.info("最终控股股东链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
+            log.debug("最终控股股东链路表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
         }
     }
 

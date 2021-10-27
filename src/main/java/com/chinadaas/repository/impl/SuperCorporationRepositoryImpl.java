@@ -22,10 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -78,6 +75,24 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
     }
 
     @Override
+    public Set<String> queryParentIdsByEntIds(Set<String> entIds) {
+        List<List<String>> batchEntIds = batchProcess(entIds);
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (List<String> batchEntId : batchEntIds) {
+            Query condition = new Query(Criteria.where(SuperConst.ENT_ID).in(batchEntId));
+            condition.fields().exclude(SuperConst._ID).include(SuperConst.PARENT_ID);
+            List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_SUPER_CORPORATION);
+            for (Map tempResult : tempResults) {
+                String parentId = (String) tempResult.get(SuperConst.PARENT_ID);
+                parentIds.add(parentId);
+            }
+        }
+
+        return parentIds;
+    }
+
+    @Override
     public void superBatchDelete(Set<String> entIds) {
         List<List<String>> batchEntIds = batchProcess(entIds);
 
@@ -106,7 +121,7 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
 
             }
 
-            log.info("母公司临时表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
+            log.debug("母公司临时表批量删除，耗费时间：[{}ms]", TimeUtils.endTime(startTime));
         }
 
     }

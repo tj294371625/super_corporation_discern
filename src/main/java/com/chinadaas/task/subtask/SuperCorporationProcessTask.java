@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +81,8 @@ public class SuperCorporationProcessTask {
 
         ChainEntity chainEntity = chainOperationService.chainQuery(currentQueryId, ModelType.PARENT);
         if (Objects.isNull(chainEntity)) {
+            log.warn("SuperCorporationProcessTask#calPartOfParent, entId: [{}] not found record in SC_CHAIN_PARENT",
+                    currentQueryId);
             return;
         }
 
@@ -101,6 +104,12 @@ public class SuperCorporationProcessTask {
             String middleEntId = chainOperationService.obtainEntBeforeDisclosure(currentQueryId, targetEntId);
             twoNodesUseInvList = nodeOperationService.sourceToTargetUseInv(currentQueryId, middleEntId, parent2SourceLayer - 1);
             twoNodesUseGroupParentList = nodeOperationService.sourceToTargetUseGroupParent(middleEntId, targetEntId);
+            if (CollectionUtils.isEmpty(twoNodesUseInvList) || CollectionUtils.isEmpty(twoNodesUseGroupParentList)) {
+                log.warn("SuperCorporationProcessTask#calPartOfParent, " +
+                                "entId: [{}], middleEntId: [{}], targetEntId: [{}], query neo4j not result",
+                        currentQueryId, middleEntId, targetEntId);
+                return;
+            }
             superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
             superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseGroupParentList));
             superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
@@ -110,6 +119,11 @@ public class SuperCorporationProcessTask {
 
         // zs: 决策权&单一大股东
         twoNodesUseInvList = nodeOperationService.sourceToTargetUseInv(currentQueryId, targetEntId, parent2SourceLayer);
+        if (CollectionUtils.isEmpty(twoNodesUseInvList)) {
+            log.warn("SuperCorporationProcessTask#calPartOfParent, " +
+                    "entId: [{}], targetEntId: [{}], query neo4j not result", currentQueryId, targetEntId);
+            return;
+        }
         superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, twoNodesUseInvList));
         superCorporationModel.setParentProperty(Neo4jResultParseUtils.obtainSpecialNode(targetEntId, twoNodesUseInvList));
         superCorporationModel.calSourceToParent(twoNodesUseInvList, twoNodesUseGroupParentList, targetEntId);
@@ -120,6 +134,8 @@ public class SuperCorporationProcessTask {
 
         ChainEntity parentEntity = chainOperationService.chainQuery(currentQueryId, ModelType.PARENT);
         if (Objects.isNull(parentEntity)) {
+            log.warn("SuperCorporationProcessTask#calPartOfCtrl, entId: [{}] not found record in SC_CHAIN_PARENT",
+                    currentQueryId);
             return;
         }
         String parentId = parentEntity.getTargetEntId();
@@ -132,6 +148,8 @@ public class SuperCorporationProcessTask {
             finCtrlEntity = chainOperationService.chainQuery(parentId, ModelType.FIN_CTRL);
         }
         if (Objects.isNull(finCtrlEntity)) {
+            log.warn("SuperCorporationProcessTask#calPartOfCtrl, entId: [{}] not found record in SC_CHAIN_FINCTRL",
+                    currentQueryId);
             return;
         }
 
@@ -150,6 +168,12 @@ public class SuperCorporationProcessTask {
                 controlPathList = nodeOperationService.sourceToTargetUseInv(currentQueryId, finCtrlId, ctrl2SourceLayer);
             } else {
                 controlPathList = nodeOperationService.sourceToPersonUseInv(currentQueryId, finCtrlId, ctrl2SourceLayer);
+            }
+
+            if (CollectionUtils.isEmpty(controlPathList)) {
+                log.warn("SuperCorporationProcessTask#calPartOfCtrl, " +
+                        "entId: [{}], finCtrlId: [{}], query neo4j not result", currentQueryId, finCtrlId);
+                return;
             }
 
             superCorporationModel.setSourceProperty(Neo4jResultParseUtils.obtainSpecialNode(currentQueryId, controlPathList));
@@ -196,6 +220,13 @@ public class SuperCorporationProcessTask {
                 } else {
                     sourceToControlPathList = nodeOperationService.sourceToPersonUseInv(currentQueryId, finCtrlId, sourceToControlLayer);
                 }
+            }
+
+            if (CollectionUtils.isEmpty(parentToControlPathList) || CollectionUtils.isEmpty(sourceToControlPathList)) {
+                log.warn("SuperCorporationProcessTask#calPartOfCtrl, " +
+                                "entId: [{}], parentId: [{}], finCtrlId: [{}], query neo4j not result",
+                        currentQueryId, parentId, finCtrlId);
+                return;
             }
 
             superCorporationModel.setFinCtrlProperty(Neo4jResultParseUtils.obtainSpecialNode(finCtrlId, parentToControlPathList));

@@ -224,6 +224,32 @@ public class RecordHandler {
     }
 
     /**
+     * 记录删除名单，用于母公司表删除
+     *
+     * @param entIds
+     */
+    public void recordDelListForParent(Set<String> entIds) {
+        if (CollectionUtils.isEmpty(entIds)) {
+            return;
+        }
+
+        doRecord(new ArrayList<>(entIds), superDataPath, "del_record_for_parent.csv");
+    }
+
+    /**
+     * 记录删除名单，用于成员表删除
+     *
+     * @param parentIds
+     */
+    public void recordDelListForMembers(Set<String> parentIds) {
+        if (CollectionUtils.isEmpty(parentIds)) {
+            return;
+        }
+
+        doRecord(new ArrayList<>(parentIds), superDataPath, "del_record_for_member.csv");
+    }
+
+    /**
      * 记录查询超时的entId
      *
      * @param entId

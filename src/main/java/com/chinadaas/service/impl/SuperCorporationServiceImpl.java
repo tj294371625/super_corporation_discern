@@ -37,6 +37,11 @@ public class SuperCorporationServiceImpl implements SuperCorporationService {
     }
 
     @Override
+    public Set<String> queryParentIdsByEntIds(Set<String> entIds) {
+        return repository.queryParentIdsByEntIds(entIds);
+    }
+
+    @Override
     public void superBatchDelete(Set<String> entIds) {
         repository.superBatchDelete(entIds);
     }

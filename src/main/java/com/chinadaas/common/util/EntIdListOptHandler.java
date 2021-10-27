@@ -70,6 +70,13 @@ public class EntIdListOptHandler {
         entIdListLoader.reloadEntIdList(parentIds);
     }
 
+    public void replacePreWithAUIncrEntIds() {
+        // zs: 获取待新增的parent，记录parentid，重新生成成员
+        Set<String> auTypeIncrSet = recordHandler.obtainAUTypeIncrSet();
+        Set<String> auParentIds = superCorporationService.queryParentIdsByEntIds(auTypeIncrSet);
+        entIdListLoader.reloadEntIdList(auParentIds);
+    }
+
     public void replacePreWithIncrFixEntIds() {
         Set<String> auTypeIncrSet = recordHandler.obtainAUTypeIncrSet();
         entIdListLoader.reloadEntIdList(auTypeIncrSet);

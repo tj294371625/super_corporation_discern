@@ -17,4 +17,7 @@ public interface SuperCorporationRepository {
     Set<String> extraParentIds();
 
     void superBatchDelete(Set<String> delTypeIncr);
+
+    Set<String> queryParentIdsByEntIds(Set<String> entIds);
+
 }

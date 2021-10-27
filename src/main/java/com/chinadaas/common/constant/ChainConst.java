@@ -68,4 +68,9 @@ public class ChainConst {
      */
     public static final String UNKNOWN_NAME = "";
 
+    /**
+     * 上市披露状态
+     */
+    public static final String DISCLOSURE = "DISCLOSURE";
+
 }

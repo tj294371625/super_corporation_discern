@@ -40,7 +40,7 @@ public class ParallelExecutor implements Executor {
         List<List<String>> divideEntIdList = entIdListHolder.getDivideEntIdList();
 
         for (List<String> partList : divideEntIdList) {
-            executor.submit(() -> {
+            executor.execute(() -> {
                 doExecute(taskName, consumer, partList);
             });
         }
@@ -56,8 +56,14 @@ public class ParallelExecutor implements Executor {
 
         for (List<String> partList : divideEntIdList) {
             Set<String> partSet = new HashSet<>(partList);
-            executor.submit(() -> {
-                consumer.accept(partSet);
+            executor.execute(() -> {
+
+                try {
+                    consumer.accept(partSet);
+                } catch (Exception e) {
+                    log.error("single task execute error", e);
+                }
+
             });
         }
 
@@ -69,15 +75,19 @@ public class ParallelExecutor implements Executor {
         AtomicLong counter = new AtomicLong(0L);
         for (String entId : partList) {
 
-            if (0L == counter.addAndGet(1L) % 10_000L) {
+            if (0L == counter.addAndGet(1L) % 50_000L) {
                 log.info("thread: [{}] task: [{}] current read records: [{}] ",
                         Thread.currentThread().getName(),
                         taskName,
                         counter.get());
             }
 
-            // task execute
-            consumer.accept(entId);
+            try {
+                // task execute
+                consumer.accept(entId);
+            } catch (Exception e) {
+                log.error("single task execute error, entId:[{}]", entId, e);
+            }
         }
 
     }

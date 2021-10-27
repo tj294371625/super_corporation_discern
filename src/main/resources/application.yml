@@ -12,6 +12,7 @@ db:
   neo4j:
     user: neo4j
     password: chinadaas2017
+#    url: bolt://192.168.100.60:7687
     url: bolt://192.168.207.26:57687
   mongodb:
     circularCollection: SC_CHAIN_CIRCULAR
