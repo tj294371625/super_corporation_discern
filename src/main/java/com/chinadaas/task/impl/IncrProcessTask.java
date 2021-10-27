@@ -47,19 +47,11 @@ public class IncrProcessTask implements IncrTask {
     @Override
     public void run() {
         generateSuperCorporation();
-        recordParentDel();
         generateMembers();
     }
 
     private void generateSuperCorporation() {
         this.superCorporationProcessTask.generateSuperCorporation();
-    }
-
-    private void recordParentDel() {
-        // zs: 获取待删除的parent，记录parentid，交给数据工厂
-        Set<String> delTypeIncrSet = recordHandler.obtainDelTypeIncrSet();
-        Set<String> delParentIds = superCorporationService.queryParentIdsByEntIds(delTypeIncrSet);
-        recordHandler.recordDelListForMembers(delParentIds);
     }
 
     private void generateMembers() {

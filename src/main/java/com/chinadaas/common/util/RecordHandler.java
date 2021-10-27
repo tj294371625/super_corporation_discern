@@ -34,9 +34,12 @@ public class RecordHandler {
      */
     private final Set<String> delTypeIncrSet;
 
+    private final Set<String> parentIdIncrSet;
+
     public RecordHandler() {
         this.auTypeIncrSet = Collections.newSetFromMap(new ConcurrentHashMap<>(200_000));
         this.delTypeIncrSet = Collections.newSetFromMap(new ConcurrentHashMap<>(200_000));
+        this.parentIdIncrSet = Collections.newSetFromMap(new ConcurrentHashMap<>(200_000));
     }
 
     public void recordAUTypeIncr(Collection<String> entIds) {
@@ -49,6 +52,18 @@ public class RecordHandler {
 
     public void clearAUTypeIncr() {
         auTypeIncrSet.clear();
+    }
+
+    public void recordParentIdIncr(Collection<String> parentIds) {
+        parentIdIncrSet.addAll(parentIds);
+    }
+
+    public Set<String> obtainParentIdIncrSet() {
+        return this.parentIdIncrSet;
+    }
+
+    public void clearParentIdIncr() {
+        parentIdIncrSet.clear();
     }
 
     public void recordDelTypeIncr(Collection<String> entIds) {

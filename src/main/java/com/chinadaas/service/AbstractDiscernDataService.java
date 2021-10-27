@@ -58,6 +58,7 @@ public abstract class AbstractDiscernDataService implements DiscernDataService {
         entIdListHolder.clear();
         recordHandler.clearAUTypeIncr();
         recordHandler.clearDelTypeIncr();
+        recordHandler.clearParentIdIncr();
 
         entIdListLoader.unlock();
     }

@@ -34,6 +34,6 @@ public class IncrListRecordTask {
         }
 
         // zs: 记录删除记录名单
-        recordHandler.recordDelList(recordHandler.obtainDelTypeIncrSet());
+        recordHandler.recordDelListForParent(recordHandler.obtainDelTypeIncrSet());
     }
 }
