@@ -58,7 +58,7 @@ public class MemberModel {
 
         mergeResults.put(MemberConst.ENTNAME, mergeResults.remove(MemberConst.NAME));
         mergeResults.put("relation_density", "紧密层");
-        mergeResults.put(MemberConst.PARENT2SOURCE_RELATION, this.parent2SourceRelation);
+        mergeResults.put(MemberConst.RELATION, this.parent2SourceRelation);
         mergeResults.put(MemberConst.PARENT_ID, this.parentId);
         mergeResults.put(MemberConst.PATH, this.parent2SourcePath);
         mergeResults.put(MemberConst.FINAL_CGZB, this.finalCgzb);
