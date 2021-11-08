@@ -68,7 +68,6 @@ public class PersonOutControlModel {
 
             // 企业属性处理
             Map<String, Object> memberProperties = (Map<String, Object>) tempResult.get(MemberConst.SOURCE_PROPERTY);
-            Map memberPropertiesDeepCopy = new HashMap(memberProperties);
             entInvType = memberProperties.remove(MemberConst.INVTYPE);
             memberProperties.remove(MemberConst.ZSID);
             String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
@@ -84,9 +83,9 @@ public class PersonOutControlModel {
             personProperties.remove(MemberConst.INVTYPE);
             personProperties.remove(MemberConst.NODEID);
             AssistantUtils.generateZspId(personProperties, this.parentId);
-            personProperties.put(MemberConst.PERSON_RISKINFO, memberPropertiesDeepCopy.remove(MemberConst.RISKINFO));
-            personProperties.put(MemberConst.PERSON_COUNTRY, memberPropertiesDeepCopy.remove(MemberConst.COUNTRY));
-            personProperties.put(MemberConst.PERSON_COUNTRY_DESC, memberPropertiesDeepCopy.remove(MemberConst.COUNTRY_DESC));
+            personProperties.put(MemberConst.PERSON_RISKINFO, personProperties.remove(MemberConst.RISKINFO));
+            personProperties.put(MemberConst.PERSON_COUNTRY, personProperties.remove(MemberConst.COUNTRY));
+            personProperties.put(MemberConst.PERSON_COUNTRY_DESC, personProperties.remove(MemberConst.COUNTRY_DESC));
 
             finalMember.put(MemberConst.PARENT_ID, parentId);
             finalMember.put(MemberConst.RELATION, "直接");
