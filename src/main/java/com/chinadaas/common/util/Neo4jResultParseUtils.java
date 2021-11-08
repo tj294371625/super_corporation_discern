@@ -30,6 +30,7 @@ public abstract class Neo4jResultParseUtils {
     private static final String ENCODE_V1 = "encode_v1";
     private static final String PALGORITHMID = "palgorithmid";
     private static final Set<String> NODE_PROPERTIES;
+    private static final Set<String> LINK_PROPERTIES;
 
     static {
         NODE_PROPERTIES = Sets.newHashSet();
@@ -37,6 +38,10 @@ public abstract class Neo4jResultParseUtils {
         NODE_PROPERTIES.add("creditcode");
         NODE_PROPERTIES.add("regno");
         NODE_PROPERTIES.add("entid");
+
+        LINK_PROPERTIES = Sets.newHashSet();
+        LINK_PROPERTIES.add("sc_conprop");
+        LINK_PROPERTIES.add("sc_holderrto");
     }
 
     public static LinkWrapper parseRelation(Relationship relationship) {
@@ -156,9 +161,31 @@ public abstract class Neo4jResultParseUtils {
 
                 filterNodes.add(filterNode);
             });
-
             filterPath.setNodeWrappers(filterNodes);
-            filterPath.setLinkWrappers(path.getLinkWrappers());
+
+            Set<LinkWrapper> linkWrappers = path.getLinkWrappers();
+            Set<LinkWrapper> filterLinks = new HashSet<>(linkWrappers.size());
+            linkWrappers.forEach(linkWrapper -> {
+                LinkWrapper filterLink = new LinkWrapper();
+
+                BeanUtils.copyProperties(linkWrapper, filterLink);
+                Map<String, Object> filterLinkProperties = filterLink.getProperties();
+
+                if (!CollectionUtils.isEmpty(filterLinkProperties)) {
+                    Set<Map.Entry<String, Object>> entries = filterLinkProperties.entrySet();
+                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, Object> next = iterator.next();
+                        String key = next.getKey();
+                        if (LINK_PROPERTIES.contains(key)) {
+                            iterator.remove();
+                        }
+                    }
+                }
+
+                filterLinks.add(filterLink);
+            });
+            filterPath.setLinkWrappers(filterLinks);
             return filterPath;
         }
 
