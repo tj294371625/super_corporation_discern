@@ -89,7 +89,7 @@ public class ControlPersonLegalModel {
             memberProperties.put(MemberConst.ENT_RISKINFO, memberProperties.remove(MemberConst.RISKINFO));
 
             // 自然人属性处理
-            Map finalControlPersonDeepCopy = new HashMap(finalControlPerson);
+            Map finalControlPersonDeepCopy = JSON.parseObject(JSON.toJSONString(finalControlPerson));
             Map personProperties = (Map) finalControlPersonDeepCopy.get(MemberConst.FIN_CTRL_PROPERTY);
             personProperties.remove(MemberConst.INVTYPE);
             personProperties.remove(MemberConst.NODEID);
