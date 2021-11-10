@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,7 +86,9 @@ public class SuperCorporationRepositoryImpl implements SuperCorporationRepositor
             List<Map> tempResults = mongoTemplate.find(condition, Map.class, SC_SUPER_CORPORATION);
             for (Map tempResult : tempResults) {
                 String parentId = (String) tempResult.get(SuperConst.PARENT_ID);
-                parentIds.add(parentId);
+                if (StringUtils.isNotBlank(parentId)) {
+                    parentIds.add(parentId);
+                }
             }
         }
 
