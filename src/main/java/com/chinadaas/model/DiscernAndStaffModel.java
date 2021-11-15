@@ -148,15 +148,21 @@ public class DiscernAndStaffModel {
                         // 成员属性处理
                         NodeWrapper memberDeepCopy = JSON.parseObject(JSON.toJSONString(memberNode), NodeWrapper.class);
                         Map<String, Object> memberProperties = memberDeepCopy.getProperties();
-                        memberInvType = memberProperties.remove(MemberConst.INVTYPE);
-                        memberProperties.remove(MemberConst.ZSID);
-                        String entStatus = (String) memberProperties.get(MemberConst.ENTSTATUS);
-                        memberProperties.put(MemberConst.ENTSTATUS_DESC, AssistantUtils.getEntStatusDesc(entStatus));
-                        memberProperties.put(MemberConst.ENTNAME, memberProperties.remove(MemberConst.NAME));
+
+                        // zs: 浅拷贝问题
+                        Map<String, Object> copyMemberProperties = JSON.parseObject(JSON.toJSONString(memberProperties), Map.class);
+
                         memberProperties.put(MemberConst.ENTID, memberProperties.remove(MemberConst.NODEID));
-                        memberProperties.put(MemberConst.ENT_COUNTRY, memberProperties.remove(MemberConst.COUNTRY));
-                        memberProperties.put(MemberConst.ENT_COUNTRY_DESC, memberProperties.remove(MemberConst.COUNTRY_DESC));
-                        memberProperties.put(MemberConst.ENT_RISKINFO, memberProperties.remove(MemberConst.RISKINFO));
+
+                        memberInvType = copyMemberProperties.remove(MemberConst.INVTYPE);
+                        copyMemberProperties.remove(MemberConst.ZSID);
+                        String entStatus = (String) copyMemberProperties.get(MemberConst.ENTSTATUS);
+                        copyMemberProperties.put(MemberConst.ENTSTATUS_DESC, AssistantUtils.getEntStatusDesc(entStatus));
+                        copyMemberProperties.put(MemberConst.ENTNAME, copyMemberProperties.remove(MemberConst.NAME));
+                        copyMemberProperties.put(MemberConst.ENTID, copyMemberProperties.remove(MemberConst.NODEID));
+                        copyMemberProperties.put(MemberConst.ENT_COUNTRY, copyMemberProperties.remove(MemberConst.COUNTRY));
+                        copyMemberProperties.put(MemberConst.ENT_COUNTRY_DESC, copyMemberProperties.remove(MemberConst.COUNTRY_DESC));
+                        copyMemberProperties.put(MemberConst.ENT_RISKINFO, copyMemberProperties.remove(MemberConst.RISKINFO));
 
 
                         // 主要投资者属性处理
@@ -177,7 +183,7 @@ public class DiscernAndStaffModel {
                         mergeResult.put(MemberConst.PARENT_ID, this.parentId);
                         mergeResult.put(MemberConst.INVTYPE, memberInvType);
                         mergeResult.putAll(personProperties);
-                        mergeResult.putAll(memberProperties);
+                        mergeResult.putAll(copyMemberProperties);
 
                         // 计算结果
                         mergeResult.put(MemberConst.POSITION, obtainPosition(staffPersonDeepCopy));
@@ -191,7 +197,12 @@ public class DiscernAndStaffModel {
                         PathWrapper pathWrapper = new PathWrapper();
                         Set<NodeWrapper> nodeWrappers = pathWrapper.getNodeWrappers();
                         Set<LinkWrapper> linkWrappers = pathWrapper.getLinkWrappers();
-                        nodeWrappers.add(parentNode);
+
+                        // zs: 过滤
+                        NodeWrapper parentDeepCopy = JSON.parseObject(JSON.toJSONString(parentNode), NodeWrapper.class);
+                        Map<String, Object> parentProperties = parentDeepCopy.getProperties();
+                        parentProperties.put(MemberConst.ENTID, parentProperties.remove(MemberConst.NODEID));
+                        nodeWrappers.add(parentDeepCopy);
                         nodeWrappers.add(staffPersonDeepCopy);
                         nodeWrappers.add(memberDeepCopy);
                         linkWrappers.add(obtainParent2SubLink(memberDeepCopy));
