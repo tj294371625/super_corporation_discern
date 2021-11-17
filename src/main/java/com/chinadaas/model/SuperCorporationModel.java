@@ -270,7 +270,9 @@ public class SuperCorporationModel {
     public PathWrapper getCtrl2ParentPath() {
         if (Objects.nonNull(this.ctrl2ParentPath)) {
             PathWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.ctrl2ParentPath), PathWrapper.class);
-            pathFixProcess(deepCopy, this.parentId);
+            // zs：最终控股股东设置为innode为true
+            String finCtrlId = finCtrlNode.obtainEntId();
+            pathFixProcess(deepCopy, finCtrlId);
             return deepCopy;
         }
 
@@ -284,7 +286,9 @@ public class SuperCorporationModel {
     public PathWrapper getCtrl2SourcePath() {
         if (Objects.nonNull(this.ctrl2SourcePath)) {
             PathWrapper deepCopy = JSON.parseObject(JSON.toJSONString(this.ctrl2SourcePath), PathWrapper.class);
-            pathFixProcess(deepCopy, this.currentQueryId);
+            // zs：最终控股股东设置为innode为true
+            String finCtrlId = finCtrlNode.obtainEntId();
+            pathFixProcess(deepCopy, finCtrlId);
             return deepCopy;
         }
 

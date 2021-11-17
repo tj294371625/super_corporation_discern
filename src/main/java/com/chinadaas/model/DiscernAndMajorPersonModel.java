@@ -97,6 +97,10 @@ public class DiscernAndMajorPersonModel {
                 .filter(node -> node.getType() == NodeType.PERSON)
                 .collect(Collectors.toSet());
 
+        for (NodeWrapper majorInvPersonNode : majorInvPersonNodes) {
+            String majorInvPersonId = majorInvPersonNode.obtainEntId();
+            Neo4jResultParseUtils.setFirstNode(graph.getNodeWrappers(), majorInvPersonId);
+        }
 
         // 获得当前成员节点信息
         Set<NodeWrapper> memberNodes = nodes.stream()

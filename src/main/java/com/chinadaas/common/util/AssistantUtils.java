@@ -871,6 +871,7 @@ public abstract class AssistantUtils {
     public static void filterFinCtrlNodeProperties(Map<String, Object> nodeProperties, int nodeType) {
 
         if (NodeType.PERSON == nodeType) {
+//            nodeProperties.remove("emc");
             nodeProperties.remove("nodeid");
             nodeProperties.put("invtype", "20");
 

@@ -88,6 +88,10 @@ public class DiscernAndStaffModel {
         Set<NodeWrapper> staffPersonNodes = nodes.stream()
                 .filter(node -> node.getType() == NodeType.PERSON)
                 .collect(Collectors.toSet());
+        for (NodeWrapper staffPersonNode : staffPersonNodes) {
+            String staffPersonId = staffPersonNode.obtainEntId();
+            Neo4jResultParseUtils.setFirstNode(graph.getNodeWrappers(), staffPersonId);
+        }
 
         // 获得当前成员节点信息集合
         Set<NodeWrapper> memberNodes = nodes.stream()
